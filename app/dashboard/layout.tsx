@@ -7,22 +7,22 @@ import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import { isAdminEmail } from '@/lib/config'
 
-const VENDOR_CONFIG = {
-  vendorName: 'Braids With Love',
-  hasProducts: true,
-  hasBookings: true,
-  hasAnalytics: true,
-  hasSubscription: true,
-} as const
+type NavItem = {
+  href: string
+  label: string
+  icon: ({ size, active }: { size?: number; active?: boolean }) => React.ReactElement
+  exact?: boolean
+  show?: boolean
+}
 
-const NAV_ITEMS = [
+const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard', label: 'Overview', icon: IconGrid, exact: true },
-  { href: '/dashboard/bookings', label: 'Bookings', icon: IconCalendar, show: VENDOR_CONFIG.hasBookings },
-  { href: '/dashboard/orders', label: 'Orders', icon: IconBox, show: VENDOR_CONFIG.hasProducts },
-  { href: '/dashboard/services', label: 'Services', icon: IconScissors, show: VENDOR_CONFIG.hasBookings },
-  { href: '/dashboard/products', label: 'Products', icon: IconTag, show: VENDOR_CONFIG.hasProducts },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: IconChart, show: VENDOR_CONFIG.hasAnalytics },
-  { href: '/dashboard/subscription', label: 'Subscription', icon: IconStar, show: VENDOR_CONFIG.hasSubscription },
+  { href: '/dashboard/bookings', label: 'Bookings', icon: IconCalendar, show: true },
+  { href: '/dashboard/orders', label: 'Orders', icon: IconBox, show: true },
+  { href: '/dashboard/services', label: 'Services', icon: IconScissors, show: true },
+  { href: '/dashboard/products', label: 'Products', icon: IconTag, show: true },
+  { href: '/dashboard/analytics', label: 'Analytics', icon: IconChart, show: true },
+  { href: '/dashboard/subscription', label: 'Subscription', icon: IconStar, show: true },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -40,61 +40,46 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   if (!user || !isAdminEmail(user.email)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0D2B35' }}>
-        <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#29C5CC', borderTopColor: 'transparent' }} />
+        <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: '#29C5CC', borderTopColor: 'transparent' }} />
       </div>
     )
   }
 
-  const visibleNav = NAV_ITEMS.filter(item => item.show !== false)
-
   return (
     <div className="min-h-screen flex" style={{ background: '#0A2028', color: '#F5F5F5', fontFamily: 'DM Sans, sans-serif' }}>
-      {/* Mobile overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-20 lg:hidden"
-          style={{ background: 'rgba(0,0,0,0.5)' }}
-          onClick={() => setSidebarOpen(false)}
-        />
+        <div className="fixed inset-0 z-20 lg:hidden" style={{ background: 'rgba(0,0,0,0.5)' }} onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-30 w-64 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
         style={{ background: '#0D2B35', borderRight: '1px solid rgba(41,197,204,0.12)' }}
       >
-        {/* Brand */}
         <div className="px-6 py-5 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(41,197,204,0.1)' }}>
-          <Image
-            src="/logo.png"
-            alt="Braids With Love"
-            width={40}
-            height={40}
-            className="rounded-full flex-shrink-0"
-            style={{ objectFit: 'cover' }}
-          />
+          <Image src="/logo.png" alt="Braids With Love" width={40} height={40} className="rounded-full flex-shrink-0" style={{ objectFit: 'cover' }} />
           <div>
             <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, fontWeight: 600, color: '#F5F5F5', lineHeight: 1.2 }}>Braids With Love</div>
             <div style={{ fontSize: 11, color: '#29C5CC', opacity: 0.8, marginTop: 1 }}>Admin Dashboard</div>
           </div>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 px-3 py-4 overflow-y-auto">
-          {visibleNav.map(item => {
-            const active = item.exact === true ? pathname === item.href : pathname.startsWith(item.href)
+          {NAV_ITEMS.filter(item => item.show !== false).map(item => {
+            const isExact = item.exact === true
+            const active = isExact ? pathname === item.href : pathname.startsWith(item.href)
             const Icon = item.icon
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 transition-colors"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1"
                 style={{
                   background: active ? 'rgba(41,197,204,0.12)' : 'transparent',
                   color: active ? '#29C5CC' : 'rgba(245,245,245,0.65)',
                   fontSize: 14,
                   fontWeight: active ? 500 : 400,
+                  textDecoration: 'none',
                 }}
               >
                 <Icon size={18} active={active} />
@@ -104,7 +89,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        {/* User footer */}
         <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(41,197,204,0.1)' }}>
           <div className="px-3 py-2 mb-2 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)' }}>
             <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.5)', marginBottom: 1 }}>Signed in as</div>
@@ -112,10 +96,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <button
             onClick={() => { logout(); router.push('/') }}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg"
             style={{ fontSize: 13, color: 'rgba(245,245,245,0.5)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#F5F5F5')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(245,245,245,0.5)')}
           >
             <IconLogout size={16} />
             Sign out
@@ -123,11 +105,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile topbar */}
         <header className="lg:hidden flex items-center gap-3 px-4 py-3 sticky top-0 z-10" style={{ background: '#0D2B35', borderBottom: '1px solid rgba(41,197,204,0.1)' }}>
-          <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded" style={{ color: '#29C5CC', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+          <button onClick={() => setSidebarOpen(true)} style={{ color: '#29C5CC', background: 'transparent', border: 'none', cursor: 'pointer', padding: 6 }}>
             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />
             </svg>
@@ -144,15 +124,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   )
 }
 
-// ── Icon components ──────────────────────────────────────────────────────────
-
 function IconGrid({ size = 20, active = false }: { size?: number; active?: boolean }) {
   return (
     <svg width={size} height={size} fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5} viewBox="0 0 24 24">
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="7" rx="1" />
-      <rect x="3" y="14" width="7" height="7" rx="1" />
-      <rect x="14" y="14" width="7" height="7" rx="1" />
+      <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
     </svg>
   )
 }
@@ -178,8 +154,7 @@ function IconBox({ size = 20, active = false }: { size?: number; active?: boolea
 function IconScissors({ size = 20, active = false }: { size?: number; active?: boolean }) {
   return (
     <svg width={size} height={size} fill="none" stroke="currentColor" strokeWidth={active ? 2 : 1.5} viewBox="0 0 24 24">
-      <circle cx="6" cy="6" r="3" />
-      <circle cx="6" cy="18" r="3" />
+      <circle cx="6" cy="6" r="3" /><circle cx="6" cy="18" r="3" />
       <path d="M20 4L8.12 15.88M14.47 14.48L20 20M8.12 8.12L12 12" strokeLinecap="round" />
     </svg>
   )
