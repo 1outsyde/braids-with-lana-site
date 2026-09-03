@@ -320,3 +320,60 @@ export async function customerLogin(params: LoginParams): Promise<AuthTokens> {
 export async function getMe(token: string): Promise<AuthUser> {
   return outsydeFetch<AuthUser>("/api/auth/me", { token });
 }
+
+// ─── BFF Client ───────────────────────────────────────────────────
+// Routes all calls through Next.js API routes (/api/*) so the backend
+// URL never reaches the browser. Used by auth-context.tsx.
+
+const BFF_BASE = '/api'
+
+async function bffRequest<T>(
+  method: string,
+  path: string,
+  body?: unknown,
+  extraHeaders?: Record<string, string>,
+  retry = true
+): Promise<{ data: T }> {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('outsyde_access_token') : null
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...extraHeaders,
+  }
+  const res = await fetch(`${BFF_BASE}${path}`, {
+    method,
+    headers,
+    credentials: 'include',
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+  })
+
+  if (res.status === 401 && retry) {
+    try {
+      await fetch(`${BFF_BASE}/auth/refresh`, { method: 'POST', credentials: 'include' })
+      return bffRequest<T>(method, path, body, extraHeaders, false)
+    } catch {
+      throw new Error('Unauthorized')
+    }
+  }
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({})) as Record<string, string>
+    throw Object.assign(new Error(err.message ?? err.error ?? 'Request failed'), {
+      response: { status: res.status, data: err },
+    })
+  }
+
+  const data = (await res.json()) as T
+  return { data }
+}
+
+export const outsydeClient = {
+  get: <T>(path: string, options?: { headers?: Record<string, string> }) =>
+    bffRequest<T>('GET', path, undefined, options?.headers),
+  post: <T>(path: string, body?: unknown, options?: { headers?: Record<string, string> }) =>
+    bffRequest<T>('POST', path, body, options?.headers),
+  patch: <T>(path: string, body?: unknown) =>
+    bffRequest<T>('PATCH', path, body),
+  delete: <T>(path: string) =>
+    bffRequest<T>('DELETE', path),
+}
