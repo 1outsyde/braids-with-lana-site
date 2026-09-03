@@ -1,1 +1,5 @@
-﻿import { redirect } from 'next/navigation' / export default function DashboardPage() { redirect('/dashboard/bookings') }
+﻿import { redirect } from 'next/navigation'
+
+export default function DashboardPage() {
+  redirect('/dashboard/bookings')
+}
