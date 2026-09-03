@@ -12,8 +12,8 @@
  *   const data = await getMe(token);
  */
 
-const ACCESS_TOKEN_KEY = "bwl_access_token";
-const REFRESH_TOKEN_KEY = "bwl_refresh_token";
+const ACCESS_TOKEN_KEY = "outsyde_access_token";
+const REFRESH_TOKEN_KEY = "outsyde_refresh_token";
 
 export function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;
