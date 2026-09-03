@@ -5,11 +5,12 @@ const BUSINESS_ID = process.env.OUTSYDE_BUSINESS_ID!
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   const body = await req.json()
 
-  const res = await fetch(`${API_URL}/api/vendor/products/${params.id}`, {
+  const res = await fetch(`${API_URL}/api/vendor/products/${id}`, {
     method: 'PATCH',
     headers: {
       'x-business-id': BUSINESS_ID,
@@ -25,9 +26,11 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const res = await fetch(`${API_URL}/api/vendor/products/${params.id}`, {
+  const { id } = await params
+
+  const res = await fetch(`${API_URL}/api/vendor/products/${id}`, {
     method: 'DELETE',
     headers: {
       'x-business-id': BUSINESS_ID,

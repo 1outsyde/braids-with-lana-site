@@ -5,11 +5,12 @@ const BUSINESS_ID = process.env.OUTSYDE_BUSINESS_ID!
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   const body = await req.json()
 
-  const res = await fetch(`${API_URL}/api/business/orders/${params.id}/fulfill`, {
+  const res = await fetch(`${API_URL}/api/business/orders/${id}/fulfill`, {
     method: 'PATCH',
     headers: {
       'x-business-id': BUSINESS_ID,

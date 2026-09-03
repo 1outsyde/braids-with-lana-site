@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
 import { isAdminEmail } from '@/lib/config'
 
@@ -25,18 +26,18 @@ const NAV_ITEMS = [
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading, logout } = useAuth()
+  const { user, logout } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    if (!loading && (!user || !isAdminEmail(user.email))) {
+    if (!user || !isAdminEmail(user.email)) {
       router.replace('/login')
     }
-  }, [user, loading, router])
+  }, [user, router])
 
-  if (loading || !user || !isAdminEmail(user.email)) {
+  if (!user || !isAdminEmail(user.email)) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0D2B35' }}>
         <div className="w-8 h-8 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#29C5CC', borderTopColor: 'transparent' }} />
@@ -63,10 +64,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         style={{ background: '#0D2B35', borderRight: '1px solid rgba(41,197,204,0.12)' }}
       >
         {/* Brand */}
-        <div className="px-6 py-6 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(41,197,204,0.1)' }}>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: '#29C5CC' }}>
-            <span style={{ color: '#0D2B35', fontSize: 14, fontFamily: 'Cormorant Garamond, serif', fontWeight: 700 }}>B</span>
-          </div>
+        <div className="px-6 py-5 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(41,197,204,0.1)' }}>
+          <Image
+            src="/logo.png"
+            alt="Braids With Love"
+            width={40}
+            height={40}
+            className="rounded-full flex-shrink-0"
+            style={{ objectFit: 'cover' }}
+          />
           <div>
             <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, fontWeight: 600, color: '#F5F5F5', lineHeight: 1.2 }}>Braids With Love</div>
             <div style={{ fontSize: 11, color: '#29C5CC', opacity: 0.8, marginTop: 1 }}>Admin Dashboard</div>
@@ -107,7 +113,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <button
             onClick={() => { logout(); router.push('/') }}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors"
-            style={{ fontSize: 13, color: 'rgba(245,245,245,0.5)' }}
+            style={{ fontSize: 13, color: 'rgba(245,245,245,0.5)', background: 'transparent', border: 'none', cursor: 'pointer' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#F5F5F5')}
             onMouseLeave={e => (e.currentTarget.style.color = 'rgba(245,245,245,0.5)')}
           >
@@ -121,11 +127,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile topbar */}
         <header className="lg:hidden flex items-center gap-3 px-4 py-3 sticky top-0 z-10" style={{ background: '#0D2B35', borderBottom: '1px solid rgba(41,197,204,0.1)' }}>
-          <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded" style={{ color: '#29C5CC' }}>
+          <button onClick={() => setSidebarOpen(true)} className="p-1.5 rounded" style={{ color: '#29C5CC', background: 'transparent', border: 'none', cursor: 'pointer' }}>
             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M3 12h18M3 6h18M3 18h18" strokeLinecap="round" />
             </svg>
           </button>
+          <Image src="/logo.png" alt="Braids With Love" width={28} height={28} className="rounded-full" />
           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 600, color: '#F5F5F5' }}>Braids With Love</span>
         </header>
 
@@ -137,7 +144,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   )
 }
 
-// ── Icon components ─────────────────────────────────────────────────────────
+// ── Icon components ──────────────────────────────────────────────────────────
 
 function IconGrid({ size = 20, active = false }: { size?: number; active?: boolean }) {
   return (
