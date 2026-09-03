@@ -11,6 +11,8 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        "teal-dark": "#0D2B35",
+        "teal-ink": "#112F3D",
         teal: {
           DEFAULT: "#29C5CC",
           50: "#E8FAFB",
@@ -83,6 +85,7 @@ const config: Config = {
         "bwl-gradient": "linear-gradient(to bottom, #29C5CC, #C9A84C)",
         "bwl-gradient-horizontal": "linear-gradient(to right, #29C5CC, #C9A84C)",
         "hero-glow": "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(41,197,204,0.12), transparent)",
+        "hero-overlay": "linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(13,43,53,0.7))",
       },
       boxShadow: {
         card: "0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3)",

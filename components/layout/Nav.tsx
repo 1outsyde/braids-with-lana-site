@@ -19,7 +19,7 @@ export default function Nav() {
   }, [])
 
   return (
-    <nav className="sticky top-0 z-50 bg-onyx border-b border-[var(--color-border)] backdrop-blur-sm">
+    <nav className="sticky top-0 z-50 bg-teal-dark border-b border-[var(--color-border)] backdrop-blur-sm">
       <div className="section-container flex items-center justify-between h-16">
         {/* Logo */}
         <Link
@@ -87,7 +87,7 @@ export default function Nav() {
 
       {/* Mobile menu */}
       {isOpen && (
-        <div className="md:hidden bg-onyx border-t border-[var(--color-border)]">
+        <div className="md:hidden bg-teal-dark border-t border-[var(--color-border)]">
           <div className="section-container py-6 flex flex-col gap-5">
             {NAV_LINKS.map((link) => (
               <Link

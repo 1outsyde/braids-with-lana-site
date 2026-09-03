@@ -2,9 +2,9 @@ import Link from "next/link"
 
 export default function Hero() {
   return (
-    <section className="relative min-h-[88vh] flex items-center overflow-hidden bg-onyx">
-      {/* Hero glow */}
-      <div className="absolute inset-0 bg-hero-glow pointer-events-none" aria-hidden="true" />
+    <section className="relative min-h-[88vh] flex items-center overflow-hidden bg-teal-dark hero-bg">
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-hero-overlay pointer-events-none" aria-hidden="true" />
 
       {/* Decorative rings */}
       <div

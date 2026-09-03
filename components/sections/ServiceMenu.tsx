@@ -11,7 +11,7 @@ export default function ServiceMenu() {
   const categories = Object.keys(grouped)
 
   return (
-    <section id="services" className="py-section-lg bg-surface">
+    <section id="services" className="py-section-lg bg-teal-ink">
       <div className="section-container">
         <div className="flex flex-col gap-3 mb-12">
           <p className="eyebrow">What we offer</p>

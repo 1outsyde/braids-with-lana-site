@@ -1,6 +1,6 @@
 export default function Contact() {
   return (
-    <section id="contact" className="py-section-lg bg-onyx">
+    <section id="contact" className="py-section-lg bg-teal-dark">
       <div className="section-container">
         <div className="flex flex-col gap-3 mb-12">
           <p className="eyebrow">Get in touch</p>

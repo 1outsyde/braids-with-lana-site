@@ -5,6 +5,8 @@
 :root {
   /* Color */
   --color-teal: #29C5CC;
+  --color-teal-dark: #0D2B35;
+  --color-teal-ink: #112F3D;
   --color-gold: #C9A84C;
   --color-white: #FFFFFF;
   --color-onyx: #0D0D0D;
@@ -66,7 +68,7 @@ html {
 }
 
 body {
-  background-color: var(--color-onyx);
+  background-color: var(--color-teal-dark);
   color: var(--color-white);
   font-family: var(--font-body);
   font-size: 1rem;
@@ -129,6 +131,14 @@ img {
 
 /* ─── Component Layer ─────────────────────────────────────────────── */
 @layer components {
+  /* Hero background photo */
+  .hero-bg {
+    background-image: url('https://images.unsplash.com/photo-1605980776566-0486c3ac7617?w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
   /* Gradient hairline — the BWL signature detail */
   .hairline-gradient {
     position: relative;
