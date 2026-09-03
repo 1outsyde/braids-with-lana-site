@@ -82,7 +82,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Nav */}
         <nav className="flex-1 px-3 py-4 overflow-y-auto">
           {visibleNav.map(item => {
-            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href) && !item.exact
+            const active = item.exact === true ? pathname === item.href : pathname.startsWith(item.href)
             const Icon = item.icon
             return (
               <Link
