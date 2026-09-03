@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
-import Nav from "@/components/layout/Nav";
-import Footer from "@/components/layout/Footer";
 import { AuthProvider } from "@/lib/auth-context";
 
 // ─── Font Loading ──────────────────────────────────────────────────
@@ -104,9 +102,7 @@ export default function RootLayout({
     >
       <body className="bg-teal-dark text-white font-body antialiased">
         <AuthProvider>
-          <Nav />
           {children}
-          <Footer />
         </AuthProvider>
       </body>
     </html>
