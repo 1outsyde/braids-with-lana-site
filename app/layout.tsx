@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, DM_Sans, DM_Mono } from "next/font/google";
 import "./globals.css";
+import Nav from "@/components/layout/Nav";
+import Footer from "@/components/layout/Footer";
 
 // ─── Font Loading ──────────────────────────────────────────────────
 const cormorant = Cormorant_Garamond({
@@ -100,7 +102,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-onyx text-white font-body antialiased">
+        <Nav />
         {children}
+        <Footer />
       </body>
     </html>
   );

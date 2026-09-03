@@ -1,0 +1,129 @@
+import type { Config } from "tailwindcss";
+
+const config: Config = {
+  content: [
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        teal: {
+          DEFAULT: "#29C5CC",
+          50: "#E8FAFB",
+          100: "#C4F1F3",
+          200: "#8AE5E8",
+          300: "#50D9DD",
+          400: "#29C5CC",
+          500: "#1EA4AA",
+          600: "#168389",
+          700: "#0E6368",
+          800: "#074347",
+          900: "#032325",
+        },
+        gold: {
+          DEFAULT: "#C9A84C",
+          50: "#FBF6E8",
+          100: "#F4E9C4",
+          200: "#E9D38A",
+          300: "#DEBB50",
+          400: "#C9A84C",
+          500: "#A8893C",
+          600: "#876B2D",
+          700: "#664E1F",
+          800: "#453211",
+          900: "#241A06",
+        },
+        onyx: {
+          DEFAULT: "#0D0D0D",
+          50: "#F5F5F5",
+          100: "#E0E0E0",
+          200: "#B0B0B0",
+          300: "#808080",
+          400: "#505050",
+          500: "#303030",
+          600: "#1A1A1A",
+          700: "#141414",
+          800: "#0D0D0D",
+          900: "#080808",
+        },
+        surface: "#141414",
+        muted: "#8A8A8A",
+      },
+      fontFamily: {
+        display: ["var(--font-cormorant)", "Georgia", "serif"],
+        body: ["var(--font-dm-sans)", "system-ui", "sans-serif"],
+        mono: ["var(--font-dm-mono)", "monospace"],
+      },
+      fontSize: {
+        "display-2xl": ["4.5rem", { lineHeight: "1.05", letterSpacing: "-0.02em" }],
+        "display-xl": ["3.75rem", { lineHeight: "1.08", letterSpacing: "-0.02em" }],
+        "display-lg": ["3rem", { lineHeight: "1.1", letterSpacing: "-0.015em" }],
+        "display-md": ["2.25rem", { lineHeight: "1.15", letterSpacing: "-0.01em" }],
+        "display-sm": ["1.875rem", { lineHeight: "1.2", letterSpacing: "-0.01em" }],
+        "body-xl": ["1.25rem", { lineHeight: "1.6" }],
+        "body-lg": ["1.125rem", { lineHeight: "1.65" }],
+        "body-md": ["1rem", { lineHeight: "1.7" }],
+        "body-sm": ["0.875rem", { lineHeight: "1.6" }],
+        "body-xs": ["0.75rem", { lineHeight: "1.5" }],
+        "mono-lg": ["1rem", { lineHeight: "1.4", letterSpacing: "0.02em" }],
+        "mono-md": ["0.875rem", { lineHeight: "1.4", letterSpacing: "0.02em" }],
+        "mono-sm": ["0.75rem", { lineHeight: "1.4", letterSpacing: "0.04em" }],
+      },
+      spacing: {
+        "section-sm": "4rem",
+        "section-md": "6rem",
+        "section-lg": "8rem",
+        "section-xl": "10rem",
+      },
+      backgroundImage: {
+        "bwl-gradient": "linear-gradient(to bottom, #29C5CC, #C9A84C)",
+        "bwl-gradient-horizontal": "linear-gradient(to right, #29C5CC, #C9A84C)",
+        "hero-glow": "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(41,197,204,0.12), transparent)",
+      },
+      boxShadow: {
+        card: "0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3)",
+        "card-hover": "0 4px 12px rgba(0,0,0,0.5), 0 12px 40px rgba(41,197,204,0.08)",
+        "glow-teal": "0 0 24px rgba(41,197,204,0.2)",
+        "glow-gold": "0 0 24px rgba(201,168,76,0.2)",
+      },
+      borderRadius: {
+        card: "12px",
+        pill: "9999px",
+      },
+      animation: {
+        "fade-up": "fadeUp 0.6s ease-out forwards",
+        "fade-in": "fadeIn 0.4s ease-out forwards",
+        shimmer: "shimmer 1.8s infinite",
+        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
+      keyframes: {
+        fadeUp: {
+          "0%": { opacity: "0", transform: "translateY(24px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        fadeIn: {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+      },
+      screens: {
+        xs: "390px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1280px",
+        "2xl": "1440px",
+        "3xl": "1920px",
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
