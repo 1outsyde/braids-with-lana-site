@@ -17,7 +17,7 @@ export default function Hero() {
       />
 
       <div className="section-container relative z-10 py-section-lg">
-        <div className="max-w-2xl flex flex-col gap-8 animate-fade-up opacity-0-start">
+        <div className="max-w-2xl flex flex-col gap-8 animate-fade-up">
           <p className="eyebrow">Professional Hair Braiding</p>
 
           <h1 className="font-display text-display-xl text-white">
