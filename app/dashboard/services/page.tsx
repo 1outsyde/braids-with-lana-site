@@ -183,10 +183,10 @@ export default function ServicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 600, color: '#F5F5F5', margin: 0 }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>
             Services
           </h1>
-          <p style={{ fontSize: 14, color: 'rgba(245,245,245,0.5)', marginTop: 4 }}>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>
             {services.length} service{services.length !== 1 ? 's' : ''} listed
           </p>
         </div>
@@ -200,9 +200,9 @@ export default function ServicesPage() {
 
       {/* Form modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: '#0D2B35', border: '1px solid rgba(41,197,204,0.2)' }}>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#F5F5F5', marginBottom: 24 }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 600, color: '#0D2B35', marginBottom: 24 }}>
               {editing ? 'Edit Service' : 'Add Service'}
             </h2>
 
@@ -262,12 +262,12 @@ export default function ServicesPage() {
                 />
               </Field>
 
-              <label className="flex items-center gap-3 cursor-pointer" style={{ fontSize: 14, color: 'rgba(245,245,245,0.75)' }}>
+              <label className="flex items-center gap-3 cursor-pointer" style={{ fontSize: 14, color: 'rgba(0,0,0,0.6)' }}>
                 <div
                   onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
                   style={{
                     width: 42, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer',
-                    background: form.is_active ? '#29C5CC' : 'rgba(245,245,245,0.15)',
+                    background: form.is_active ? '#C9A84C' : 'rgba(0,0,0,0.15)',
                     transition: 'background 0.2s',
                   }}
                 >
@@ -281,14 +281,14 @@ export default function ServicesPage() {
               </label>
 
               {formError && (
-                <p style={{ fontSize: 13, color: '#F87171', margin: 0 }}>{formError}</p>
+                <p style={{ fontSize: 13, color: '#991B1B', margin: 0 }}>{formError}</p>
               )}
             </div>
 
             <div className="flex gap-3 mt-6 justify-end">
               <button
                 onClick={closeForm}
-                style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: '1px solid rgba(245,245,245,0.15)', background: 'transparent', color: 'rgba(245,245,245,0.6)', cursor: 'pointer' }}
+                style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}
               >
                 Cancel
               </button>
@@ -306,14 +306,14 @@ export default function ServicesPage() {
 
       {/* Delete confirm modal */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#0D2B35', border: '1px solid rgba(239,68,68,0.3)' }}>
-            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, color: '#F5F5F5', marginBottom: 12 }}>Delete service?</h3>
-            <p style={{ fontSize: 14, color: 'rgba(245,245,245,0.55)', marginBottom: 24 }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.2)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, color: '#0D2B35', marginBottom: 12 }}>Delete service?</h3>
+            <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginBottom: 24 }}>
               This cannot be undone. Any future bookings for this service will need to be manually managed.
             </p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setDeleteConfirm(null)} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,245,245,0.15)', background: 'transparent', color: 'rgba(245,245,245,0.6)', cursor: 'pointer' }}>
+              <button onClick={() => setDeleteConfirm(null)} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>
                 Cancel
               </button>
               <button onClick={() => handleDelete(deleteConfirm)} disabled={deleting} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: 'none', background: '#EF4444', color: '#fff', fontWeight: 600, cursor: deleting ? 'not-allowed' : 'pointer', opacity: deleting ? 0.7 : 1 }}>
@@ -326,17 +326,31 @@ export default function ServicesPage() {
 
       {/* Content */}
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-6 h-6 rounded-full border-2 animate-spin" style={{ borderColor: '#29C5CC', borderTopColor: 'transparent' }} />
+        <div className="flex flex-col gap-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '20px 24px' }}>
+              <div style={{ height: 16, width: 180, borderRadius: 4, background: 'rgba(0,0,0,0.06)', marginBottom: 8 }} />
+              <div style={{ height: 12, width: 280, borderRadius: 4, background: 'rgba(0,0,0,0.04)' }} />
+            </div>
+          ))}
         </div>
       ) : error ? (
-        <div className="rounded-xl p-10 text-center" style={{ border: '1px solid rgba(239,68,68,0.2)' }}>
-          <p style={{ color: '#F87171' }}>{error}</p>
-          <button onClick={loadServices} style={{ marginTop: 12, fontSize: 13, color: '#29C5CC', background: 'transparent', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 8, padding: '6px 16px', cursor: 'pointer' }}>Try again</button>
+        <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.15)', padding: '48px 24px' }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 22 }}>
+            ⚠
+          </div>
+          <p style={{ color: '#991B1B', fontSize: 14, marginBottom: 16 }}>{error}</p>
+          <button onClick={loadServices} style={{ fontSize: 13, padding: '7px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Try again</button>
         </div>
       ) : services.length === 0 ? (
-        <div className="rounded-xl p-16 text-center" style={{ border: '1px dashed rgba(245,245,245,0.12)' }}>
-          <p style={{ fontSize: 15, color: 'rgba(245,245,245,0.4)', marginBottom: 20 }}>No services added yet</p>
+        <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '56px 24px' }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+            ✂
+          </div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 8 }}>
+            No services added yet
+          </div>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', marginBottom: 24 }}>Add your services so clients can book online</p>
           <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>
             Add your first service
           </button>
@@ -346,15 +360,15 @@ export default function ServicesPage() {
           {services.map(service => (
             <div
               key={service.id}
-              className="flex items-center gap-4 px-5 py-4 rounded-xl"
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(245,245,245,0.07)' }}
+              className="flex items-center gap-4 px-5 py-4 rounded-2xl"
+              style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}
             >
               {/* Active toggle */}
               <div
                 onClick={() => toggleActive(service)}
                 style={{
                   width: 38, height: 22, borderRadius: 11, position: 'relative', cursor: 'pointer', flexShrink: 0,
-                  background: service.is_active ? '#29C5CC' : 'rgba(245,245,245,0.15)',
+                  background: service.is_active ? '#C9A84C' : 'rgba(0,0,0,0.15)',
                   transition: 'background 0.2s',
                 }}
               >
@@ -362,26 +376,27 @@ export default function ServicesPage() {
                   position: 'absolute', top: 2, left: service.is_active ? 18 : 2,
                   width: 18, height: 18, borderRadius: '50%', background: '#fff',
                   transition: 'left 0.2s',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
                 }} />
               </div>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span style={{ fontSize: 15, fontWeight: 500, color: '#F5F5F5' }}>{service.name}</span>
+                  <span style={{ fontSize: 15, fontWeight: 500, color: '#0D2B35' }}>{service.name}</span>
                   {service.category && (
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(41,197,204,0.1)', color: '#29C5CC' }}>
+                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(13,43,53,0.07)', color: '#0D2B35' }}>
                       {service.category}
                     </span>
                   )}
                   {!service.is_active && (
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(156,163,175,0.12)', color: '#9CA3AF' }}>
+                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: '#F3F4F6', color: '#6B7280' }}>
                       Hidden
                     </span>
                   )}
                 </div>
                 {service.description && (
-                  <p style={{ fontSize: 13, color: 'rgba(245,245,245,0.45)', marginTop: 3, marginBottom: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.45)', marginTop: 3, marginBottom: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {service.description}
                   </p>
                 )}
@@ -390,20 +405,20 @@ export default function ServicesPage() {
               {/* Price + duration */}
               <div className="text-right flex-shrink-0 hidden sm:block">
                 <div style={{ fontSize: 15, fontWeight: 600, color: '#C9A84C' }}>{fmtPrice(service.price)}</div>
-                <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.4)', marginTop: 2 }}>{fmtDuration(service.duration_minutes)}</div>
+                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>{fmtDuration(service.duration_minutes)}</div>
               </div>
 
               {/* Actions */}
               <div className="flex gap-2 flex-shrink-0">
                 <button
                   onClick={() => openEdit(service)}
-                  style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid rgba(245,245,245,0.15)', background: 'transparent', color: 'rgba(245,245,245,0.65)', cursor: 'pointer' }}
+                  style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => setDeleteConfirm(service.id)}
-                  style={{ fontSize: 12, padding: '5px 12px', borderRadius: 7, border: '1px solid rgba(239,68,68,0.25)', background: 'transparent', color: '#F87171', cursor: 'pointer' }}
+                  style={{ fontSize: 12, padding: '5px 12px', borderRadius: 7, border: '1px solid rgba(239,68,68,0.25)', background: 'transparent', color: '#991B1B', cursor: 'pointer' }}
                 >
                   Delete
                 </button>
@@ -423,9 +438,9 @@ const inputStyle: React.CSSProperties = {
   fontSize: 14,
   padding: '9px 12px',
   borderRadius: 8,
-  border: '1px solid rgba(245,245,245,0.12)',
-  background: 'rgba(255,255,255,0.05)',
-  color: '#F5F5F5',
+  border: '1px solid rgba(0,0,0,0.12)',
+  background: '#F5F7F8',
+  color: '#1A1A1A',
   outline: 'none',
   boxSizing: 'border-box',
 }
@@ -433,7 +448,7 @@ const inputStyle: React.CSSProperties = {
 function Field({ label, children, style }: { label: string; children: React.ReactNode; style?: React.CSSProperties }) {
   return (
     <div style={style}>
-      <label style={{ fontSize: 12, color: 'rgba(245,245,245,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+      <label style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
         {label}
       </label>
       {children}

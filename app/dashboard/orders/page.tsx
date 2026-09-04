@@ -25,11 +25,11 @@ interface Order {
 type ShipForm = { trackingNumber: string; carrier: string }
 
 const STATUS_STYLE: Record<string, { bg: string; color: string }> = {
-  pending:   { bg: 'rgba(156,163,175,0.15)', color: '#9CA3AF' },
-  paid:      { bg: 'rgba(201,168,76,0.15)',  color: '#C9A84C' },
-  shipped:   { bg: 'rgba(59,130,246,0.15)',  color: '#60A5FA' },
-  delivered: { bg: 'rgba(34,197,94,0.15)',   color: '#4ADE80' },
-  cancelled: { bg: 'rgba(239,68,68,0.15)',   color: '#F87171' },
+  pending:   { bg: '#F3F4F6', color: '#6B7280' },
+  paid:      { bg: '#FEF3C7', color: '#92400E' },
+  shipped:   { bg: '#DBEAFE', color: '#1E40AF' },
+  delivered: { bg: '#D1FAE5', color: '#065F46' },
+  cancelled: { bg: '#FEE2E2', color: '#991B1B' },
 }
 
 function fmtOrderNum(n: number) { return `#${String(n).padStart(4, '0')}` }
@@ -108,29 +108,29 @@ export default function OrdersPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 600, color: '#F5F5F5', margin: 0 }}>Orders</h1>
-          <p style={{ fontSize: 14, color: 'rgba(245,245,245,0.5)', marginTop: 4 }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>Orders</h1>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>
             {pendingOrders.length > 0 ? `${pendingOrders.length} awaiting fulfillment` : 'All orders fulfilled'}
           </p>
         </div>
-        <button onClick={loadOrders} style={{ fontSize: 13, color: '#29C5CC', background: 'transparent', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 8, padding: '6px 14px', cursor: 'pointer' }}>
+        <button onClick={loadOrders} style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 8, padding: '6px 14px', cursor: 'pointer' }}>
           Refresh
         </button>
       </div>
 
       {/* Ship modal */}
       {shipModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="w-full max-w-md rounded-2xl p-6" style={{ background: '#0D2B35', border: '1px solid rgba(41,197,204,0.2)' }}>
-            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, color: '#F5F5F5', marginBottom: 6 }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="w-full max-w-md rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 600, color: '#0D2B35', marginBottom: 6 }}>
               Ship {fmtOrderNum(shipModal.order_number)}
             </h3>
-            <p style={{ fontSize: 13, color: 'rgba(245,245,245,0.5)', marginBottom: 24 }}>
+            <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.45)', marginBottom: 24 }}>
               Enter tracking information to mark this order as shipped.
             </p>
             <div className="flex flex-col gap-4">
               <div>
-                <label style={{ fontSize: 12, color: 'rgba(245,245,245,0.5)', display: 'block', marginBottom: 6 }}>Tracking number *</label>
+                <label style={labelStyle}>Tracking number *</label>
                 <input
                   value={shipForm.trackingNumber}
                   onChange={e => setShipForm(f => ({ ...f, trackingNumber: e.target.value }))}
@@ -139,7 +139,7 @@ export default function OrdersPage() {
                 />
               </div>
               <div>
-                <label style={{ fontSize: 12, color: 'rgba(245,245,245,0.5)', display: 'block', marginBottom: 6 }}>Carrier</label>
+                <label style={labelStyle}>Carrier</label>
                 <select
                   value={shipForm.carrier}
                   onChange={e => setShipForm(f => ({ ...f, carrier: e.target.value }))}
@@ -155,13 +155,13 @@ export default function OrdersPage() {
               </div>
             </div>
             <div className="flex gap-3 justify-end mt-6">
-              <button onClick={() => setShipModal(null)} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,245,245,0.15)', background: 'transparent', color: 'rgba(245,245,245,0.6)', cursor: 'pointer' }}>
+              <button onClick={() => setShipModal(null)} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>
                 Cancel
               </button>
               <button
                 onClick={() => handleShip(shipModal)}
                 disabled={!!actionLoading}
-                style={{ fontSize: 13, padding: '7px 18px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: actionLoading ? 'not-allowed' : 'pointer', opacity: actionLoading ? 0.7 : 1 }}
+                style={{ fontSize: 13, padding: '7px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: actionLoading ? 'not-allowed' : 'pointer', opacity: actionLoading ? 0.7 : 1 }}
               >
                 {actionLoading ? 'Shipping…' : 'Mark shipped'}
               </button>
@@ -171,17 +171,29 @@ export default function OrdersPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-6 h-6 rounded-full border-2 animate-spin" style={{ borderColor: '#29C5CC', borderTopColor: 'transparent' }} />
+        <div className="flex flex-col gap-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '20px 24px' }}>
+              <div style={{ height: 14, width: 120, borderRadius: 4, background: 'rgba(0,0,0,0.06)', marginBottom: 8 }} />
+              <div style={{ height: 12, width: 200, borderRadius: 4, background: 'rgba(0,0,0,0.04)' }} />
+            </div>
+          ))}
         </div>
       ) : error ? (
-        <div className="rounded-xl p-10 text-center" style={{ border: '1px solid rgba(239,68,68,0.2)' }}>
-          <p style={{ color: '#F87171', marginBottom: 12 }}>{error}</p>
-          <button onClick={loadOrders} style={{ fontSize: 13, color: '#29C5CC', background: 'transparent', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 8, padding: '6px 16px', cursor: 'pointer' }}>Try again</button>
+        <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.15)', padding: '48px 24px' }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 22 }}>
+            ⚠
+          </div>
+          <p style={{ color: '#991B1B', fontSize: 14, marginBottom: 16 }}>{error}</p>
+          <button onClick={loadOrders} style={{ fontSize: 13, padding: '7px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Try again</button>
         </div>
       ) : orders.length === 0 ? (
-        <div className="rounded-xl p-16 text-center" style={{ border: '1px solid rgba(245,245,245,0.08)' }}>
-          <p style={{ fontSize: 15, color: 'rgba(245,245,245,0.4)', margin: 0 }}>No orders yet</p>
+        <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '56px 24px' }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+            📦
+          </div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 8 }}>No orders yet</div>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', margin: 0 }}>Orders will appear here once customers purchase</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -189,43 +201,43 @@ export default function OrdersPage() {
             const st = STATUS_STYLE[order.status] ?? STATUS_STYLE.pending
             const isOpen = expanded === order.id
             return (
-              <div key={order.id} className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(245,245,245,0.08)', background: 'rgba(255,255,255,0.02)' }}>
+              <div key={order.id} className="rounded-2xl overflow-hidden" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}>
                 <div
                   className="flex items-center gap-4 px-5 py-4 cursor-pointer"
                   onClick={() => setExpanded(isOpen ? null : order.id)}
                 >
-                  <span style={{ fontSize: 13, color: '#29C5CC', fontFamily: 'DM Mono, monospace', flexShrink: 0 }}>
+                  <span style={{ fontSize: 13, color: '#C9A84C', fontFamily: 'DM Mono, monospace', flexShrink: 0, fontWeight: 500 }}>
                     {fmtOrderNum(order.order_number)}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div style={{ fontSize: 14, color: '#F5F5F5', fontWeight: 500 }}>{order.customer_name}</div>
-                    <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.4)', marginTop: 2 }}>{fmtDate(order.created_at)}</div>
+                    <div style={{ fontSize: 14, color: '#0D2B35', fontWeight: 500 }}>{order.customer_name}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>{fmtDate(order.created_at)}</div>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: '#C9A84C', flexShrink: 0 }}>{fmtMoney(order.total_amount)}</div>
-                  <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 12, background: st.bg, color: st.color, flexShrink: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#C9A84C', flexShrink: 0 }}>{fmtMoney(order.total_amount)}</div>
+                  <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 10, background: st.bg, color: st.color, flexShrink: 0 }}>
                     {order.status.toUpperCase()}
                   </span>
-                  <svg width="16" height="16" fill="none" stroke="rgba(245,245,245,0.4)" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                  <svg width="16" height="16" fill="none" stroke="rgba(0,0,0,0.35)" strokeWidth="2" viewBox="0 0 24 24" style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
                     <path d="M6 9l6 6 6-6" strokeLinecap="round" />
                   </svg>
                 </div>
 
                 {isOpen && (
-                  <div style={{ borderTop: '1px solid rgba(245,245,245,0.06)', padding: '16px 20px' }}>
-                    <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.4)', marginBottom: 10 }}>{order.customer_email}</div>
+                  <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', padding: '16px 20px', background: '#FAFAFA' }}>
+                    <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginBottom: 12 }}>{order.customer_email}</div>
                     <div className="flex flex-col gap-2 mb-4">
                       {(order.items ?? []).map((item, i) => (
                         <div key={i} className="flex justify-between" style={{ fontSize: 13 }}>
-                          <span style={{ color: 'rgba(245,245,245,0.75)' }}>
+                          <span style={{ color: 'rgba(0,0,0,0.65)' }}>
                             {item.name}{item.variant_label ? ` — ${item.variant_label}` : ''} × {item.quantity}
                           </span>
-                          <span style={{ color: 'rgba(245,245,245,0.5)' }}>{fmtMoney(item.price * item.quantity)}</span>
+                          <span style={{ color: 'rgba(0,0,0,0.45)' }}>{fmtMoney(item.price * item.quantity)}</span>
                         </div>
                       ))}
                     </div>
                     {order.tracking_number && (
-                      <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.5)', marginBottom: 12 }}>
-                        Tracking: <span style={{ color: '#29C5CC' }}>{order.tracking_number}</span>
+                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginBottom: 12 }}>
+                        Tracking: <span style={{ color: '#1E40AF', fontWeight: 500 }}>{order.tracking_number}</span>
                         {order.carrier ? ` via ${order.carrier}` : ''}
                       </div>
                     )}
@@ -242,7 +254,7 @@ export default function OrdersPage() {
                         <button
                           onClick={() => handleCancel(order.id)}
                           disabled={!!actionLoading}
-                          style={{ fontSize: 13, padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#F87171', cursor: 'pointer' }}
+                          style={{ fontSize: 13, padding: '6px 14px', borderRadius: 8, border: '1px solid rgba(239,68,68,0.3)', background: 'transparent', color: '#991B1B', cursor: 'pointer' }}
                         >
                           Cancel
                         </button>
@@ -261,6 +273,10 @@ export default function OrdersPage() {
 
 const inputStyle: React.CSSProperties = {
   width: '100%', fontSize: 14, padding: '9px 12px', borderRadius: 8,
-  border: '1px solid rgba(245,245,245,0.12)', background: 'rgba(255,255,255,0.05)',
-  color: '#F5F5F5', outline: 'none', boxSizing: 'border-box',
+  border: '1px solid rgba(0,0,0,0.12)', background: '#F5F7F8',
+  color: '#1A1A1A', outline: 'none', boxSizing: 'border-box',
+}
+
+const labelStyle: React.CSSProperties = {
+  fontSize: 12, color: 'rgba(0,0,0,0.5)', display: 'block', marginBottom: 6, fontWeight: 500,
 }
