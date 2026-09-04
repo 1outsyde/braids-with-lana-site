@@ -64,7 +64,11 @@ function Nav({ scrolled }: { scrolled: boolean }) {
 }
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
-function Hero() {
+function Hero({ heroImage }: { heroImage: string | null }) {
+  const panelStyle: React.CSSProperties = heroImage
+    ? { backgroundImage: `url('${heroImage}')`, backgroundSize: 'cover', backgroundPosition: 'center top' }
+    : { background: '#29C5CC' }
+
   return (
     <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'stretch', overflow: 'hidden', background: '#f8fafa' }}>
       {/* Left — text */}
@@ -109,20 +113,23 @@ function Hero() {
       <div style={{ flex: '0 0 50%', position: 'relative', minHeight: 600 }}>
         <div style={{
           position: 'absolute', top: 0, right: 0, bottom: 0, left: '8%',
-          background: '#29C5CC',
+          ...panelStyle,
           borderRadius: '0 0 0 48px', overflow: 'hidden',
         }}>
-          <div style={{ position: 'absolute', inset: 0, opacity: 0.15, backgroundImage: 'radial-gradient(circle at 30% 70%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 40%)' }} />
-          {/* Placeholder — replace with hero.jpg once available */}
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-            <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', fontWeight: 600, marginBottom: 4 }}>Add photo to /public/hero.jpg</div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>Replace teal panel with real photo</div>
-            </div>
-          </div>
+          {!heroImage && (
+            <>
+              <div style={{ position: 'absolute', inset: 0, opacity: 0.15, backgroundImage: 'radial-gradient(circle at 30% 70%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 40%)' }} />
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', fontWeight: 600, marginBottom: 4 }}>Upload a hero photo from the dashboard</div>
+                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>Settings → Site Hero Image</div>
+                </div>
+              </div>
+            </>
+          )}
           {/* Floating card */}
           <div style={{ position: 'absolute', bottom: 48, left: 32, background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(41,197,204,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>✂️</div>
@@ -331,6 +338,7 @@ export default function HomePage() {
   const [services, setServices] = useState<Service[]>([])
   const [servicesLoading, setServicesLoading] = useState(true)
   const [scrolled, setScrolled] = useState(false)
+  const [heroImage, setHeroImage] = useState<string | null>(null)
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 60)
@@ -350,12 +358,17 @@ export default function HomePage() {
       .then(data => setServices(data.services ?? []))
       .catch(() => setServices([]))
       .finally(() => setServicesLoading(false))
+
+    fetch(`${apiUrl}/api/vendor/profile?businessId=${businessId}`)
+      .then(r => r.json())
+      .then(data => setHeroImage(data.heroImageUrl ?? null))
+      .catch(() => null)
   }, [])
 
   return (
     <div style={{ fontFamily: 'DM Sans, sans-serif', color: '#4a6872', background: '#f8fafa' }}>
       <Nav scrolled={scrolled} />
-      <Hero />
+      <Hero heroImage={heroImage} />
       <Services services={services} loading={servicesLoading} />
       <Why />
       <BookCTA />
