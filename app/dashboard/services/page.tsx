@@ -2,27 +2,32 @@
 
 import { useEffect, useState } from 'react'
 
-interface Service {
+interface VendorService {
   id: string
   name: string
-  description?: string
+  description: string | null
   price: number          // cents
-  duration_minutes: number
-  is_active: boolean
-  category?: string
+  durationMinutes: number
+  category: string | null
+  isActive: boolean
+  isFeatured: boolean
+  status: 'draft' | 'live' | 'archived'
+  stripeProductId: string | null
+  stripePriceId: string | null
+  createdAt: string
 }
 
 type FormData = {
   name: string
   description: string
   price: string          // dollars (user input)
-  duration_minutes: string
+  durationMinutes: string
   category: string
-  is_active: boolean
+  isActive: boolean
 }
 
 const EMPTY_FORM: FormData = {
-  name: '', description: '', price: '', duration_minutes: '60', category: '', is_active: true,
+  name: '', description: '', price: '', durationMinutes: '60', category: '', isActive: true,
 }
 
 const DURATION_OPTIONS = [
@@ -38,6 +43,20 @@ const DURATION_OPTIONS = [
   { value: '360', label: '6 hrs' },
 ]
 
+const STATUS_BADGE: Record<string, { bg: string; color: string; label: string }> = {
+  live:     { bg: '#29C5CC', color: '#fff', label: 'LIVE'     },
+  paused:   { bg: '#C9A84C', color: '#fff', label: 'PAUSED'   },
+  draft:    { bg: '#9CA3AF', color: '#fff', label: 'DRAFT'    },
+  archived: { bg: '#7F1D1D', color: '#fff', label: 'ARCHIVED' },
+}
+
+function getDisplayStatus(s: VendorService) {
+  if (s.status === 'archived') return 'archived'
+  if (s.status === 'live' && !s.isActive) return 'paused'
+  if (s.status === 'live' && s.isActive) return 'live'
+  return 'draft'
+}
+
 function fmtPrice(cents: number) {
   return `$${(cents / 100).toFixed(2)}`
 }
@@ -49,23 +68,31 @@ function fmtDuration(minutes: number) {
   return m ? `${h} hr ${m} min` : `${h} hr${h > 1 ? 's' : ''}`
 }
 
+function authHeaders(token: string | null): Record<string, string> {
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
+
 export default function ServicesPage() {
-  const [services, setServices] = useState<Service[]>([])
+  const [services, setServices] = useState<VendorService[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
-  const [editing, setEditing] = useState<Service | null>(null)
+  const [editing, setEditing] = useState<VendorService | null>(null)
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+  const [publishing, setPublishing] = useState<string | null>(null)
 
   async function loadServices() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch('/api/admin/services')
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch('/api/admin/services', {
+        headers: authHeaders(token),
+      })
       if (!res.ok) throw new Error()
       const data = await res.json()
       setServices(Array.isArray(data) ? data : (data.services ?? []))
@@ -85,15 +112,15 @@ export default function ServicesPage() {
     setShowForm(true)
   }
 
-  function openEdit(service: Service) {
+  function openEdit(service: VendorService) {
     setEditing(service)
     setForm({
       name: service.name,
       description: service.description ?? '',
       price: (service.price / 100).toFixed(2),
-      duration_minutes: String(service.duration_minutes),
+      durationMinutes: String(service.durationMinutes),
       category: service.category ?? '',
-      is_active: service.is_active,
+      isActive: service.isActive,
     })
     setFormError(null)
     setShowForm(true)
@@ -111,35 +138,36 @@ export default function ServicesPage() {
     if (!form.name.trim()) { setFormError('Service name is required.'); return }
     const price = parseFloat(form.price)
     if (isNaN(price) || price < 0) { setFormError('Enter a valid price.'); return }
-    const duration = parseInt(form.duration_minutes)
+    const duration = parseInt(form.durationMinutes)
     if (!duration || duration < 15) { setFormError('Duration must be at least 15 minutes.'); return }
 
     setSaving(true)
     try {
+      const token = localStorage.getItem('outsyde_access_token')
       const payload = {
         name: form.name.trim(),
-        description: form.description.trim() || undefined,
+        description: form.description.trim() || null,
         price: Math.round(price * 100),
-        duration_minutes: duration,
-        category: form.category.trim() || undefined,
-        is_active: form.is_active,
+        durationMinutes: duration,
+        category: form.category.trim() || null,
+        isActive: form.isActive,
       }
 
       const res = editing
         ? await fetch(`/api/admin/services/${editing.id}`, {
             method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
             body: JSON.stringify(payload),
           })
         : await fetch('/api/admin/services', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
             body: JSON.stringify(payload),
           })
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(err.message ?? 'Save failed')
+        throw new Error((err as { message?: string }).message ?? 'Save failed')
       }
 
       closeForm()
@@ -151,10 +179,56 @@ export default function ServicesPage() {
     }
   }
 
+  async function handlePublish(service: VendorService) {
+    setPublishing(service.id)
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const isFirstPublish = !service.stripeProductId
+
+      if (isFirstPublish) {
+        const res = await fetch(`/api/admin/services/${service.id}/go-live`, {
+          method: 'POST',
+          headers: authHeaders(token),
+        })
+        if (!res.ok) throw new Error('Publish failed')
+      } else {
+        const res = await fetch(`/api/admin/services/${service.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+          body: JSON.stringify({ status: 'live', isActive: true }),
+        })
+        if (!res.ok) throw new Error('Publish failed')
+      }
+
+      await loadServices()
+    } catch {
+      alert('Could not publish service. Please try again.')
+    } finally {
+      setPublishing(null)
+    }
+  }
+
+  async function handleArchive(service: VendorService) {
+    const token = localStorage.getItem('outsyde_access_token')
+    try {
+      await fetch(`/api/admin/services/${service.id}/archive`, {
+        method: 'POST',
+        headers: authHeaders(token),
+      })
+      await loadServices()
+    } catch {
+      alert('Could not archive service.')
+    }
+  }
+
   async function handleDelete(id: string) {
     setDeleting(true)
     try {
-      const res = await fetch(`/api/admin/services/${id}`, { method: 'DELETE' })
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch(`/api/admin/services/${id}`, {
+        method: 'DELETE',
+        headers: authHeaders(token),
+      })
       if (!res.ok) throw new Error()
       setDeleteConfirm(null)
       await loadServices()
@@ -165,12 +239,13 @@ export default function ServicesPage() {
     }
   }
 
-  async function toggleActive(service: Service) {
+  async function toggleActive(service: VendorService) {
     try {
+      const token = localStorage.getItem('outsyde_access_token')
       await fetch(`/api/admin/services/${service.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ is_active: !service.is_active }),
+        headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+        body: JSON.stringify({ isActive: !service.isActive }),
       })
       await loadServices()
     } catch {
@@ -241,14 +316,13 @@ export default function ServicesPage() {
 
                 <Field label="Duration *" style={{ flex: 1 }}>
                   <select
-                    value={form.duration_minutes}
-                    onChange={e => setForm(f => ({ ...f, duration_minutes: e.target.value }))}
+                    value={form.durationMinutes}
+                    onChange={e => setForm(f => ({ ...f, durationMinutes: e.target.value }))}
                     style={{ ...inputStyle, cursor: 'pointer' }}
                   >
                     {DURATION_OPTIONS.map(o => (
                       <option key={o.value} value={o.value}>{o.label}</option>
                     ))}
-                    <option value="custom">Custom</option>
                   </select>
                 </Field>
               </div>
@@ -264,20 +338,20 @@ export default function ServicesPage() {
 
               <label className="flex items-center gap-3 cursor-pointer" style={{ fontSize: 14, color: 'rgba(0,0,0,0.6)' }}>
                 <div
-                  onClick={() => setForm(f => ({ ...f, is_active: !f.is_active }))}
+                  onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))}
                   style={{
                     width: 42, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer',
-                    background: form.is_active ? '#C9A84C' : 'rgba(0,0,0,0.15)',
+                    background: form.isActive ? '#C9A84C' : 'rgba(0,0,0,0.15)',
                     transition: 'background 0.2s',
                   }}
                 >
                   <div style={{
-                    position: 'absolute', top: 3, left: form.is_active ? 21 : 3,
+                    position: 'absolute', top: 3, left: form.isActive ? 21 : 3,
                     width: 18, height: 18, borderRadius: '50%', background: '#fff',
                     transition: 'left 0.2s',
                   }} />
                 </div>
-                Active (visible to clients)
+                Active (visible to clients when live)
               </label>
 
               {formError && (
@@ -357,74 +431,117 @@ export default function ServicesPage() {
         </div>
       ) : (
         <div className="grid gap-3">
-          {services.map(service => (
-            <div
-              key={service.id}
-              className="flex items-center gap-4 px-5 py-4 rounded-2xl"
-              style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}
-            >
-              {/* Active toggle */}
-              <div
-                onClick={() => toggleActive(service)}
-                style={{
-                  width: 38, height: 22, borderRadius: 11, position: 'relative', cursor: 'pointer', flexShrink: 0,
-                  background: service.is_active ? '#C9A84C' : 'rgba(0,0,0,0.15)',
-                  transition: 'background 0.2s',
-                }}
-              >
-                <div style={{
-                  position: 'absolute', top: 2, left: service.is_active ? 18 : 2,
-                  width: 18, height: 18, borderRadius: '50%', background: '#fff',
-                  transition: 'left 0.2s',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
-                }} />
-              </div>
+          {services.map(service => {
+            const displayStatus = getDisplayStatus(service)
+            const badge = STATUS_BADGE[displayStatus]
+            const isPublishing = publishing === service.id
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span style={{ fontSize: 15, fontWeight: 500, color: '#0D2B35' }}>{service.name}</span>
-                  {service.category && (
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(13,43,53,0.07)', color: '#0D2B35' }}>
-                      {service.category}
-                    </span>
-                  )}
-                  {!service.is_active && (
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: '#F3F4F6', color: '#6B7280' }}>
-                      Hidden
-                    </span>
+            return (
+              <div
+                key={service.id}
+                className="flex items-center gap-4 px-5 py-4 rounded-2xl"
+                style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}
+              >
+                {/* Active toggle — only for live services */}
+                {service.status === 'live' && (
+                  <div
+                    onClick={() => toggleActive(service)}
+                    title={service.isActive ? 'Click to pause (hide from homepage)' : 'Click to make visible'}
+                    style={{
+                      width: 38, height: 22, borderRadius: 11, position: 'relative', cursor: 'pointer', flexShrink: 0,
+                      background: service.isActive ? '#C9A84C' : 'rgba(0,0,0,0.15)',
+                      transition: 'background 0.2s',
+                    }}
+                  >
+                    <div style={{
+                      position: 'absolute', top: 2, left: service.isActive ? 18 : 2,
+                      width: 18, height: 18, borderRadius: '50%', background: '#fff',
+                      transition: 'left 0.2s',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+                    }} />
+                  </div>
+                )}
+                {service.status !== 'live' && (
+                  <div style={{ width: 38, flexShrink: 0 }} />
+                )}
+
+                {/* Status badge */}
+                <span style={{
+                  fontSize: 10, fontWeight: 700, letterSpacing: '0.08em',
+                  padding: '3px 8px', borderRadius: 4,
+                  background: badge.bg, color: badge.color,
+                  flexShrink: 0,
+                }}>
+                  {badge.label}
+                </span>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#0D2B35' }}>{service.name}</span>
+                    {service.category && (
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(13,43,53,0.07)', color: '#0D2B35' }}>
+                        {service.category}
+                      </span>
+                    )}
+                  </div>
+                  {service.description && (
+                    <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.45)', marginTop: 3, marginBottom: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {service.description}
+                    </p>
                   )}
                 </div>
-                {service.description && (
-                  <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.45)', marginTop: 3, marginBottom: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {service.description}
-                  </p>
-                )}
-              </div>
 
-              {/* Price + duration */}
-              <div className="text-right flex-shrink-0 hidden sm:block">
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#C9A84C' }}>{fmtPrice(service.price)}</div>
-                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>{fmtDuration(service.duration_minutes)}</div>
-              </div>
+                {/* Price + duration */}
+                <div className="text-right flex-shrink-0 hidden sm:block">
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#C9A84C' }}>{fmtPrice(service.price)}</div>
+                  <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>{fmtDuration(service.durationMinutes)}</div>
+                </div>
 
-              {/* Actions */}
-              <div className="flex gap-2 flex-shrink-0">
-                <button
-                  onClick={() => openEdit(service)}
-                  style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => setDeleteConfirm(service.id)}
-                  style={{ fontSize: 12, padding: '5px 12px', borderRadius: 7, border: '1px solid rgba(239,68,68,0.25)', background: 'transparent', color: '#991B1B', cursor: 'pointer' }}
-                >
-                  Delete
-                </button>
+                {/* Actions */}
+                <div className="flex gap-2 flex-shrink-0">
+                  {displayStatus === 'draft' && (
+                    <button
+                      onClick={() => handlePublish(service)}
+                      disabled={isPublishing}
+                      style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: 'none', background: '#29C5CC', color: '#fff', fontWeight: 600, cursor: isPublishing ? 'not-allowed' : 'pointer', opacity: isPublishing ? 0.7 : 1 }}
+                    >
+                      {isPublishing ? 'Publishing…' : 'Publish'}
+                    </button>
+                  )}
+                  {displayStatus === 'paused' && (
+                    <button
+                      onClick={() => handlePublish(service)}
+                      disabled={isPublishing}
+                      style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: 'none', background: '#29C5CC', color: '#fff', fontWeight: 600, cursor: isPublishing ? 'not-allowed' : 'pointer', opacity: isPublishing ? 0.7 : 1 }}
+                    >
+                      {isPublishing ? 'Activating…' : 'Re-activate'}
+                    </button>
+                  )}
+                  {displayStatus === 'live' && (
+                    <button
+                      onClick={() => handleArchive(service)}
+                      style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.45)', cursor: 'pointer' }}
+                    >
+                      Archive
+                    </button>
+                  )}
+                  <button
+                    onClick={() => openEdit(service)}
+                    style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirm(service.id)}
+                    style={{ fontSize: 12, padding: '5px 12px', borderRadius: 7, border: '1px solid rgba(239,68,68,0.25)', background: 'transparent', color: '#991B1B', cursor: 'pointer' }}
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

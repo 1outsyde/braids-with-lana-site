@@ -353,7 +353,7 @@ export default function HomePage() {
       setServicesLoading(false)
       return
     }
-    fetch(`${apiUrl}/api/vendor/services?businessId=${businessId}`)
+    fetch(`${apiUrl}/api/businesses/${businessId}/services`)
       .then(r => r.json())
       .then(data => setServices(data.services ?? []))
       .catch(() => setServices([]))
