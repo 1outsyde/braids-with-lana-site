@@ -22,6 +22,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/products', label: 'PRODUCTS', show: VENDOR_CONFIG.hasProducts },
   { href: '/dashboard/analytics', label: 'ANALYTICS', show: VENDOR_CONFIG.hasAnalytics },
   { href: '/dashboard/subscription', label: 'SUBSCRIPTION', show: VENDOR_CONFIG.hasSubscription },
+  { href: '/dashboard/settings', label: 'SETTINGS', show: true },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
