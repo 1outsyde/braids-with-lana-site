@@ -14,23 +14,17 @@ function proxyHeaders(req: NextRequest): Record<string, string> {
   }
 }
 
-export async function GET(req: NextRequest) {
-  const res = await fetch(`${API_URL}/api/vendor/services?businessId=${BUSINESS_ID}&includeInactive=true`, {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params
+  const body = await req.text()
+
+  const res = await fetch(`${API_URL}/api/appointments/${id}`, {
+    method: 'PATCH',
     headers: proxyHeaders(req),
-    cache: 'no-store',
-  })
-
-  const data = await res.json().catch(() => ({}))
-  return NextResponse.json(data, { status: res.status })
-}
-
-export async function POST(req: NextRequest) {
-  const body = await req.json()
-
-  const res = await fetch(`${API_URL}/api/vendor/services`, {
-    method: 'POST',
-    headers: proxyHeaders(req),
-    body: JSON.stringify({ ...body, businessId: BUSINESS_ID }),
+    body,
   })
 
   const data = await res.json().catch(() => ({}))
