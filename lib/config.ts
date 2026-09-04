@@ -6,7 +6,10 @@ export const VENDOR_CONFIG = {
   vendorName: "Braids With Love",
   ownerName: "Danei Johnson",
   hasBookings: true,
+  hasServices: true,
   hasProducts: true,
+  hasAnalytics: true,
+  hasSubscription: true,
 } as const
 
 export const ADMIN_EMAILS = [

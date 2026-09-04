@@ -5,44 +5,48 @@ import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useAuth } from '@/lib/auth-context'
-import { isAdminEmail } from '@/lib/config'
+import { isAdminEmail, VENDOR_CONFIG } from '@/lib/config'
 
 type NavItem = {
   href: string
   label: string
   icon: ({ size, active }: { size?: number; active?: boolean }) => React.ReactElement
   exact?: boolean
-  show?: boolean
+  show: boolean
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/dashboard', label: 'Overview', icon: IconGrid, exact: true },
-  { href: '/dashboard/bookings', label: 'Bookings', icon: IconCalendar, show: true },
+  { href: '/dashboard', label: 'Overview', icon: IconGrid, exact: true, show: true },
+  { href: '/dashboard/bookings', label: 'Bookings', icon: IconCalendar, show: VENDOR_CONFIG.hasBookings },
   { href: '/dashboard/orders', label: 'Orders', icon: IconBox, show: true },
-  { href: '/dashboard/services', label: 'Services', icon: IconScissors, show: true },
-  { href: '/dashboard/products', label: 'Products', icon: IconTag, show: true },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: IconChart, show: true },
-  { href: '/dashboard/subscription', label: 'Subscription', icon: IconStar, show: true },
+  { href: '/dashboard/services', label: 'Services', icon: IconScissors, show: VENDOR_CONFIG.hasServices },
+  { href: '/dashboard/products', label: 'Products', icon: IconTag, show: VENDOR_CONFIG.hasProducts },
+  { href: '/dashboard/analytics', label: 'Analytics', icon: IconChart, show: VENDOR_CONFIG.hasAnalytics },
+  { href: '/dashboard/subscription', label: 'Subscription', icon: IconStar, show: VENDOR_CONFIG.hasSubscription },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, logout } = useAuth()
+  const { user, logout, isLoading } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    if (!user || !isAdminEmail(user.email)) {
+    if (!isLoading && (!user || !isAdminEmail(user.email))) {
       router.replace('/login')
     }
-  }, [user, router])
+  }, [user, isLoading, router])
 
-  if (!user || !isAdminEmail(user.email)) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0D2B35' }}>
         <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: '#29C5CC', borderTopColor: 'transparent' }} />
       </div>
     )
+  }
+
+  if (!user || !isAdminEmail(user.email)) {
+    return null
   }
 
   return (
@@ -64,7 +68,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <nav className="flex-1 px-3 py-4 overflow-y-auto">
-          {NAV_ITEMS.filter(item => item.show !== false).map(item => {
+          {NAV_ITEMS.filter(item => item.show).map(item => {
             const isExact = item.exact === true
             const active = isExact ? pathname === item.href : pathname.startsWith(item.href)
             const Icon = item.icon
