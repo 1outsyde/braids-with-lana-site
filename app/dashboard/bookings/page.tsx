@@ -34,11 +34,11 @@ const STATUS_FILTERS: { label: string; value: string }[] = [
 ]
 
 const STATUS_STYLE: Record<BookingStatus, { bg: string; color: string; label: string }> = {
-  pending:   { bg: 'rgba(201,168,76,0.15)',  color: '#C9A84C', label: 'Pending'   },
-  confirmed: { bg: 'rgba(41,197,204,0.15)',  color: '#29C5CC', label: 'Confirmed' },
-  completed: { bg: 'rgba(34,197,94,0.15)',   color: '#4ADE80', label: 'Completed' },
-  cancelled: { bg: 'rgba(239,68,68,0.15)',   color: '#F87171', label: 'Cancelled' },
-  declined:  { bg: 'rgba(156,163,175,0.15)', color: '#9CA3AF', label: 'Declined'  },
+  pending:   { bg: '#FEF3C7', color: '#92400E', label: 'Pending'   },
+  confirmed: { bg: '#DBEAFE', color: '#1E40AF', label: 'Confirmed' },
+  completed: { bg: '#D1FAE5', color: '#065F46', label: 'Completed' },
+  cancelled: { bg: '#FEE2E2', color: '#991B1B', label: 'Cancelled' },
+  declined:  { bg: '#F3F4F6', color: '#6B7280', label: 'Declined'  },
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -74,7 +74,6 @@ export default function BookingsPage() {
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState('')
   const [actionLoading, setActionLoading] = useState<string | null>(null)
-  const [selected, setSelected] = useState<Booking | null>(null)
 
   async function loadBookings() {
     setLoading(true)
@@ -85,7 +84,7 @@ export default function BookingsPage() {
       if (!res.ok) throw new Error('Failed to load bookings')
       const data = await res.json()
       setBookings(Array.isArray(data) ? data : (data.appointments ?? data.bookings ?? []))
-    } catch (e) {
+    } catch {
       setError('Could not load bookings. Please try again.')
     } finally {
       setLoading(false)
@@ -103,7 +102,6 @@ export default function BookingsPage() {
         body: JSON.stringify({ id, status }),
       })
       if (!res.ok) throw new Error()
-      setSelected(null)
       await loadBookings()
     } catch {
       alert('Action failed. Please try again.')
@@ -126,16 +124,16 @@ export default function BookingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 600, color: '#F5F5F5', margin: 0 }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>
             Bookings
           </h1>
-          <p style={{ fontSize: 14, color: 'rgba(245,245,245,0.5)', marginTop: 4 }}>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>
             Manage client appointments
           </p>
         </div>
         <button
           onClick={loadBookings}
-          style={{ fontSize: 13, color: '#29C5CC', background: 'transparent', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 8, padding: '6px 14px', cursor: 'pointer' }}
+          style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', background: 'transparent', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 8, padding: '6px 14px', cursor: 'pointer' }}
         >
           Refresh
         </button>
@@ -143,63 +141,52 @@ export default function BookingsPage() {
 
       {/* Up Next card */}
       {upNext && (
-        <div className="mb-8 p-5 rounded-xl" style={{ background: 'rgba(41,197,204,0.07)', border: '1px solid rgba(41,197,204,0.2)' }}>
-          <div style={{ fontSize: 11, color: '#29C5CC', letterSpacing: '0.08em', marginBottom: 10, fontWeight: 500 }}>UP NEXT</div>
+        <div className="mb-8 p-5 rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(201,168,76,0.25)', boxShadow: '0 2px 12px rgba(201,168,76,0.08)' }}>
+          <div style={{ fontSize: 10, color: '#C9A84C', letterSpacing: '0.12em', marginBottom: 10, fontWeight: 700 }}>UP NEXT</div>
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <div style={{ fontSize: 18, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#F5F5F5' }}>
+              <div style={{ fontSize: 20, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#0D2B35' }}>
                 {upNext.customer_name}
               </div>
-              <div style={{ fontSize: 14, color: 'rgba(245,245,245,0.7)', marginTop: 3 }}>{upNext.service_name}</div>
-              <div style={{ fontSize: 13, color: '#29C5CC', marginTop: 6 }}>
+              <div style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginTop: 3 }}>{upNext.service_name}</div>
+              <div style={{ fontSize: 13, color: '#0D2B35', marginTop: 6, fontWeight: 500 }}>
                 {fmtDate(upNext.appointment_date)}{fmtTime(upNext) ? ` · ${fmtTime(upNext)}` : ''}
               </div>
             </div>
             <div className="flex gap-2">
               {upNext.status === 'pending' && (
                 <>
-                  <ActionButton
-                    label="Accept"
-                    loading={actionLoading === upNext.id + 'confirmed'}
-                    onClick={() => updateStatus(upNext.id, 'confirmed')}
-                    primary
-                  />
-                  <ActionButton
-                    label="Decline"
-                    loading={actionLoading === upNext.id + 'declined'}
-                    onClick={() => updateStatus(upNext.id, 'declined')}
-                  />
+                  <ActionButton label="Accept" loading={actionLoading === upNext.id + 'confirmed'} onClick={() => updateStatus(upNext.id, 'confirmed')} primary />
+                  <ActionButton label="Decline" loading={actionLoading === upNext.id + 'declined'} onClick={() => updateStatus(upNext.id, 'declined')} />
                 </>
               )}
               {upNext.status === 'confirmed' && (
-                <ActionButton
-                  label="Mark Complete"
-                  loading={actionLoading === upNext.id + 'completed'}
-                  onClick={() => updateStatus(upNext.id, 'completed')}
-                  primary
-                />
+                <ActionButton label="Mark Complete" loading={actionLoading === upNext.id + 'completed'} onClick={() => updateStatus(upNext.id, 'completed')} primary />
               )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Status filters */}
-      <div className="flex gap-2 flex-wrap mb-6">
+      {/* Filter tabs — underline pattern */}
+      <div style={{ display: 'flex', borderBottom: '1px solid rgba(0,0,0,0.08)', marginBottom: 24 }}>
         {STATUS_FILTERS.map(f => (
           <button
             key={f.value}
             onClick={() => setFilter(f.value)}
             style={{
               fontSize: 13,
-              padding: '5px 14px',
-              borderRadius: 20,
-              border: '1px solid',
-              borderColor: filter === f.value ? '#29C5CC' : 'rgba(245,245,245,0.12)',
-              background: filter === f.value ? 'rgba(41,197,204,0.12)' : 'transparent',
-              color: filter === f.value ? '#29C5CC' : 'rgba(245,245,245,0.55)',
+              padding: '10px 0',
+              marginRight: 24,
+              background: 'transparent',
+              border: 'none',
+              borderBottom: `2px solid ${filter === f.value ? '#C9A84C' : 'transparent'}`,
+              marginBottom: -1,
+              color: filter === f.value ? '#0D2B35' : 'rgba(0,0,0,0.45)',
+              fontWeight: filter === f.value ? 600 : 400,
               cursor: 'pointer',
               transition: 'all 0.15s',
+              whiteSpace: 'nowrap',
             }}
           >
             {f.label}
@@ -207,7 +194,7 @@ export default function BookingsPage() {
         ))}
       </div>
 
-      {/* Table */}
+      {/* Content */}
       {loading ? (
         <LoadingSkeleton />
       ) : error ? (
@@ -215,89 +202,56 @@ export default function BookingsPage() {
       ) : bookings.length === 0 ? (
         <EmptyState filter={filter} />
       ) : (
-        <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(245,245,245,0.08)' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ background: 'rgba(255,255,255,0.03)' }}>
-                {['Booking', 'Client', 'Service', 'Date & Time', 'Amount', 'Status', ''].map(h => (
-                  <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: 11, color: 'rgba(245,245,245,0.4)', fontWeight: 500, letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {bookings.map((b, i) => {
-                const st = STATUS_STYLE[b.status] ?? STATUS_STYLE.pending
-                const time = fmtTime(b)
-                return (
-                  <tr
-                    key={b.id}
-                    style={{
-                      borderTop: i > 0 ? '1px solid rgba(245,245,245,0.06)' : 'none',
-                      background: 'transparent',
-                      transition: 'background 0.1s',
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.025)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    <td style={{ padding: '14px 16px', fontSize: 13, color: '#29C5CC', fontFamily: 'DM Mono, monospace', whiteSpace: 'nowrap' }}>
-                      {fmtBookingNum(b.booking_number)}
-                    </td>
-                    <td style={{ padding: '14px 16px' }}>
-                      <div style={{ fontSize: 13, color: '#F5F5F5', fontWeight: 500 }}>{b.customer_name}</div>
-                      <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.45)', marginTop: 2 }}>{b.customer_email}</div>
-                    </td>
-                    <td style={{ padding: '14px 16px', fontSize: 13, color: 'rgba(245,245,245,0.75)' }}>
-                      {b.service_name}
-                    </td>
-                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
-                      <div style={{ fontSize: 13, color: 'rgba(245,245,245,0.75)' }}>{fmtDate(b.appointment_date)}</div>
-                      {time && <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.45)', marginTop: 2 }}>{time}</div>}
-                    </td>
-                    <td style={{ padding: '14px 16px', fontSize: 13, color: 'rgba(245,245,245,0.75)', whiteSpace: 'nowrap' }}>
-                      {fmtMoney(b.total_amount) ?? '—'}
-                    </td>
-                    <td style={{ padding: '14px 16px' }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 12, background: st.bg, color: st.color, letterSpacing: '0.04em' }}>
+        <div className="flex flex-col gap-3">
+          {bookings.map(b => {
+            const st = STATUS_STYLE[b.status] ?? STATUS_STYLE.pending
+            const time = fmtTime(b)
+            return (
+              <div
+                key={b.id}
+                className="rounded-2xl"
+                style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '16px 20px' }}
+              >
+                <div className="flex items-start justify-between gap-4 flex-wrap">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-2">
+                      <span style={{ fontSize: 12, color: '#C9A84C', fontFamily: 'DM Mono, monospace', fontWeight: 500 }}>
+                        {fmtBookingNum(b.booking_number)}
+                      </span>
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 10, background: st.bg, color: st.color, letterSpacing: '0.03em' }}>
                         {st.label.toUpperCase()}
                       </span>
-                    </td>
-                    <td style={{ padding: '14px 16px' }}>
-                      <div className="flex gap-2 justify-end">
-                        {b.status === 'pending' && (
-                          <>
-                            <ActionButton
-                              label="Accept"
-                              loading={actionLoading === b.id + 'confirmed'}
-                              onClick={() => updateStatus(b.id, 'confirmed')}
-                              primary
-                              small
-                            />
-                            <ActionButton
-                              label="Decline"
-                              loading={actionLoading === b.id + 'declined'}
-                              onClick={() => updateStatus(b.id, 'declined')}
-                              small
-                            />
-                          </>
-                        )}
-                        {b.status === 'confirmed' && (
-                          <ActionButton
-                            label="Complete"
-                            loading={actionLoading === b.id + 'completed'}
-                            onClick={() => updateStatus(b.id, 'completed')}
-                            primary
-                            small
-                          />
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                    </div>
+                    <div style={{ fontSize: 17, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#0D2B35' }}>
+                      {b.customer_name}
+                    </div>
+                    <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', marginTop: 2 }}>{b.service_name}</div>
+                    <div className="flex items-center gap-3 mt-3 flex-wrap">
+                      <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.6)' }}>
+                        {fmtDate(b.appointment_date)}{time ? ` · ${time}` : ''}
+                      </span>
+                      {b.total_amount != null && (
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#C9A84C' }}>
+                          {fmtMoney(b.total_amount)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-center flex-shrink-0 mt-1">
+                    {b.status === 'pending' && (
+                      <>
+                        <ActionButton label="Accept" loading={actionLoading === b.id + 'confirmed'} onClick={() => updateStatus(b.id, 'confirmed')} primary small />
+                        <ActionButton label="Decline" loading={actionLoading === b.id + 'declined'} onClick={() => updateStatus(b.id, 'declined')} small />
+                      </>
+                    )}
+                    {b.status === 'confirmed' && (
+                      <ActionButton label="Complete" loading={actionLoading === b.id + 'completed'} onClick={() => updateStatus(b.id, 'completed')} primary small />
+                    )}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
     </div>
@@ -317,12 +271,12 @@ function ActionButton({
       disabled={loading}
       style={{
         fontSize: small ? 12 : 13,
-        padding: small ? '4px 12px' : '7px 18px',
+        padding: small ? '5px 14px' : '8px 20px',
         borderRadius: 8,
         border: '1px solid',
-        borderColor: primary ? '#C9A84C' : 'rgba(245,245,245,0.2)',
+        borderColor: primary ? '#C9A84C' : 'rgba(0,0,0,0.15)',
         background: primary ? '#C9A84C' : 'transparent',
-        color: primary ? '#0D0D0D' : 'rgba(245,245,245,0.7)',
+        color: primary ? '#0D0D0D' : 'rgba(0,0,0,0.55)',
         cursor: loading ? 'not-allowed' : 'pointer',
         opacity: loading ? 0.6 : 1,
         fontWeight: primary ? 600 : 400,
@@ -337,12 +291,12 @@ function ActionButton({
 
 function LoadingSkeleton() {
   return (
-    <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(245,245,245,0.08)' }}>
-      {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex gap-4 px-4 py-4" style={{ borderTop: i > 0 ? '1px solid rgba(245,245,245,0.06)' : 'none' }}>
-          {[60, 140, 120, 140, 60, 80].map((w, j) => (
-            <div key={j} style={{ height: 14, width: w, borderRadius: 4, background: 'rgba(255,255,255,0.07)', animation: 'pulse 1.5s ease-in-out infinite' }} />
-          ))}
+    <div className="flex flex-col gap-3">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '20px 24px' }}>
+          <div style={{ height: 12, width: 100, borderRadius: 4, background: 'rgba(0,0,0,0.06)', marginBottom: 10 }} />
+          <div style={{ height: 18, width: 200, borderRadius: 4, background: 'rgba(0,0,0,0.08)', marginBottom: 8 }} />
+          <div style={{ height: 12, width: 160, borderRadius: 4, background: 'rgba(0,0,0,0.05)' }} />
         </div>
       ))}
     </div>
@@ -351,9 +305,12 @@ function LoadingSkeleton() {
 
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div className="rounded-xl p-10 text-center" style={{ border: '1px solid rgba(239,68,68,0.2)', background: 'rgba(239,68,68,0.04)' }}>
-      <p style={{ color: '#F87171', marginBottom: 16 }}>{message}</p>
-      <button onClick={onRetry} style={{ fontSize: 13, color: '#29C5CC', background: 'transparent', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 8, padding: '6px 16px', cursor: 'pointer' }}>
+    <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.15)', padding: '48px 24px' }}>
+      <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 22 }}>
+        ⚠
+      </div>
+      <p style={{ fontSize: 14, color: '#991B1B', marginBottom: 20 }}>{message}</p>
+      <button onClick={onRetry} style={{ fontSize: 13, padding: '7px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>
         Try again
       </button>
     </div>
@@ -362,12 +319,14 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 
 function EmptyState({ filter }: { filter: string }) {
   return (
-    <div className="rounded-xl p-14 text-center" style={{ border: '1px solid rgba(245,245,245,0.08)' }}>
-      <div style={{ fontSize: 36, marginBottom: 12, opacity: 0.3 }}>✂</div>
-      <p style={{ fontSize: 15, color: 'rgba(245,245,245,0.5)', margin: 0 }}>
+    <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '56px 24px' }}>
+      <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+        ✂
+      </div>
+      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 8 }}>
         {filter ? `No ${filter} bookings` : 'No bookings yet'}
-      </p>
-      <p style={{ fontSize: 13, color: 'rgba(245,245,245,0.3)', marginTop: 6 }}>
+      </div>
+      <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', margin: 0 }}>
         New appointments will appear here
       </p>
     </div>

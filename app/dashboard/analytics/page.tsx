@@ -34,10 +34,10 @@ function fmtMoney(cents: number) {
 
 function StatCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(245,245,245,0.07)' }}>
-      <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.45)', marginBottom: 10, fontWeight: 500 }}>{label}</div>
-      <div style={{ fontSize: 26, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#F5F5F5' }}>{value}</div>
-      {sub && <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.35)', marginTop: 4 }}>{sub}</div>}
+    <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}>
+      <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', marginBottom: 10, fontWeight: 600, letterSpacing: '0.08em' }}>{label.toUpperCase()}</div>
+      <div style={{ fontSize: 30, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#0D2B35' }}>{value}</div>
+      {sub && <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.35)', marginTop: 4 }}>{sub}</div>}
     </div>
   )
 }
@@ -82,8 +82,8 @@ export default function AnalyticsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 600, color: '#F5F5F5', margin: 0 }}>Analytics</h1>
-          <p style={{ fontSize: 14, color: 'rgba(245,245,245,0.5)', marginTop: 4 }}>Business performance overview</p>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>Analytics</h1>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>Business performance overview</p>
         </div>
         <button
           onClick={openPayouts}
@@ -97,16 +97,19 @@ export default function AnalyticsPage() {
       {loading ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {[...Array(4)].map((_, i) => (
-            <div key={i} className="rounded-xl p-5" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(245,245,245,0.07)' }}>
-              <div style={{ height: 12, width: 80, borderRadius: 4, background: 'rgba(255,255,255,0.07)', marginBottom: 14 }} />
-              <div style={{ height: 28, width: 120, borderRadius: 4, background: 'rgba(255,255,255,0.07)' }} />
+            <div key={i} className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}>
+              <div style={{ height: 11, width: 80, borderRadius: 4, background: 'rgba(0,0,0,0.06)', marginBottom: 14 }} />
+              <div style={{ height: 30, width: 120, borderRadius: 4, background: 'rgba(0,0,0,0.08)' }} />
             </div>
           ))}
         </div>
       ) : error ? (
-        <div className="rounded-xl p-10 text-center mb-8" style={{ border: '1px solid rgba(239,68,68,0.2)' }}>
-          <p style={{ color: '#F87171', marginBottom: 12 }}>{error}</p>
-          <button onClick={loadStats} style={{ fontSize: 13, color: '#29C5CC', background: 'transparent', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 8, padding: '6px 16px', cursor: 'pointer' }}>Try again</button>
+        <div className="rounded-2xl text-center mb-8" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.15)', padding: '48px 24px' }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 22 }}>
+            ⚠
+          </div>
+          <p style={{ color: '#991B1B', fontSize: 14, marginBottom: 16 }}>{error}</p>
+          <button onClick={loadStats} style={{ fontSize: 13, padding: '7px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Try again</button>
         </div>
       ) : stats ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -118,11 +121,11 @@ export default function AnalyticsPage() {
       ) : null}
 
       {/* Payouts CTA */}
-      <div className="rounded-xl p-6" style={{ background: 'rgba(201,168,76,0.06)', border: '1px solid rgba(201,168,76,0.2)' }}>
-        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, fontWeight: 600, color: '#F5F5F5', marginBottom: 6 }}>
+      <div className="rounded-2xl p-6 mb-4" style={{ background: '#FFFFFF', border: '1px solid rgba(201,168,76,0.2)' }}>
+        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 6 }}>
           Ready to get paid?
         </div>
-        <p style={{ fontSize: 14, color: 'rgba(245,245,245,0.55)', marginBottom: 16, maxWidth: 480 }}>
+        <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginBottom: 20, maxWidth: 480 }}>
           Your earnings are held in your Stripe Express account. Open the payout dashboard to view your balance and initiate a transfer to your bank.
         </p>
         <button
@@ -134,11 +137,11 @@ export default function AnalyticsPage() {
         </button>
       </div>
 
-      {/* More analytics note */}
-      <div className="mt-6 rounded-xl p-5 flex items-center gap-4" style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(245,245,245,0.06)' }}>
-        <div style={{ fontSize: 24, opacity: 0.3 }}>📊</div>
-        <div>
-          <div style={{ fontSize: 14, color: 'rgba(245,245,245,0.6)' }}>Detailed analytics — revenue charts, period comparisons, and CSV exports — are coming soon.</div>
+      {/* Coming soon note */}
+      <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}>
+        <div style={{ fontSize: 24, opacity: 0.4 }}>📊</div>
+        <div style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)' }}>
+          Detailed analytics — revenue charts, period comparisons, and CSV exports — are coming soon.
         </div>
       </div>
     </div>

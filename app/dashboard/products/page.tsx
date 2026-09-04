@@ -18,10 +18,10 @@ interface Product {
 type ProductStatus = 'live' | 'paused' | 'draft' | 'archived'
 
 const STATUS_BADGE: Record<ProductStatus, { bg: string; color: string; label: string }> = {
-  live:     { bg: '#1E3020', color: '#F2EBD9', label: 'LIVE'     },
-  paused:   { bg: '#B8831A', color: '#fff',    label: 'PAUSED'   },
-  draft:    { bg: '#2A3240', color: '#9CA3AF', label: 'DRAFT'    },
-  archived: { bg: '#3D1515', color: '#F87171', label: 'ARCHIVED' },
+  live:     { bg: '#D1FAE5', color: '#065F46', label: 'LIVE'     },
+  paused:   { bg: '#FEF3C7', color: '#92400E', label: 'PAUSED'   },
+  draft:    { bg: '#F3F4F6', color: '#6B7280', label: 'DRAFT'    },
+  archived: { bg: '#FEE2E2', color: '#991B1B', label: 'ARCHIVED' },
 }
 
 function getDisplayStatus(p: Product): ProductStatus {
@@ -147,8 +147,8 @@ export default function ProductsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 28, fontWeight: 600, color: '#F5F5F5', margin: 0 }}>Products</h1>
-          <p style={{ fontSize: 14, color: 'rgba(245,245,245,0.5)', marginTop: 4 }}>{products.length} product{products.length !== 1 ? 's' : ''}</p>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>Products</h1>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>{products.length} product{products.length !== 1 ? 's' : ''}</p>
         </div>
         <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>
           + Add Product
@@ -157,9 +157,9 @@ export default function ProductsPage() {
 
       {/* Form modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: '#0D2B35', border: '1px solid rgba(41,197,204,0.2)' }}>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#F5F5F5', marginBottom: 24 }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 600, color: '#0D2B35', marginBottom: 24 }}>
               {editing ? 'Edit Product' : 'Add Product'}
             </h2>
             <div className="flex flex-col gap-4">
@@ -185,10 +185,10 @@ export default function ProductsPage() {
                 <label style={labelStyle}>Category</label>
                 <input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="e.g. Hair Care" style={inputStyle} />
               </div>
-              {formError && <p style={{ fontSize: 13, color: '#F87171', margin: 0 }}>{formError}</p>}
+              {formError && <p style={{ fontSize: 13, color: '#991B1B', margin: 0 }}>{formError}</p>}
             </div>
             <div className="flex gap-3 mt-6 justify-end">
-              <button onClick={closeForm} style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: '1px solid rgba(245,245,245,0.15)', background: 'transparent', color: 'rgba(245,245,245,0.6)', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={closeForm} style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Cancel</button>
               <button onClick={handleSave} disabled={saving} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
                 {saving ? 'Saving…' : editing ? 'Save changes' : 'Add product'}
               </button>
@@ -199,12 +199,12 @@ export default function ProductsPage() {
 
       {/* Delete confirm */}
       {deleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)' }}>
-          <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#0D2B35', border: '1px solid rgba(239,68,68,0.3)' }}>
-            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 20, color: '#F5F5F5', marginBottom: 12 }}>Delete product?</h3>
-            <p style={{ fontSize: 14, color: 'rgba(245,245,245,0.55)', marginBottom: 24 }}>This is permanent and cannot be undone. The product will be removed from your storefront immediately.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.2)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, color: '#0D2B35', marginBottom: 12 }}>Delete product?</h3>
+            <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginBottom: 24 }}>This is permanent and cannot be undone. The product will be removed from your storefront immediately.</p>
             <div className="flex gap-3 justify-end">
-              <button onClick={() => setDeleteConfirm(null)} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(245,245,245,0.15)', background: 'transparent', color: 'rgba(245,245,245,0.6)', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => setDeleteConfirm(null)} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Cancel</button>
               <button onClick={() => handleDelete(deleteConfirm)} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: 'none', background: '#EF4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
             </div>
           </div>
@@ -212,17 +212,29 @@ export default function ProductsPage() {
       )}
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-6 h-6 rounded-full border-2 animate-spin" style={{ borderColor: '#29C5CC', borderTopColor: 'transparent' }} />
+        <div className="flex flex-col gap-3">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '20px 24px' }}>
+              <div style={{ height: 16, width: 180, borderRadius: 4, background: 'rgba(0,0,0,0.06)', marginBottom: 8 }} />
+              <div style={{ height: 12, width: 120, borderRadius: 4, background: 'rgba(0,0,0,0.04)' }} />
+            </div>
+          ))}
         </div>
       ) : error ? (
-        <div className="rounded-xl p-10 text-center" style={{ border: '1px solid rgba(239,68,68,0.2)' }}>
-          <p style={{ color: '#F87171', marginBottom: 12 }}>{error}</p>
-          <button onClick={loadProducts} style={{ fontSize: 13, color: '#29C5CC', background: 'transparent', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 8, padding: '6px 16px', cursor: 'pointer' }}>Try again</button>
+        <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.15)', padding: '48px 24px' }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: 22 }}>
+            ⚠
+          </div>
+          <p style={{ color: '#991B1B', fontSize: 14, marginBottom: 16 }}>{error}</p>
+          <button onClick={loadProducts} style={{ fontSize: 13, padding: '7px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Try again</button>
         </div>
       ) : products.length === 0 ? (
-        <div className="rounded-xl p-16 text-center" style={{ border: '1px dashed rgba(245,245,245,0.12)' }}>
-          <p style={{ fontSize: 15, color: 'rgba(245,245,245,0.4)', marginBottom: 20 }}>No products yet</p>
+        <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '56px 24px' }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+            🏷
+          </div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 8 }}>No products yet</div>
+          <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', marginBottom: 24 }}>Add products to sell through your storefront</p>
           <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>Add your first product</button>
         </div>
       ) : (
@@ -232,30 +244,30 @@ export default function ProductsPage() {
             const badge = STATUS_BADGE[displayStatus]
             const isLive = displayStatus === 'live'
             return (
-              <div key={product.id} className="flex items-center gap-4 px-5 py-4 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(245,245,245,0.07)' }}>
+              <div key={product.id} className="flex items-center gap-4 px-5 py-4 rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span style={{ fontSize: 15, fontWeight: 500, color: '#F5F5F5' }}>{product.name}</span>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#0D2B35' }}>{product.name}</span>
                     <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 10, background: badge.bg, color: badge.color }}>
                       {badge.label}
                     </span>
                   </div>
-                  {product.category && <span style={{ fontSize: 12, color: 'rgba(245,245,245,0.4)', marginTop: 3, display: 'block' }}>{product.category}</span>}
+                  {product.category && <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 3, display: 'block' }}>{product.category}</span>}
                 </div>
                 <div className="text-right flex-shrink-0 hidden sm:block">
                   <div style={{ fontSize: 15, fontWeight: 600, color: '#C9A84C' }}>{fmtPrice(product.price)}</div>
-                  {product.inventory != null && <div style={{ fontSize: 12, color: 'rgba(245,245,245,0.4)', marginTop: 2 }}>Stock: {product.inventory}</div>}
+                  {product.inventory != null && <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>Stock: {product.inventory}</div>}
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   <button
                     onClick={() => handlePublish(product)}
                     disabled={publishLoading === product.id}
-                    style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid', borderColor: isLive ? 'rgba(245,245,245,0.15)' : 'rgba(201,168,76,0.5)', background: isLive ? 'transparent' : 'rgba(201,168,76,0.1)', color: isLive ? 'rgba(245,245,245,0.55)' : '#C9A84C', cursor: 'pointer', opacity: publishLoading === product.id ? 0.6 : 1 }}
+                    style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid', borderColor: isLive ? 'rgba(0,0,0,0.12)' : 'rgba(201,168,76,0.5)', background: isLive ? 'transparent' : 'rgba(201,168,76,0.08)', color: isLive ? 'rgba(0,0,0,0.45)' : '#C9A84C', cursor: 'pointer', opacity: publishLoading === product.id ? 0.6 : 1 }}
                   >
                     {publishLoading === product.id ? '…' : isLive ? 'Unpublish' : 'Publish'}
                   </button>
-                  <button onClick={() => openEdit(product)} style={{ fontSize: 12, padding: '5px 12px', borderRadius: 7, border: '1px solid rgba(245,245,245,0.15)', background: 'transparent', color: 'rgba(245,245,245,0.65)', cursor: 'pointer' }}>Edit</button>
-                  <button onClick={() => setDeleteConfirm(product.id)} style={{ fontSize: 12, padding: '5px 10px', borderRadius: 7, border: '1px solid rgba(239,68,68,0.25)', background: 'transparent', color: '#F87171', cursor: 'pointer' }}>Delete</button>
+                  <button onClick={() => openEdit(product)} style={{ fontSize: 12, padding: '5px 12px', borderRadius: 7, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Edit</button>
+                  <button onClick={() => setDeleteConfirm(product.id)} style={{ fontSize: 12, padding: '5px 10px', borderRadius: 7, border: '1px solid rgba(239,68,68,0.25)', background: 'transparent', color: '#991B1B', cursor: 'pointer' }}>Delete</button>
                 </div>
               </div>
             )
@@ -266,5 +278,5 @@ export default function ProductsPage() {
   )
 }
 
-const inputStyle: React.CSSProperties = { width: '100%', fontSize: 14, padding: '9px 12px', borderRadius: 8, border: '1px solid rgba(245,245,245,0.12)', background: 'rgba(255,255,255,0.05)', color: '#F5F5F5', outline: 'none', boxSizing: 'border-box' }
-const labelStyle: React.CSSProperties = { fontSize: 12, color: 'rgba(245,245,245,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }
+const inputStyle: React.CSSProperties = { width: '100%', fontSize: 14, padding: '9px 12px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: '#F5F7F8', color: '#1A1A1A', outline: 'none', boxSizing: 'border-box' }
+const labelStyle: React.CSSProperties = { fontSize: 12, color: 'rgba(0,0,0,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }
