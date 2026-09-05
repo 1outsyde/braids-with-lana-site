@@ -22,10 +22,10 @@ const TIERS = [
 
 function resolveSubscription(raw: Record<string, unknown>) {
   return {
-    planName: String(raw.planName ?? raw.plan_name ?? 'Unknown'),
+    planName: String(raw.planName ?? raw.plan_name ?? raw.tierDisplayName ?? raw.tierName ?? 'Unknown'),
     status: String(raw.status ?? 'unknown'),
-    priceCents: Number(raw.price ?? raw.price_cents ?? 0),
-    renewalDate: String(raw.renewalDate ?? raw.renewal_date ?? raw.nextBillingDate ?? raw.next_billing_date ?? ''),
+    priceCents: Number(raw.price ?? raw.price_cents ?? raw.priceInCents ?? 0),
+    renewalDate: String(raw.renewalDate ?? raw.renewal_date ?? raw.nextBillingDate ?? raw.next_billing_date ?? raw.currentPeriodEnd ?? ''),
   }
 }
 
@@ -40,7 +40,9 @@ export default function SubscriptionPage() {
         const res = await fetch('/api/admin/subscription')
         if (!res.ok) throw new Error()
         const data = await res.json()
-        setSub(resolveSubscription(data))
+        // API returns { subscription: { ... } }; unwrap one level if present
+        const payload = data?.subscription ?? data
+        setSub(resolveSubscription(payload))
       } catch {
         setError('Could not load subscription details.')
       } finally {
