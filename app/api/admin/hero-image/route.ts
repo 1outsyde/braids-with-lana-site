@@ -8,7 +8,8 @@ export async function POST(req: NextRequest) {
     const incoming = await req.formData()
     const forwarded = new FormData()
     for (const [key, value] of incoming.entries()) {
-      forwarded.append(key, value)
+      // Backend multer expects field name "file"; frontend sends "image"
+      forwarded.append(key === 'image' ? 'file' : key, value)
     }
     forwarded.append('folder', 'hero')
     forwarded.append('businessId', BUSINESS_ID ?? '')
