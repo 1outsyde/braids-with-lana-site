@@ -8,7 +8,7 @@ type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'decl
 
 interface Booking {
   id: string
-  booking_number: number
+  bookingNumber: number
   status: BookingStatus
   service_name: string
   customer_name: string
@@ -216,7 +216,7 @@ export default function BookingsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-2">
                       <span style={{ fontSize: 12, color: '#C9A84C', fontFamily: 'DM Mono, monospace', fontWeight: 500 }}>
-                        {fmtBookingNum(b.booking_number)}
+                        {fmtBookingNum(b.bookingNumber)}
                       </span>
                       <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 10, background: st.bg, color: st.color, letterSpacing: '0.03em' }}>
                         {st.label.toUpperCase()}
