@@ -12,6 +12,7 @@ interface VendorService {
   isActive: boolean
   isFeatured: boolean
   status: 'draft' | 'live' | 'archived'
+  imageUrl: string | null
   stripeProductId: string | null
   stripePriceId: string | null
   createdAt: string
@@ -84,6 +85,8 @@ export default function ServicesPage() {
   const [deleting, setDeleting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [publishing, setPublishing] = useState<string | null>(null)
+  const [formImageUrl, setFormImageUrl] = useState<string | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   async function loadServices() {
     setLoading(true)
@@ -109,6 +112,7 @@ export default function ServicesPage() {
     setEditing(null)
     setForm(EMPTY_FORM)
     setFormError(null)
+    setFormImageUrl(null)
     setShowForm(true)
   }
 
@@ -123,6 +127,7 @@ export default function ServicesPage() {
       isActive: service.isActive,
     })
     setFormError(null)
+    setFormImageUrl(service.imageUrl ?? null)
     setShowForm(true)
   }
 
@@ -131,6 +136,28 @@ export default function ServicesPage() {
     setEditing(null)
     setForm(EMPTY_FORM)
     setFormError(null)
+    setFormImageUrl(null)
+  }
+
+  async function handleImageUpload(file: File) {
+    setUploadingImage(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch('/api/admin/services/upload-image', {
+        method: 'POST',
+        headers: authHeaders(token),
+        body: fd,
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error((data as { error?: string }).error ?? 'Upload failed')
+      setFormImageUrl((data as { url?: string }).url ?? null)
+    } catch (e: unknown) {
+      setFormError(e instanceof Error ? e.message : 'Image upload failed.')
+    } finally {
+      setUploadingImage(false)
+    }
   }
 
   async function handleSave() {
@@ -151,6 +178,7 @@ export default function ServicesPage() {
         durationMinutes: duration,
         category: form.category.trim() || null,
         isActive: form.isActive,
+        imageUrl: formImageUrl,
       }
 
       const res = editing
@@ -334,6 +362,40 @@ export default function ServicesPage() {
                   placeholder="e.g. Braids, Locs, Twists"
                   style={inputStyle}
                 />
+              </Field>
+
+              <Field label="Service Photo (optional)">
+                <input
+                  type="file"
+                  accept="image/*"
+                  disabled={uploadingImage}
+                  onChange={e => {
+                    const file = e.target.files?.[0]
+                    if (file) handleImageUpload(file)
+                    e.target.value = ''
+                  }}
+                  style={{ ...inputStyle, padding: '7px 12px', cursor: 'pointer' }}
+                />
+                {uploadingImage && (
+                  <p style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>Uploading…</p>
+                )}
+                {formImageUrl && !uploadingImage && (
+                  <div style={{ marginTop: 8, position: 'relative', display: 'inline-block' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={formImageUrl}
+                      alt="Service preview"
+                      style={{ width: 120, height: 80, objectFit: 'cover', borderRadius: 6, display: 'block', border: '1px solid rgba(0,0,0,0.1)' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormImageUrl(null)}
+                      style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', border: 'none', background: '#EF4444', color: '#fff', fontSize: 12, lineHeight: '20px', textAlign: 'center', cursor: 'pointer', padding: 0 }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                )}
               </Field>
 
               <label className="flex items-center gap-3 cursor-pointer" style={{ fontSize: 14, color: 'rgba(0,0,0,0.6)' }}>
