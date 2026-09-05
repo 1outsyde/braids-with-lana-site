@@ -481,7 +481,7 @@ function PaymentStep({
         if (!holdId) throw new Error('Invalid hold response.')
 
         // 2. Create payment intent
-        const piRes = await fetch('/api/bookings/payment-intent', {
+        const piRes = await fetch('/api/bookings/deposit-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ holdId }),
