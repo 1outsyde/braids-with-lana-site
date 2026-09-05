@@ -12,9 +12,12 @@ export default function SettingsPage() {
     const bizId = process.env.NEXT_PUBLIC_OUTSYDE_BUSINESS_ID
     const apiUrl = process.env.NEXT_PUBLIC_OUTSYDE_API_URL
     if (!bizId || !apiUrl) return
-    fetch(`${apiUrl}/api/vendor/profile?businessId=${bizId}`)
+    fetch(`${apiUrl}/api/businesses/${bizId}`)
       .then(r => r.json())
-      .then(data => setHeroImageUrl(data.heroImageUrl ?? null))
+      .then(data => {
+        const biz = data.business ?? data
+        setHeroImageUrl(biz.coverImage ?? biz.cover_image ?? null)
+      })
       .catch(() => null)
   }, [])
 
@@ -99,11 +102,11 @@ export default function SettingsPage() {
           color: '#0D2B35',
           marginBottom: 6,
         }}>
-          Homepage Hero Image
+          Cover Image
         </h2>
         <p style={{ fontSize: 13, color: '#6b8c94', marginBottom: 20, lineHeight: 1.6 }}>
-          This photo appears in the large panel on the right side of your homepage. Upload a
-          high-quality braiding photo — at least 1200px wide, portrait or landscape orientation.
+          This is your business cover photo. It appears on your homepage and across the Outsyde platform.
+          Upload a high-quality braiding photo — at least 1200px wide.
         </p>
 
         {heroImageUrl && (
@@ -121,7 +124,7 @@ export default function SettingsPage() {
                 display: 'block',
               }}
             />
-            <p style={{ fontSize: 11, color: '#9ab3b8', marginTop: 6 }}>Current hero image</p>
+            <p style={{ fontSize: 11, color: '#9ab3b8', marginTop: 6 }}>Current cover image</p>
           </div>
         )}
 
@@ -144,7 +147,7 @@ export default function SettingsPage() {
             <polyline points="17 8 12 3 7 8" />
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
-          {heroUploading ? 'Uploading…' : 'Upload hero photo'}
+          {heroUploading ? 'Uploading…' : 'Upload cover photo'}
           <input
             type="file"
             accept="image/jpeg,image/png,image/webp"
@@ -159,7 +162,7 @@ export default function SettingsPage() {
         )}
         {heroSuccess && (
           <p style={{ fontSize: 12, color: '#29C5CC', marginTop: 12 }}>
-            ✓ Hero image updated — live on your homepage
+            ✓ Cover image updated
           </p>
         )}
       </div>
