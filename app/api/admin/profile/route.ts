@@ -15,11 +15,24 @@ function proxyHeaders(req: NextRequest): Record<string, string> {
 }
 
 export async function PATCH(req: NextRequest) {
-  const body = await req.text()
-  const res = await fetch(`${API_URL}/api/vendor/profile`, {
+  // Rewrite the incoming body so heroImageUrl maps to the fields the backend expects.
+  // PATCH /api/vendor/my-business accepts coverImage + coverMediaType, not heroImageUrl.
+  let upstream: string
+  try {
+    const incoming = await req.json()
+    if ('heroImageUrl' in incoming) {
+      upstream = JSON.stringify({ coverImage: incoming.heroImageUrl, coverMediaType: 'image' })
+    } else {
+      upstream = JSON.stringify(incoming)
+    }
+  } catch {
+    upstream = await req.text()
+  }
+
+  const res = await fetch(`${API_URL}/api/vendor/my-business`, {
     method: 'PATCH',
     headers: proxyHeaders(req),
-    body,
+    body: upstream,
   })
   const data = await res.json().catch(() => ({}))
   return NextResponse.json(data, { status: res.status })
