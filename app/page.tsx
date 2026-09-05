@@ -359,9 +359,12 @@ export default function HomePage() {
       .catch(() => setServices([]))
       .finally(() => setServicesLoading(false))
 
-    fetch(`${apiUrl}/api/vendor/profile?businessId=${businessId}`)
+    fetch(`${apiUrl}/api/businesses/${businessId}`)
       .then(r => r.json())
-      .then(data => setHeroImage(data.heroImageUrl ?? null))
+      .then(data => {
+        const biz = data.business ?? data
+        setHeroImage(biz.coverImage ?? biz.cover_image ?? null)
+      })
       .catch(() => null)
   }, [])
 
