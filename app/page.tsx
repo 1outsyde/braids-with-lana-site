@@ -7,9 +7,9 @@ interface Service {
   id: string
   name: string
   description: string
-  price_in_cents: number
-  duration_minutes: number
-  image_url?: string
+  price: number
+  durationMinutes: number
+  imageUrl?: string
   category?: string
 }
 
@@ -183,8 +183,8 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#eef2f3'; el.style.transform = 'translateY(0)'; el.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)' }}>
                 {/* Image area */}
                 <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
-                  {s.image_url
-                    ? <img src={s.image_url} alt={s.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  {s.imageUrl
+                    ? <img src={s.imageUrl} alt={s.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <div style={{ width: '100%', height: '100%', background: CARD_COLORS[i % CARD_COLORS.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#29C5CC', opacity: 0.5, fontSize: 32 }}>✂</div>
                   }
                   {s.category && (
@@ -195,11 +195,11 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
                 <div style={{ padding: '20px 20px 24px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
                     <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 21, fontWeight: 600, color: '#0D2B35', lineHeight: 1.2 }}>{s.name}</h3>
-                    <span style={{ color: '#C9A84C', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap', marginLeft: 10 }}>From {fmtPrice(s.price_in_cents)}</span>
+                    <span style={{ color: '#C9A84C', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap', marginLeft: 10 }}>From {fmtPrice(s.price)}</span>
                   </div>
                   <p style={{ fontSize: 13, color: '#6b8c94', lineHeight: 1.65, marginBottom: 18 }}>{s.description}</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: '#9ab3b8' }}>⏱ {fmtDur(s.duration_minutes)}</span>
+                    <span style={{ fontSize: 11, color: '#9ab3b8' }}>⏱ {fmtDur(s.durationMinutes)}</span>
                     <Link href={`/book?serviceId=${s.id}`} style={{ background: '#29C5CC', border: 'none', borderRadius: 3, color: '#fff', fontSize: 12, fontWeight: 600, padding: '8px 18px', cursor: 'pointer', letterSpacing: '0.04em', textDecoration: 'none', display: 'inline-block' }}>
                       Book this →
                     </Link>
