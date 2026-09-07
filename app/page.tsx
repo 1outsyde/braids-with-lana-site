@@ -141,10 +141,12 @@ function Hero({ heroImage }: { heroImage: string | null }) {
     }}>
 
       {/* Layer 1 — Cover image (background) */}
-      {heroImage ? (
+      {heroImage && !heroImageFailed ? (
         <img
           src={heroImage}
           alt="Braids With Love"
+          loading="eager"
+          onError={() => setHeroImageFailed(true)}
           style={{
             position: 'absolute',
             inset: 0,
@@ -157,20 +159,11 @@ function Hero({ heroImage }: { heroImage: string | null }) {
           }}
         />
       ) : (
-        // Fallback gradient when no cover image set
+        // Fallback gradient — shown before fetch resolves, on fetch timeout, or if image URL fails
         <div style={{
           position: 'absolute', inset: 0,
           background: 'linear-gradient(135deg, #0D2B35 0%, #1a4050 100%)',
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16,
-        }}>
-          <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', fontWeight: 500, marginBottom: 4 }}>Upload a cover photo from the dashboard</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>Settings → Cover Image</div>
-          </div>
-        </div>
+        }} />
       )}
 
       {/* Layer 2 — Gradient overlay (readability) */}
@@ -477,27 +470,40 @@ export default function HomePage() {
   const [services, setServices] = useState<Service[]>([])
   const [servicesLoading, setServicesLoading] = useState(true)
   const [heroImage, setHeroImage] = useState<string | null>(null)
+  const [heroImageFailed, setHeroImageFailed] = useState(false)
 
   useEffect(() => {
+    const controller = new AbortController()
+    const signal = controller.signal
+
     const businessId = process.env.NEXT_PUBLIC_OUTSYDE_BUSINESS_ID
     const apiUrl = process.env.NEXT_PUBLIC_OUTSYDE_API_URL
     if (!businessId || !apiUrl) {
       setServicesLoading(false)
       return
     }
-    fetch(`${apiUrl}/api/businesses/${businessId}/services`)
+
+    fetch(`${apiUrl}/api/businesses/${businessId}/services`, { signal })
       .then(r => r.json())
       .then(data => setServices(data.services ?? []))
-      .catch(() => setServices([]))
+      .catch(err => { if (err.name !== 'AbortError') setServices([]) })
       .finally(() => setServicesLoading(false))
 
-    fetch(`${apiUrl}/api/businesses/${businessId}`)
+    fetch(`${apiUrl}/api/businesses/${businessId}`, { signal })
       .then(r => r.json())
       .then(data => {
         const biz = data.business ?? data
         setHeroImage(biz.coverImage ?? biz.cover_image ?? null)
+        setHeroImageFailed(false)
       })
-      .catch(() => null)
+      .catch(err => { if (err.name === 'AbortError') return })
+
+    const timeout = setTimeout(() => controller.abort(), 15000)
+
+    return () => {
+      controller.abort()
+      clearTimeout(timeout)
+    }
   }, [])
 
   return (
