@@ -14,28 +14,29 @@ function proxyHeaders(req: NextRequest): Record<string, string> {
   }
 }
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl
-  const params = new URLSearchParams()
-  const startDate = searchParams.get('startDate')
-  const endDate = searchParams.get('endDate')
-  if (startDate) params.set('startDate', startDate)
-  if (endDate) params.set('endDate', endDate)
-  const qs = params.toString()
-  const res = await fetch(`${API}/api/businesses/me/blocks${qs ? `?${qs}` : ''}`, {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ blockId: string }> }
+) {
+  const { blockId } = await params
+  const body = await req.json().catch(() => null)
+  const res = await fetch(`${API}/api/businesses/me/blocks/${blockId}`, {
+    method: 'PATCH',
     headers: proxyHeaders(req),
-    cache: 'no-store',
+    body: JSON.stringify(body),
   })
   const data = await res.json().catch(() => ({}))
   return NextResponse.json(data, { status: res.status })
 }
 
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null)
-  const res = await fetch(`${API}/api/businesses/me/blocks`, {
-    method: 'POST',
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ blockId: string }> }
+) {
+  const { blockId } = await params
+  const res = await fetch(`${API}/api/businesses/me/blocks/${blockId}`, {
+    method: 'DELETE',
     headers: proxyHeaders(req),
-    body: JSON.stringify(body),
   })
   const data = await res.json().catch(() => ({}))
   return NextResponse.json(data, { status: res.status })

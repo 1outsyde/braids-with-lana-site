@@ -15,14 +15,7 @@ function proxyHeaders(req: NextRequest): Record<string, string> {
 }
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl
-  const params = new URLSearchParams()
-  const startDate = searchParams.get('startDate')
-  const endDate = searchParams.get('endDate')
-  if (startDate) params.set('startDate', startDate)
-  if (endDate) params.set('endDate', endDate)
-  const qs = params.toString()
-  const res = await fetch(`${API}/api/businesses/me/blocks${qs ? `?${qs}` : ''}`, {
+  const res = await fetch(`${API}/api/businesses/me/weekly-availability`, {
     headers: proxyHeaders(req),
     cache: 'no-store',
   })
@@ -30,10 +23,10 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data, { status: res.status })
 }
 
-export async function POST(req: NextRequest) {
+export async function PUT(req: NextRequest) {
   const body = await req.json().catch(() => null)
-  const res = await fetch(`${API}/api/businesses/me/blocks`, {
-    method: 'POST',
+  const res = await fetch(`${API}/api/businesses/me/weekly-availability`, {
+    method: 'PUT',
     headers: proxyHeaders(req),
     body: JSON.stringify(body),
   })
