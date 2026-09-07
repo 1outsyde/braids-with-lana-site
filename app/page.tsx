@@ -26,85 +26,97 @@ function fmtDur(mins: number) {
 }
 
 // ── Nav ──────────────────────────────────────────────────────────────────────
-function Nav({ scrolled }: { scrolled: boolean }) {
-  const isMobile = useWindowWidth() < 768
+function Nav({ isMobile }: { isMobile: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
     <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-      background: scrolled ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0)',
-      backdropFilter: scrolled ? 'blur(16px)' : 'none',
-      borderBottom: scrolled ? '1px solid rgba(0,0,0,0.07)' : '1px solid transparent',
-      transition: 'all 0.3s ease',
+      position: 'absolute',
+      top: 0, left: 0, right: 0,
+      padding: isMobile ? '16px 20px' : '24px 64px',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      zIndex: 3,
+      // Subtle top fade to help nav items read on any photo
+      background: 'linear-gradient(to bottom, rgba(13,43,53,0.5) 0%, transparent 100%)',
     }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 40px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        {/* Logo */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid #29C5CC', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(41,197,204,0.06)' }}>
-            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 600, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
-          </div>
-          <div>
-            <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 600, color: '#0D2B35', lineHeight: 1.1 }}>Braids With Love</div>
-            <div style={{ fontSize: 9, color: '#29C5CC', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Virginia Beach, VA</div>
-          </div>
+      {/* Logo */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid rgba(41,197,204,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(41,197,204,0.1)' }}>
+          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 600, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
         </div>
-
-        {/* Desktop links */}
-        {!isMobile && (
-          <div style={{ display: 'flex', gap: 36, alignItems: 'center' }}>
-            {['Services', 'Gallery', 'About', 'Contact'].map(l => (
-              <a key={l} href={`#${l.toLowerCase()}`}
-                style={{ fontSize: 13, color: '#5a7a80', textDecoration: 'none', letterSpacing: '0.03em', fontWeight: 400 }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#0D2B35')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#5a7a80')}>{l}</a>
-            ))}
-          </div>
-        )}
-
-        {/* Desktop CTAs */}
-        {!isMobile && (
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-            <Link href="/login" style={{ fontSize: 13, color: '#5a7a80', textDecoration: 'none' }}>Sign in</Link>
-            <a href="#book" style={{ background: '#29C5CC', color: '#fff', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(41,197,204,0.3)' }}>Book Now</a>
-          </div>
-        )}
-
-        {/* Mobile hamburger */}
-        {isMobile && (
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: 5, minHeight: 44, justifyContent: 'center' }}
-            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          >
-            <span style={{ display: 'block', width: 22, height: 2, background: '#0D2B35', transition: 'all 0.2s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : undefined }} />
-            <span style={{ display: 'block', width: 22, height: 2, background: '#0D2B35', transition: 'all 0.2s', opacity: menuOpen ? 0 : 1 }} />
-            <span style={{ display: 'block', width: 22, height: 2, background: '#0D2B35', transition: 'all 0.2s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : undefined }} />
-          </button>
-        )}
+        <div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 600, color: '#fff', lineHeight: 1.1 }}>Braids With Love</div>
+          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Virginia Beach, VA</div>
+        </div>
       </div>
 
-      {/* Mobile dropdown */}
+      {/* Desktop links */}
+      {!isMobile && (
+        <div style={{ display: 'flex', gap: 36, alignItems: 'center' }}>
+          {['Services', 'Gallery', 'About', 'Contact'].map(l => (
+            <a key={l} href={`#${l.toLowerCase()}`}
+              style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', letterSpacing: '0.03em', fontWeight: 400 }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#29C5CC')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.85)')}>{l}</a>
+          ))}
+        </div>
+      )}
+
+      {/* Desktop CTAs */}
+      {!isMobile && (
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Sign in</Link>
+          <a href="#book" style={{ background: '#29C5CC', color: '#0D2B35', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(41,197,204,0.4)' }}>Book Now</a>
+        </div>
+      )}
+
+      {/* Mobile hamburger */}
+      {isMobile && (
+        <button
+          onClick={() => setMenuOpen(o => !o)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: 5, minHeight: 44, justifyContent: 'center' }}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+        >
+          <span style={{ display: 'block', width: 22, height: 2, background: '#ffffff', transition: 'all 0.2s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : undefined }} />
+          <span style={{ display: 'block', width: 22, height: 2, background: '#ffffff', transition: 'all 0.2s', opacity: menuOpen ? 0 : 1 }} />
+          <span style={{ display: 'block', width: 22, height: 2, background: '#ffffff', transition: 'all 0.2s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : undefined }} />
+        </button>
+      )}
+
+      {/* Mobile drawer — fixed so it overlays everything */}
       {isMobile && menuOpen && (
         <div style={{
-          background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(0,0,0,0.07)', padding: '16px 24px 24px',
+          position: 'fixed',
+          top: 0, left: 0, right: 0,
+          background: '#0D2B35',
+          zIndex: 1000,
+          padding: '20px 20px 32px',
         }}>
+          {/* Close row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(41,197,204,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
+              </div>
+              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Love</span>
+            </div>
+            <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 24, lineHeight: 1, padding: '4px', minHeight: 44 }} aria-label="Close menu">×</button>
+          </div>
           {['Services', 'Gallery', 'About', 'Contact'].map(l => (
             <a
               key={l}
               href={`#${l.toLowerCase()}`}
               onClick={() => setMenuOpen(false)}
-              style={{ display: 'block', padding: '13px 0', fontSize: 15, color: '#0D2B35', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.06)', fontWeight: 500 }}
+              style={{ display: 'block', padding: '14px 0', fontSize: 15, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)', fontWeight: 500 }}
             >
               {l}
             </a>
           ))}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 20 }}>
-            <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: '#0D2B35', textDecoration: 'none', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 4 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
+            <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
               Sign in
             </Link>
-            <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#29C5CC', color: '#fff', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
+            <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#29C5CC', color: '#0D2B35', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
               Book Now
             </a>
           </div>
@@ -117,83 +129,153 @@ function Nav({ scrolled }: { scrolled: boolean }) {
 // ── Hero ─────────────────────────────────────────────────────────────────────
 function Hero({ heroImage }: { heroImage: string | null }) {
   const isMobile = useWindowWidth() < 768
-  const panelStyle: React.CSSProperties = heroImage
-    ? { backgroundImage: `url('${heroImage}')`, backgroundSize: 'cover', backgroundPosition: 'center top' }
-    : { background: '#29C5CC' }
 
   return (
-    <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'stretch', overflow: 'hidden', background: '#f8fafa', flexDirection: isMobile ? 'column' : undefined }}>
-      {/* Left — text */}
-      <div style={{ flex: isMobile ? '1 1 auto' : '0 0 50%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: isMobile ? '100px 24px 48px' : '120px 64px 80px 10%', position: 'relative', zIndex: 2 }}>
-        {/* Live badge */}
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(41,197,204,0.1)', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 24, padding: '6px 16px', marginBottom: 32, alignSelf: 'flex-start' }}>
-          <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#29C5CC', boxShadow: '0 0 8px rgba(41,197,204,0.8)' }} />
-          <span style={{ fontSize: 11, fontWeight: 600, color: '#1a8f94', letterSpacing: '0.08em' }}>Now accepting bookings</span>
+    <section style={{
+      position: 'relative',
+      width: '100%',
+      height: isMobile ? '90vh' : '100vh',
+      minHeight: isMobile ? 580 : 640,
+      overflow: 'hidden',
+      backgroundColor: '#0D2B35',  // fallback while image loads
+    }}>
+
+      {/* Layer 1 — Cover image (background) */}
+      {heroImage ? (
+        <img
+          src={heroImage}
+          alt="Braids With Love"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            // objectPosition: 'center top' keeps subject's face in frame on tall mobile viewports
+            // Change to 'center center' if cover image is landscape-oriented
+            objectPosition: 'center top',
+          }}
+        />
+      ) : (
+        // Fallback gradient when no cover image set
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(135deg, #0D2B35 0%, #1a4050 100%)',
+          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16,
+        }}>
+          <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', fontWeight: 500, marginBottom: 4 }}>Upload a cover photo from the dashboard</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)' }}>Settings → Cover Image</div>
+          </div>
         </div>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(42px,5.5vw,80px)', fontWeight: 400, lineHeight: 1.02, color: '#0D2B35', marginBottom: 24, letterSpacing: '-0.01em' }}>
-          Where every<br />
-          braid tells<br />
-          <em style={{ color: '#29C5CC', fontWeight: 300 }}>your story.</em>
+      )}
+
+      {/* Layer 2 — Gradient overlay (readability) */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: `linear-gradient(
+          to bottom,
+          rgba(13,43,53,0.15) 0%,
+          rgba(13,43,53,0.05) 25%,
+          rgba(13,43,53,0.4) 55%,
+          rgba(13,43,53,0.82) 75%,
+          rgba(13,43,53,0.96) 100%
+        )`,
+        zIndex: 1,
+      }} />
+
+      {/* Layer 3 — Nav (floats at top) */}
+      <Nav isMobile={isMobile} />
+
+      {/* Layer 4 — Hero content (floats at bottom) */}
+      <div style={{
+        position: 'absolute',
+        bottom: 0, left: 0, right: 0,
+        padding: isMobile ? '0 20px 32px' : '0 64px 64px',
+        zIndex: 2,
+      }}>
+        {/* Availability pill */}
+        <div style={{
+          display: 'inline-flex', alignItems: 'center', gap: 6,
+          background: 'rgba(41,197,204,0.15)',
+          border: '0.5px solid rgba(41,197,204,0.4)',
+          borderRadius: 20, padding: '5px 12px',
+          marginBottom: 14,
+        }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#29C5CC' }} />
+          <span style={{ fontSize: 12, color: '#29C5CC', fontWeight: 500 }}>
+            Now accepting bookings
+          </span>
+        </div>
+
+        {/* Headline */}
+        <h1 style={{
+          fontFamily: 'Cormorant Garamond, Georgia, serif',
+          fontSize: isMobile ? 38 : 56,
+          fontWeight: 400,
+          color: '#ffffff',
+          lineHeight: 1.1,
+          margin: '0 0 12px',
+        }}>
+          Where every braid tells{' '}
+          <em style={{ color: '#29C5CC', fontStyle: 'italic' }}>your story.</em>
         </h1>
-        <p style={{ fontSize: 16, color: '#4a6872', lineHeight: 1.75, maxWidth: 380, marginBottom: 40 }}>
-          Knotless braids, box braids, faux locs, and more — booked online in minutes. No DMs, no waiting.
+
+        {/* Subheadline */}
+        <p style={{
+          fontSize: isMobile ? 14 : 16,
+          color: 'rgba(255,255,255,0.7)',
+          lineHeight: 1.6,
+          margin: '0 0 20px',
+          maxWidth: isMobile ? '100%' : 480,
+        }}>
+          Knotless braids, box braids, faux locs, and more — booked online in minutes.
+          No DMs, no waiting.
         </p>
-        <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap', marginBottom: 52 }}>
-          <a href="#book" style={{ display: 'inline-flex', alignItems: 'center', gap: 9, background: '#29C5CC', color: '#fff', fontSize: 14, fontWeight: 600, padding: '14px 30px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.03em', boxShadow: '0 4px 20px rgba(41,197,204,0.35)' }}>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-            Book an appointment
-          </a>
-          <a href="#services" style={{ fontSize: 14, color: '#29C5CC', textDecoration: 'none', fontWeight: 500 }}>
-            View services →
-          </a>
-        </div>
-        {/* Trust row */}
-        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', paddingTop: 24, borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+
+        {/* Trust badges row */}
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 20 }}>
           {[
-            { icon: '📅', label: 'Book online 24/7' },
-            { icon: '🔒', label: 'Secure checkout' },
-            { icon: '⭐', label: 'Earn rewards' },
-          ].map(t => (
-            <div key={t.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span style={{ fontSize: 14 }}>{t.icon}</span>
-              <span style={{ fontSize: 12, color: '#5a7a80', fontWeight: 500 }}>{t.label}</span>
+            { icon: '📅', text: 'Book online 24/7' },
+            { icon: '🔒', text: 'Secure checkout' },
+            { icon: '⭐', text: 'Earn rewards' },
+          ].map(({ icon, text }) => (
+            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ fontSize: 13 }}>{icon}</span>
+              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>{text}</span>
             </div>
           ))}
         </div>
-      </div>
-      {/* Right — photo */}
-      <div style={{ flex: isMobile ? '0 0 280px' : '0 0 50%', position: 'relative', minHeight: isMobile ? 280 : 600 }}>
+
+        {/* CTA button */}
         <div style={{
-          position: 'absolute', top: 0, right: 0, bottom: 0, left: isMobile ? 0 : '8%',
-          ...panelStyle,
-          borderRadius: isMobile ? 0 : '0 0 0 48px', overflow: 'hidden',
+          display: 'flex',
+          flexDirection: isMobile ? 'column' : 'row',
+          gap: 12, alignItems: isMobile ? 'stretch' : 'center',
         }}>
-          {!heroImage && (
-            <>
-              <div style={{ position: 'absolute', inset: 0, opacity: 0.15, backgroundImage: 'radial-gradient(circle at 30% 70%, rgba(255,255,255,0.4) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.3) 0%, transparent 40%)' }} />
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
-                <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></svg>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', fontWeight: 600, marginBottom: 4 }}>Upload a hero photo from the dashboard</div>
-                  <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>Settings → Site Hero Image</div>
-                </div>
-              </div>
-            </>
-          )}
-          {/* Floating card */}
-          {!isMobile && (
-            <div style={{ position: 'absolute', bottom: 48, left: 32, background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(41,197,204,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>✂️</div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: '#0D2B35', marginBottom: 2 }}>5-star experience</div>
-                <div style={{ fontSize: 11, color: '#5a7a80' }}>Virginia Beach&apos;s top braider</div>
-              </div>
-            </div>
-          )}
+          <a href="/book" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            background: '#29C5CC', color: '#0D2B35',
+            borderRadius: 12, padding: '14px 28px',
+            fontWeight: 700, fontSize: 15,
+            textDecoration: 'none',
+          }}>
+            📅 Book an appointment
+          </a>
+          <a href="#services" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'rgba(255,255,255,0.7)',
+            fontSize: 14, textDecoration: 'none',
+            padding: isMobile ? '8px 0' : '14px 0',
+          }}>
+            View services →
+          </a>
         </div>
       </div>
+
     </section>
   )
 }
@@ -394,14 +476,7 @@ function Footer() {
 export default function HomePage() {
   const [services, setServices] = useState<Service[]>([])
   const [servicesLoading, setServicesLoading] = useState(true)
-  const [scrolled, setScrolled] = useState(false)
   const [heroImage, setHeroImage] = useState<string | null>(null)
-
-  useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', fn, { passive: true })
-    return () => window.removeEventListener('scroll', fn)
-  }, [])
 
   useEffect(() => {
     const businessId = process.env.NEXT_PUBLIC_OUTSYDE_BUSINESS_ID
@@ -427,7 +502,6 @@ export default function HomePage() {
 
   return (
     <div style={{ fontFamily: 'DM Sans, sans-serif', color: '#4a6872', background: '#f8fafa' }}>
-      <Nav scrolled={scrolled} />
       <Hero heroImage={heroImage} />
       <Services services={services} loading={servicesLoading} />
       <Why />
