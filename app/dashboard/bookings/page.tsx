@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { buildDateMap, DateMap } from '@/lib/calendar'
+import DashboardCalendar from '@/components/calendar/DashboardCalendar'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -70,6 +72,7 @@ function fmtMoney(cents?: number) {
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [dateMap, setDateMap] = useState<DateMap>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState('')
@@ -79,11 +82,23 @@ export default function BookingsPage() {
     setLoading(true)
     setError(null)
     try {
+      const today = new Date().toISOString().substring(0, 10)
+      const in90 = new Date(Date.now() + 90 * 864e5).toISOString().substring(0, 10)
       const q = filter ? `?status=${filter}` : ''
-      const res = await fetch(`/api/admin/bookings${q}`)
-      if (!res.ok) throw new Error('Failed to load bookings')
-      const data = await res.json()
-      setBookings(Array.isArray(data) ? data : (data.appointments ?? data.bookings ?? []))
+      const [bookingsRes, blocksRes] = await Promise.all([
+        fetch(`/api/admin/bookings${q}`),
+        fetch(`/api/admin/availability/blocks?startDate=${today}&endDate=${in90}`),
+      ])
+      if (!bookingsRes.ok) throw new Error('Failed to load bookings')
+      const [bookingsData, blocksData] = await Promise.all([
+        bookingsRes.json(),
+        blocksRes.json().catch(() => ({})),
+      ])
+      const loaded = Array.isArray(bookingsData)
+        ? bookingsData
+        : (bookingsData.appointments ?? bookingsData.bookings ?? [])
+      setBookings(loaded)
+      setDateMap(buildDateMap(loaded, blocksData.blocks ?? blocksData.data ?? []))
     } catch {
       setError('Could not load bookings. Please try again.')
     } finally {
@@ -137,6 +152,14 @@ export default function BookingsPage() {
         >
           Refresh
         </button>
+      </div>
+
+      {/* Calendar — month/list toggle above bookings list */}
+      <div style={{
+        background: '#FFFFFF', borderRadius: 16,
+        border: '1px solid rgba(0,0,0,0.07)', padding: '20px 24px', marginBottom: 28,
+      }}>
+        <DashboardCalendar dateMap={dateMap} mode="bookings" />
       </div>
 
       {/* Up Next card */}
