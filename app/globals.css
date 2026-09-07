@@ -335,3 +335,7 @@ img {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+.tab-scroll::-webkit-scrollbar {
+  display: none;
+}

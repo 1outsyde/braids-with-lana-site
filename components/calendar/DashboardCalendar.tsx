@@ -119,6 +119,7 @@ function DayPanel({
       marginTop: 16, padding: '16px 20px',
       background: 'rgba(13,43,53,0.03)', borderRadius: 10,
       border: '1px solid rgba(13,43,53,0.09)',
+      width: '100%', boxSizing: 'border-box',
     }}>
       {/* Header */}
       <div style={{

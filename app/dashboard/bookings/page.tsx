@@ -16,6 +16,7 @@ interface Booking {
   customer_name: string
   customer_email: string
   appointment_date: string
+  appointmentDate?: string
   appointment_time?: string
   start_time?: string
   duration_minutes?: number
@@ -49,8 +50,10 @@ function fmtBookingNum(n: number) {
   return `#A${String(n).padStart(4, '0')}`
 }
 
-function fmtDate(dateStr: string) {
+function fmtDate(dateStr: string | undefined | null) {
+  if (!dateStr) return '—'
   const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return '—'
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
 }
 
@@ -173,7 +176,7 @@ export default function BookingsPage() {
               </div>
               <div style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginTop: 3 }}>{upNext.service_name}</div>
               <div style={{ fontSize: 13, color: '#0D2B35', marginTop: 6, fontWeight: 500 }}>
-                {fmtDate(upNext.appointment_date)}{fmtTime(upNext) ? ` · ${fmtTime(upNext)}` : ''}
+                {fmtDate(upNext.appointment_date ?? upNext.appointmentDate)}{fmtTime(upNext) ? ` · ${fmtTime(upNext)}` : ''}
               </div>
             </div>
             <div className="flex gap-2">
@@ -192,7 +195,10 @@ export default function BookingsPage() {
       )}
 
       {/* Filter tabs — underline pattern */}
-      <div style={{ display: 'flex', borderBottom: '1px solid rgba(0,0,0,0.08)', marginBottom: 24 }}>
+      <div
+        className="tab-scroll"
+        style={{ display: 'flex', borderBottom: '1px solid rgba(0,0,0,0.08)', marginBottom: 24, overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
         {STATUS_FILTERS.map(f => (
           <button
             key={f.value}
@@ -251,7 +257,7 @@ export default function BookingsPage() {
                     <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', marginTop: 2 }}>{b.service_name}</div>
                     <div className="flex items-center gap-3 mt-3 flex-wrap">
                       <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.6)' }}>
-                        {fmtDate(b.appointment_date)}{time ? ` · ${time}` : ''}
+                        {fmtDate(b.appointment_date ?? b.appointmentDate)}{time ? ` · ${time}` : ''}
                       </span>
                       {b.total_amount != null && (
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#C9A84C' }}>

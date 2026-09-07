@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useWindowWidth } from '@/lib/useWindowWidth'
 
 export default function SettingsPage() {
+  const isMobile = useWindowWidth() < 768
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null)
   const [heroUploading, setHeroUploading] = useState(false)
   const [heroError, setHeroError] = useState<string | null>(null)
@@ -93,7 +95,7 @@ export default function SettingsPage() {
         background: '#fff',
         border: '1.5px solid #eef2f3',
         borderRadius: 12,
-        padding: '28px 32px',
+        padding: isMobile ? '24px 20px' : '28px 32px',
       }}>
         <h2 style={{
           fontFamily: 'Cormorant Garamond, serif',
