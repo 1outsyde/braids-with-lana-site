@@ -52,7 +52,7 @@ export default function RegisterPage() {
     border: '1px solid rgba(255,255,255,0.12)',
     padding: '12px 14px',
     color: '#f0f9fa',
-    fontSize: '0.95rem',
+    fontSize: '1rem',
     outline: 'none',
     boxSizing: 'border-box',
     borderRadius: '4px',

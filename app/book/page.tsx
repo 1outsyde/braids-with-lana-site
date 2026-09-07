@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { useWindowWidth } from '@/lib/useWindowWidth'
 import { loadStripe } from '@stripe/stripe-js'
 import {
   Elements,
@@ -59,7 +60,7 @@ const inputStyle: React.CSSProperties = {
   padding: '11px 14px',
   border: `1px solid ${T.border}`,
   borderRadius: 6,
-  fontSize: 14,
+  fontSize: 16,
   color: T.navy,
   outline: 'none',
   fontFamily: "'DM Sans', sans-serif",
@@ -96,8 +97,11 @@ const btnSecondary: React.CSSProperties = {
 
 const STEPS: Step[] = ['service', 'datetime', 'auth', 'payment', 'confirm']
 const STEP_LABELS = ['Service', 'Date & Time', 'Account', 'Payment', 'Confirmed']
+const STEP_LABELS_MOBILE = ['Svc', 'Time', 'Acct', 'Pay', 'Done']
 
 function ProgressBar({ step }: { step: Step }) {
+  const isMobile = useWindowWidth() < 480
+  const labels = isMobile ? STEP_LABELS_MOBILE : STEP_LABELS
   const idx = STEPS.indexOf(step)
   return (
     <div style={{ marginBottom: 32 }}>
@@ -120,8 +124,8 @@ function ProgressBar({ step }: { step: Step }) {
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6 }}>
-        {STEP_LABELS.map((label, i) => (
-          <span key={label} style={{ fontSize: 10, color: i <= idx ? T.teal : T.muted, fontWeight: i === idx ? 700 : 400, width: 60, textAlign: 'center' }}>
+        {labels.map((label, i) => (
+          <span key={label} style={{ fontSize: 10, color: i <= idx ? T.teal : T.muted, fontWeight: i === idx ? 700 : 400, width: isMobile ? 40 : 60, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {label}
           </span>
         ))}

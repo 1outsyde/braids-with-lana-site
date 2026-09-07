@@ -561,7 +561,7 @@ export default function ServicesPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2 flex-shrink-0">
+                <div className="flex gap-2 flex-shrink-0" style={{ flexWrap: 'wrap' }}>
                   {displayStatus === 'draft' && (
                     <button
                       onClick={() => handlePublish(service)}
@@ -614,7 +614,7 @@ export default function ServicesPage() {
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
-  fontSize: 14,
+  fontSize: 16,
   padding: '9px 12px',
   borderRadius: 8,
   border: '1px solid rgba(0,0,0,0.12)',

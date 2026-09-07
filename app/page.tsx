@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useWindowWidth } from '@/lib/useWindowWidth'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Service {
@@ -26,6 +27,9 @@ function fmtDur(mins: number) {
 
 // ── Nav ──────────────────────────────────────────────────────────────────────
 function Nav({ scrolled }: { scrolled: boolean }) {
+  const isMobile = useWindowWidth() < 768
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <nav style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
@@ -34,7 +38,7 @@ function Nav({ scrolled }: { scrolled: boolean }) {
       borderBottom: scrolled ? '1px solid rgba(0,0,0,0.07)' : '1px solid transparent',
       transition: 'all 0.3s ease',
     }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 20px' : '0 40px', height: 68, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid #29C5CC', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(41,197,204,0.06)' }}>
@@ -45,40 +49,88 @@ function Nav({ scrolled }: { scrolled: boolean }) {
             <div style={{ fontSize: 9, color: '#29C5CC', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Virginia Beach, VA</div>
           </div>
         </div>
-        {/* Links */}
-        <div style={{ display: 'flex', gap: 36, alignItems: 'center' }}>
-          {['Services', 'Gallery', 'About', 'Contact'].map(l => (
-            <a key={l} href={`#${l.toLowerCase()}`}
-              style={{ fontSize: 13, color: '#5a7a80', textDecoration: 'none', letterSpacing: '0.03em', fontWeight: 400 }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#0D2B35')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#5a7a80')}>{l}</a>
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-          <Link href="/login" style={{ fontSize: 13, color: '#5a7a80', textDecoration: 'none' }}>Sign in</Link>
-          <a href="#book" style={{ background: '#29C5CC', color: '#fff', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(41,197,204,0.3)' }}>Book Now</a>
-        </div>
+
+        {/* Desktop links */}
+        {!isMobile && (
+          <div style={{ display: 'flex', gap: 36, alignItems: 'center' }}>
+            {['Services', 'Gallery', 'About', 'Contact'].map(l => (
+              <a key={l} href={`#${l.toLowerCase()}`}
+                style={{ fontSize: 13, color: '#5a7a80', textDecoration: 'none', letterSpacing: '0.03em', fontWeight: 400 }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#0D2B35')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#5a7a80')}>{l}</a>
+            ))}
+          </div>
+        )}
+
+        {/* Desktop CTAs */}
+        {!isMobile && (
+          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+            <Link href="/login" style={{ fontSize: 13, color: '#5a7a80', textDecoration: 'none' }}>Sign in</Link>
+            <a href="#book" style={{ background: '#29C5CC', color: '#fff', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(41,197,204,0.3)' }}>Book Now</a>
+          </div>
+        )}
+
+        {/* Mobile hamburger */}
+        {isMobile && (
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: 5, minHeight: 44, justifyContent: 'center' }}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          >
+            <span style={{ display: 'block', width: 22, height: 2, background: '#0D2B35', transition: 'all 0.2s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : undefined }} />
+            <span style={{ display: 'block', width: 22, height: 2, background: '#0D2B35', transition: 'all 0.2s', opacity: menuOpen ? 0 : 1 }} />
+            <span style={{ display: 'block', width: 22, height: 2, background: '#0D2B35', transition: 'all 0.2s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : undefined }} />
+          </button>
+        )}
       </div>
+
+      {/* Mobile dropdown */}
+      {isMobile && menuOpen && (
+        <div style={{
+          background: 'rgba(255,255,255,0.98)', backdropFilter: 'blur(16px)',
+          borderTop: '1px solid rgba(0,0,0,0.07)', padding: '16px 24px 24px',
+        }}>
+          {['Services', 'Gallery', 'About', 'Contact'].map(l => (
+            <a
+              key={l}
+              href={`#${l.toLowerCase()}`}
+              onClick={() => setMenuOpen(false)}
+              style={{ display: 'block', padding: '13px 0', fontSize: 15, color: '#0D2B35', textDecoration: 'none', borderBottom: '1px solid rgba(0,0,0,0.06)', fontWeight: 500 }}
+            >
+              {l}
+            </a>
+          ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 20 }}>
+            <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: '#0D2B35', textDecoration: 'none', border: '1px solid rgba(0,0,0,0.12)', borderRadius: 4 }}>
+              Sign in
+            </Link>
+            <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#29C5CC', color: '#fff', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
+              Book Now
+            </a>
+          </div>
+        </div>
+      )}
     </nav>
   )
 }
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 function Hero({ heroImage }: { heroImage: string | null }) {
+  const isMobile = useWindowWidth() < 768
   const panelStyle: React.CSSProperties = heroImage
     ? { backgroundImage: `url('${heroImage}')`, backgroundSize: 'cover', backgroundPosition: 'center top' }
     : { background: '#29C5CC' }
 
   return (
-    <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'stretch', overflow: 'hidden', background: '#f8fafa' }}>
+    <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'stretch', overflow: 'hidden', background: '#f8fafa', flexDirection: isMobile ? 'column' : undefined }}>
       {/* Left — text */}
-      <div style={{ flex: '0 0 50%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '120px 64px 80px 10%', position: 'relative', zIndex: 2 }}>
+      <div style={{ flex: isMobile ? '1 1 auto' : '0 0 50%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: isMobile ? '100px 24px 48px' : '120px 64px 80px 10%', position: 'relative', zIndex: 2 }}>
         {/* Live badge */}
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(41,197,204,0.1)', border: '1px solid rgba(41,197,204,0.3)', borderRadius: 24, padding: '6px 16px', marginBottom: 32, alignSelf: 'flex-start' }}>
           <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#29C5CC', boxShadow: '0 0 8px rgba(41,197,204,0.8)' }} />
           <span style={{ fontSize: 11, fontWeight: 600, color: '#1a8f94', letterSpacing: '0.08em' }}>Now accepting bookings</span>
         </div>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(52px,5.5vw,80px)', fontWeight: 400, lineHeight: 1.02, color: '#0D2B35', marginBottom: 24, letterSpacing: '-0.01em' }}>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(42px,5.5vw,80px)', fontWeight: 400, lineHeight: 1.02, color: '#0D2B35', marginBottom: 24, letterSpacing: '-0.01em' }}>
           Where every<br />
           braid tells<br />
           <em style={{ color: '#29C5CC', fontWeight: 300 }}>your story.</em>
@@ -96,7 +148,7 @@ function Hero({ heroImage }: { heroImage: string | null }) {
           </a>
         </div>
         {/* Trust row */}
-        <div style={{ display: 'flex', gap: 28, paddingTop: 24, borderTop: '1px solid rgba(0,0,0,0.07)' }}>
+        <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap', paddingTop: 24, borderTop: '1px solid rgba(0,0,0,0.07)' }}>
           {[
             { icon: '📅', label: 'Book online 24/7' },
             { icon: '🔒', label: 'Secure checkout' },
@@ -110,11 +162,11 @@ function Hero({ heroImage }: { heroImage: string | null }) {
         </div>
       </div>
       {/* Right — photo */}
-      <div style={{ flex: '0 0 50%', position: 'relative', minHeight: 600 }}>
+      <div style={{ flex: isMobile ? '0 0 280px' : '0 0 50%', position: 'relative', minHeight: isMobile ? 280 : 600 }}>
         <div style={{
-          position: 'absolute', top: 0, right: 0, bottom: 0, left: '8%',
+          position: 'absolute', top: 0, right: 0, bottom: 0, left: isMobile ? 0 : '8%',
           ...panelStyle,
-          borderRadius: '0 0 0 48px', overflow: 'hidden',
+          borderRadius: isMobile ? 0 : '0 0 0 48px', overflow: 'hidden',
         }}>
           {!heroImage && (
             <>
@@ -131,13 +183,15 @@ function Hero({ heroImage }: { heroImage: string | null }) {
             </>
           )}
           {/* Floating card */}
-          <div style={{ position: 'absolute', bottom: 48, left: 32, background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', gap: 14 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(41,197,204,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>✂️</div>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#0D2B35', marginBottom: 2 }}>5-star experience</div>
-              <div style={{ fontSize: 11, color: '#5a7a80' }}>Virginia Beach&apos;s top braider</div>
+          {!isMobile && (
+            <div style={{ position: 'absolute', bottom: 48, left: 32, background: '#fff', borderRadius: 12, padding: '16px 20px', boxShadow: '0 8px 32px rgba(0,0,0,0.12)', display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'rgba(41,197,204,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>✂️</div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0D2B35', marginBottom: 2 }}>5-star experience</div>
+                <div style={{ fontSize: 11, color: '#5a7a80' }}>Virginia Beach&apos;s top braider</div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </section>
@@ -146,11 +200,12 @@ function Hero({ heroImage }: { heroImage: string | null }) {
 
 // ── Services ─────────────────────────────────────────────────────────────────
 function Services({ services, loading }: { services: Service[]; loading: boolean }) {
+  const isMobile = useWindowWidth() < 768
   const CARD_COLORS = ['#e8f9fa', '#fff5e6', '#f0f9ff', '#f5f0ff', '#e8faf5']
   return (
     <section id="services" style={{ padding: '96px 0', background: '#fff' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 52 }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 24px' : '0 40px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 52, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
               <div style={{ width: 32, height: 2, background: '#29C5CC', borderRadius: 1 }} />
@@ -246,27 +301,28 @@ function Why() {
 
 // ── CTA Banner ────────────────────────────────────────────────────────────────
 function BookCTA() {
+  const isMobile = useWindowWidth() < 768
   return (
-    <section id="book" style={{ background: '#0D2B35', padding: '100px 40px' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr auto', gap: 64, alignItems: 'center' }}>
+    <section id="book" style={{ background: '#0D2B35', padding: isMobile ? '64px 24px' : '100px 40px' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr auto', gap: isMobile ? 36 : 64, alignItems: 'center' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
             <div style={{ width: 32, height: 2, background: '#29C5CC', borderRadius: 1 }} />
             <span style={{ fontSize: 12, color: '#29C5CC', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Ready to book?</span>
           </div>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(40px,5vw,64px)', fontWeight: 300, lineHeight: 1.05, color: '#fff', marginBottom: 16 }}>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px,5vw,64px)', fontWeight: 300, lineHeight: 1.05, color: '#fff', marginBottom: 16 }}>
             Your next look<br /><em style={{ color: '#29C5CC', fontWeight: 400 }}>starts here.</em>
           </h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.75, maxWidth: 480 }}>
             Pick your style, choose a date, pay securely. Address confirmed after booking.
           </p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, minWidth: 220 }}>
-          <Link href="/book" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#29C5CC', color: '#fff', fontSize: 15, fontWeight: 600, padding: '16px 36px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.03em', boxShadow: '0 4px 24px rgba(41,197,204,0.4)', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMobile ? 'stretch' : 'center', gap: 14 }}>
+          <Link href="/book" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#29C5CC', color: '#fff', fontSize: 15, fontWeight: 600, padding: '16px 36px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.03em', boxShadow: '0 4px 24px rgba(41,197,204,0.4)', whiteSpace: 'nowrap' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
             Book your appointment
           </Link>
-          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em' }}>No DMs · No waiting · Earn rewards</span>
+          <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.06em', textAlign: 'center' }}>No DMs · No waiting · Earn rewards</span>
         </div>
       </div>
     </section>
@@ -275,9 +331,10 @@ function BookCTA() {
 
 // ── Contact ───────────────────────────────────────────────────────────────────
 function Contact() {
+  const isMobile = useWindowWidth() < 768
   return (
-    <section id="contact" style={{ padding: '88px 40px', background: '#fff', borderTop: '1px solid #eef2f3' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80, alignItems: 'start' }}>
+    <section id="contact" style={{ padding: isMobile ? '56px 24px' : '88px 40px', background: '#fff', borderTop: '1px solid #eef2f3' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 40 : 80, alignItems: 'start' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
             <div style={{ width: 32, height: 2, background: '#29C5CC', borderRadius: 1 }} />
@@ -298,7 +355,7 @@ function Contact() {
           ].map(item => (
             <div key={item.label} style={{ borderTop: '1px solid #eef2f3', padding: '22px 0' }}>
               <div style={{ fontSize: 10, color: '#29C5CC', letterSpacing: '0.14em', fontWeight: 700, marginBottom: 6, textTransform: 'uppercase' as const }}>{item.label}</div>
-              <div style={{ fontSize: 15, color: '#0D2B35', fontWeight: 500 }}>{item.value}</div>
+              <div style={{ fontSize: 15, color: '#0D2B35', fontWeight: 500, wordBreak: 'break-word' }}>{item.value}</div>
               {item.sub && <div style={{ fontSize: 12, color: '#9ab3b8', marginTop: 3 }}>{item.sub}</div>}
             </div>
           ))}

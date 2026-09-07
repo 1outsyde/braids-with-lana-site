@@ -548,7 +548,7 @@ function ProfileSection() {
 
   const inputStyle: React.CSSProperties = {
     width: '100%', background: 'rgba(255,255,255,0.06)', border: `1px solid ${BORDER}`,
-    padding: '12px 14px', color: TEXT, fontSize: '0.95rem', outline: 'none',
+    padding: '12px 14px', color: TEXT, fontSize: '1rem', outline: 'none',
     boxSizing: 'border-box', borderRadius: 4, fontFamily: FONT_BODY,
   }
   const labelStyle: React.CSSProperties = {
@@ -738,17 +738,17 @@ export default function AccountPage() {
           {/* Avatar + identity */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
             <Avatar imageUrl={user.profileImageUrl} initial={initial} size={56} />
-            <div>
+            <div style={{ flex: 1, minWidth: 0 }}>
               <p style={{ fontFamily: FONT_DISPLAY, fontSize: '1.5rem', fontWeight: 500, color: TEXT, marginBottom: 2 }}>
                 {user.firstName || user.email.split('@')[0]}
               </p>
-              <p style={{ fontFamily: FONT_BODY, fontSize: '0.85rem', color: GOLD }}>
+              <p style={{ fontFamily: FONT_BODY, fontSize: '0.85rem', color: GOLD, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {user.email}
               </p>
             </div>
             {/* Points badge */}
             <div style={{
-              marginLeft: 'auto', border: `1px solid ${GOLD}`, borderRadius: 20,
+              flexShrink: 0, border: `1px solid ${GOLD}`, borderRadius: 20,
               padding: '5px 14px', whiteSpace: 'nowrap',
             }}>
               <span style={{ fontFamily: FONT_BODY, fontSize: '0.8rem', color: GOLD }}>
@@ -758,7 +758,10 @@ export default function AccountPage() {
           </div>
 
           {/* Tab bar */}
-          <div style={{ display: 'flex', gap: 0 }}>
+          <div
+            className="tab-scroll"
+            style={{ display: 'flex', gap: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {visibleTabs.map(tab => (
               <button
                 key={tab.id}
