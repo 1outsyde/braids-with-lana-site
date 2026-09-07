@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { buildDateMap, DateMap } from '@/lib/calendar'
+import DashboardCalendar from '@/components/calendar/DashboardCalendar'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -80,26 +82,38 @@ export default function DashboardOverviewPage() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [serviceCount, setServiceCount] = useState<number | null>(null)
   const [appointments, setAppointments] = useState<Appointment[]>([])
+  const [dateMap, setDateMap] = useState<DateMap>({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       try {
-        const [statsRes, servicesRes, apptsRes] = await Promise.all([
+        const today = new Date().toISOString().substring(0, 10)
+        const in90 = new Date(Date.now() + 90 * 864e5).toISOString().substring(0, 10)
+
+        const [statsRes, servicesRes, apptsRes, allApptsRes, blocksRes] = await Promise.all([
           fetch('/api/dashboard/stats', { cache: 'no-store' }),
           fetch('/api/bookings/services', { cache: 'no-store' }),
           fetch('/api/dashboard/appointments-today', { cache: 'no-store' }),
+          fetch('/api/admin/bookings', { cache: 'no-store' }),
+          fetch(`/api/admin/availability/blocks?startDate=${today}&endDate=${in90}`, { cache: 'no-store' }),
         ])
 
-        const [statsData, servicesData, apptsData] = await Promise.all([
+        const [statsData, servicesData, apptsData, allApptsData, blocksData] = await Promise.all([
           statsRes.json().catch(() => ({})),
           servicesRes.json().catch(() => ({})),
           apptsRes.json().catch(() => ({ appointments: [] })),
+          allApptsRes.json().catch(() => ({})),
+          blocksRes.json().catch(() => ({})),
         ])
 
         setStats(statsData?.stats ?? null)
         setServiceCount(Array.isArray(servicesData?.services) ? servicesData.services.length : null)
         setAppointments(apptsData?.appointments ?? [])
+        setDateMap(buildDateMap(
+          allApptsData.appointments ?? allApptsData.data ?? [],
+          blocksData.blocks ?? blocksData.data ?? [],
+        ))
       } finally {
         setLoading(false)
       }
@@ -157,6 +171,17 @@ export default function DashboardOverviewPage() {
           </Link>
         </div>
       )}
+
+      {/* Calendar overview */}
+      <div style={{
+        background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+        border: '1px solid #e8f0f1', padding: '24px', marginBottom: 24,
+      }}>
+        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', margin: '0 0 20px' }}>
+          Calendar
+        </h2>
+        <DashboardCalendar dateMap={dateMap} mode="overview" />
+      </div>
 
       {/* Today's appointments */}
       <div style={{
