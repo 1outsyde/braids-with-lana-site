@@ -15,6 +15,7 @@ interface VendorService {
   imageUrl: string | null
   stripeProductId: string | null
   stripePriceId: string | null
+  depositAmountCents: number | null
   createdAt: string
 }
 
@@ -25,10 +26,13 @@ type FormData = {
   durationMinutes: string
   category: string
   isActive: boolean
+  depositEnabled: boolean
+  depositAmount: string  // dollars (user input)
 }
 
 const EMPTY_FORM: FormData = {
   name: '', description: '', price: '', durationMinutes: '60', category: '', isActive: true,
+  depositEnabled: false, depositAmount: '',
 }
 
 const DURATION_OPTIONS = [
@@ -87,6 +91,7 @@ export default function ServicesPage() {
   const [publishing, setPublishing] = useState<string | null>(null)
   const [formImageUrl, setFormImageUrl] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
+  const [applyingDeposit, setApplyingDeposit] = useState(false)
 
   async function loadServices() {
     setLoading(true)
@@ -125,6 +130,10 @@ export default function ServicesPage() {
       durationMinutes: String(service.durationMinutes),
       category: service.category ?? '',
       isActive: service.isActive,
+      depositEnabled: typeof service.depositAmountCents === 'number',
+      depositAmount: typeof service.depositAmountCents === 'number'
+        ? (service.depositAmountCents / 100).toFixed(2)
+        : '',
     })
     setFormError(null)
     setFormImageUrl(service.imageUrl ?? null)
@@ -137,6 +146,7 @@ export default function ServicesPage() {
     setForm(EMPTY_FORM)
     setFormError(null)
     setFormImageUrl(null)
+    setApplyingDeposit(false)
   }
 
   async function handleImageUpload(file: File) {
@@ -168,6 +178,13 @@ export default function ServicesPage() {
     const duration = parseInt(form.durationMinutes)
     if (!duration || duration < 15) { setFormError('Duration must be at least 15 minutes.'); return }
 
+    let depositAmountCents: number | null = null
+    if (form.depositEnabled) {
+      const depositVal = parseFloat(form.depositAmount)
+      if (isNaN(depositVal) || depositVal < 0) { setFormError('Enter a valid deposit amount.'); return }
+      depositAmountCents = Math.round(depositVal * 100)
+    }
+
     setSaving(true)
     try {
       const token = localStorage.getItem('outsyde_access_token')
@@ -179,6 +196,7 @@ export default function ServicesPage() {
         category: form.category.trim() || null,
         isActive: form.isActive,
         imageUrl: formImageUrl,
+        depositAmountCents,
       }
 
       const res = editing
@@ -278,6 +296,32 @@ export default function ServicesPage() {
       await loadServices()
     } catch {
       alert('Could not update service.')
+    }
+  }
+
+  async function handleApplyDepositToAll() {
+    let depositAmountCents: number | null = null
+    if (form.depositEnabled) {
+      const depositVal = parseFloat(form.depositAmount)
+      if (isNaN(depositVal) || depositVal < 0) { setFormError('Enter a valid deposit amount before applying to all.'); return }
+      depositAmountCents = Math.round(depositVal * 100)
+    }
+    setApplyingDeposit(true)
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch('/api/admin/services/apply-deposit-to-all', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+        body: JSON.stringify({ depositAmountCents }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error((err as { error?: string }).error ?? 'Failed to apply deposit')
+      }
+    } catch (e: unknown) {
+      setFormError(e instanceof Error ? e.message : 'Could not apply deposit to all services.')
+    } finally {
+      setApplyingDeposit(false)
     }
   }
 
@@ -416,6 +460,51 @@ export default function ServicesPage() {
                 Active (visible to clients when live)
               </label>
 
+              {/* Deposit section */}
+              <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: 16 }}>
+                <label className="flex items-center gap-3 cursor-pointer" style={{ fontSize: 14, color: 'rgba(0,0,0,0.6)', marginBottom: form.depositEnabled ? 12 : 0 }}>
+                  <div
+                    onClick={() => setForm(f => ({ ...f, depositEnabled: !f.depositEnabled, depositAmount: f.depositEnabled ? '' : f.depositAmount }))}
+                    style={{
+                      width: 42, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer',
+                      background: form.depositEnabled ? '#C9A84C' : 'rgba(0,0,0,0.15)',
+                      transition: 'background 0.2s',
+                    }}
+                  >
+                    <div style={{
+                      position: 'absolute', top: 3, left: form.depositEnabled ? 21 : 3,
+                      width: 18, height: 18, borderRadius: '50%', background: '#fff',
+                      transition: 'left 0.2s',
+                    }} />
+                  </div>
+                  Require deposit at booking
+                </label>
+                {form.depositEnabled && (
+                  <div className="flex gap-3 items-end">
+                    <Field label="Deposit amount ($)" style={{ flex: 1 }}>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={form.depositAmount}
+                        onChange={e => setForm(f => ({ ...f, depositAmount: e.target.value }))}
+                        placeholder="0.00"
+                        style={inputStyle}
+                      />
+                    </Field>
+                    <button
+                      type="button"
+                      onClick={handleApplyDepositToAll}
+                      disabled={applyingDeposit}
+                      title="Apply this deposit amount to all services"
+                      style={{ fontSize: 12, padding: '9px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: applyingDeposit ? 'not-allowed' : 'pointer', opacity: applyingDeposit ? 0.6 : 1, whiteSpace: 'nowrap', marginBottom: 0 }}
+                    >
+                      {applyingDeposit ? 'Applying…' : 'Apply to all'}
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {formError && (
                 <p style={{ fontSize: 13, color: '#991B1B', margin: 0 }}>{formError}</p>
               )}
@@ -544,6 +633,11 @@ export default function ServicesPage() {
                     {service.category && (
                       <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(13,43,53,0.07)', color: '#0D2B35' }}>
                         {service.category}
+                      </span>
+                    )}
+                    {typeof service.depositAmountCents === 'number' && (
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(201,168,76,0.12)', color: '#92740A' }}>
+                        {fmtPrice(service.depositAmountCents)} deposit
                       </span>
                     )}
                   </div>
