@@ -127,7 +127,11 @@ function Nav({ isMobile }: { isMobile: boolean }) {
 }
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
-function Hero({ heroImage }: { heroImage: string | null }) {
+function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
+  heroImage: string | null
+  heroImageFailed: boolean
+  setHeroImageFailed: (v: boolean) => void
+}) {
   const isMobile = useWindowWidth() < 768
 
   return (
@@ -508,7 +512,11 @@ export default function HomePage() {
 
   return (
     <div style={{ fontFamily: 'DM Sans, sans-serif', color: '#4a6872', background: '#f8fafa' }}>
-      <Hero heroImage={heroImage} />
+      <Hero
+        heroImage={heroImage}
+        heroImageFailed={heroImageFailed}
+        setHeroImageFailed={setHeroImageFailed}
+      />
       <Services services={services} loading={servicesLoading} />
       <Why />
       <BookCTA />

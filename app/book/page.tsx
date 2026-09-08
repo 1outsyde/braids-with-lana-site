@@ -480,17 +480,24 @@ function PaymentStep({
         })
         if (!holdRes.ok) throw new Error('Could not reserve time slot.')
         const holdData = await holdRes.json()
-        const holdId: string = holdData.id ?? holdData.holdId
+        const holdId: string = holdData.id ?? holdData.holdId ?? holdData.hold_id
 
-        if (!holdId) throw new Error('Invalid hold response.')
+        if (!holdId) {
+          console.error('[book] hold response missing id field:', holdData)
+          throw new Error('Unable to reserve your time slot. Please try again.')
+        }
 
         // 2. Create payment intent
-        const piRes = await fetch('/api/bookings/deposit-intent', {
+        const piRes = await fetch('/api/bookings/payment-intent', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ holdId }),
         })
-        if (!piRes.ok) throw new Error('Could not initialize payment.')
+        if (!piRes.ok) {
+          const errData = await piRes.json().catch(() => ({}))
+          console.error('[book] payment-intent error:', piRes.status, errData)
+          throw new Error(errData.message ?? 'Unable to initialize payment. Please try again.')
+        }
         const piData = await piRes.json()
 
         if (!cancelled) {
