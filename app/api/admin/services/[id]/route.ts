@@ -35,6 +35,9 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const token = req.cookies.get('outsyde_access_token')?.value
+  if (!token) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+
   const { id } = await params
 
   const res = await fetch(`${API_URL}/api/vendor/services/${id}`, {
