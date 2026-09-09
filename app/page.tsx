@@ -298,9 +298,9 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
           <a href="#book" style={{ fontSize: 13, color: '#29C5CC', textDecoration: 'none', fontWeight: 600, marginBottom: 8 }}>All services →</a>
         </div>
         {loading && (
-          <div style={{ display: 'flex', gap: 20 }}>
+          <div style={{ display: 'flex', gap: 20, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'none' as const }}>
             {[1, 2, 3].map(i => (
-              <div key={i} style={{ flex: '0 0 268px', height: 340, background: '#f8fafa', borderRadius: 12, border: '1.5px solid #eef2f3' }} />
+              <div key={i} style={{ flex: '0 0 268px', height: 340, background: '#f8fafa', borderRadius: 12, border: '1.5px solid #eef2f3', flexShrink: 0 }} />
             ))}
           </div>
         )}
@@ -447,7 +447,7 @@ function Contact() {
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer style={{ padding: '28px 40px', background: '#0D2B35' }}>
+    <footer style={{ padding: '28px 20px', background: '#0D2B35' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1.5px solid rgba(41,197,204,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -455,7 +455,7 @@ function Footer() {
           </div>
           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Love</span>
         </div>
-        <div style={{ display: 'flex', gap: 28 }}>
+        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' as const }}>
           {['Services', 'Gallery', 'Contact'].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`} style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', letterSpacing: '0.04em' }}>{l}</a>
           ))}
