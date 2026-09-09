@@ -48,7 +48,7 @@ function StatusBadge({ status }: { status: string }) {
       fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 10,
       background: s.bg, color: s.color, textTransform: 'capitalize', letterSpacing: '0.02em',
     }}>
-      {status}
+      {status.replace(/_/g, ' ')}
     </span>
   )
 }
@@ -163,7 +163,7 @@ export default function DashboardOverviewPage() {
       {showAddServiceCTA && (
         <div style={{
           background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.25)',
-          borderRadius: 14, padding: '16px 20px', marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          borderRadius: 14, padding: '16px 20px', marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8,
         }}>
           <span style={{ fontSize: 14, color: '#0D2B35' }}>You have no services listed yet.</span>
           <Link href="/dashboard/services" style={{ fontSize: 13, fontWeight: 600, color: '#C9A84C', textDecoration: 'none' }}>
@@ -210,15 +210,15 @@ export default function DashboardOverviewPage() {
                 padding: '12px 16px', borderRadius: 12,
                 background: 'rgba(0,0,0,0.025)', border: '1px solid rgba(0,0,0,0.05)',
               }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 500, color: '#0D2B35' }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: '#0D2B35', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {appt.clientName || 'Client'}
                   </div>
-                  <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>
+                  <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {appt.serviceName ?? 'Service'}{appt.appointmentTime ? ` · ${appt.appointmentTime}` : ''}
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 8 }}>
                   {appt.totalPrice != null && (
                     <span style={{ fontSize: 14, color: '#0D2B35', fontWeight: 500 }}>
                       {formatCents(appt.totalPrice)}
