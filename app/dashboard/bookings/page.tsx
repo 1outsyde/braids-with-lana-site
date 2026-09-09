@@ -13,11 +13,13 @@ interface Booking {
   bookingNumber: number
   status: BookingStatus
   service_name: string
+  serviceName?: string
   customer_name: string
   customer_email: string
   appointment_date: string
   appointmentDate?: string
   appointment_time?: string
+  appointmentTime?: string
   start_time?: string
   duration_minutes?: number
   notes?: string
@@ -52,13 +54,13 @@ function fmtBookingNum(n: number) {
 
 function fmtDate(dateStr: string | undefined | null) {
   if (!dateStr) return '—'
-  const d = new Date(dateStr)
+  const d = new Date(dateStr + 'T00:00:00')
   if (isNaN(d.getTime())) return '—'
   return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 function fmtTime(booking: Booking) {
-  const t = booking.appointment_time ?? booking.start_time
+  const t = booking.appointmentTime ?? booking.appointment_time ?? booking.start_time
   if (!t) return null
   const [h, m] = t.split(':').map(Number)
   const ampm = h >= 12 ? 'PM' : 'AM'
@@ -131,10 +133,10 @@ export default function BookingsPage() {
   const today = new Date().toDateString()
   const upcoming = bookings.filter(b =>
     (b.status === 'pending' || b.status === 'confirmed') &&
-    new Date(b.appointment_date) >= new Date(today)
+    new Date((b.appointmentDate ?? b.appointment_date) + 'T00:00:00') >= new Date(today + 'T00:00:00')
   )
   const upNext = upcoming.sort((a, b) =>
-    new Date(a.appointment_date).getTime() - new Date(b.appointment_date).getTime()
+    new Date((a.appointmentDate ?? a.appointment_date) + 'T00:00:00').getTime() - new Date((b.appointmentDate ?? b.appointment_date) + 'T00:00:00').getTime()
   )[0]
 
   return (
@@ -174,7 +176,7 @@ export default function BookingsPage() {
               <div style={{ fontSize: 20, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#0D2B35' }}>
                 {upNext.customer_name}
               </div>
-              <div style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginTop: 3 }}>{upNext.service_name}</div>
+              <div style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginTop: 3 }}>{upNext.serviceName ?? upNext.service_name}</div>
               <div style={{ fontSize: 13, color: '#0D2B35', marginTop: 6, fontWeight: 500 }}>
                 {fmtDate(upNext.appointment_date ?? upNext.appointmentDate)}{fmtTime(upNext) ? ` · ${fmtTime(upNext)}` : ''}
               </div>
@@ -254,7 +256,7 @@ export default function BookingsPage() {
                     <div style={{ fontSize: 17, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#0D2B35' }}>
                       {b.customer_name}
                     </div>
-                    <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', marginTop: 2 }}>{b.service_name}</div>
+                    <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', marginTop: 2 }}>{b.serviceName ?? b.service_name}</div>
                     <div className="flex items-center gap-3 mt-3 flex-wrap">
                       <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.6)' }}>
                         {fmtDate(b.appointment_date ?? b.appointmentDate)}{time ? ` · ${time}` : ''}
