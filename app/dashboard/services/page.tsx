@@ -391,265 +391,356 @@ export default function ServicesPage() {
 
       {/* Form modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
-          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', maxHeight: '90vh', overflowY: 'auto' }}>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 600, color: '#0D2B35', marginBottom: 24 }}>
-              {editing ? 'Edit Service' : 'Add Service'}
-            </h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(13,43,53,0.55)' }}>
+          <div style={{ background: '#fff', borderRadius: 16, maxWidth: 520, width: '100%', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.18)' }}>
 
-            <div className="flex flex-col gap-4">
-              <Field label="Service name *">
-                <input
-                  value={form.name}
-                  onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder="e.g. Box Braids"
-                  style={inputStyle}
-                />
-              </Field>
+            {/* Modal header */}
+            <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid #eef1f2' }}>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', margin: 0 }}>
+                {editing ? 'Edit Service' : 'Add Service'}
+              </h2>
+              <p style={{ fontSize: 13, color: '#4a6872', margin: '4px 0 0' }}>
+                {editing ? 'Update this service\'s details' : 'Create a new bookable service for your clients'}
+              </p>
+            </div>
 
-              <Field label="Description">
-                <textarea
-                  value={form.description}
-                  onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="Brief description of the service…"
-                  rows={3}
-                  style={{ ...inputStyle, resize: 'vertical' }}
-                />
-              </Field>
+            {/* Modal body */}
+            <div style={{ padding: '20px 28px 0' }}>
+              <div className="flex flex-col gap-4">
 
-              <div className="flex gap-4">
-                <Field label="Price ($) *" style={{ flex: 1 }}>
+                <Field label="Service name *">
                   <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={form.price}
-                    onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                    placeholder="0.00"
+                    value={form.name}
+                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                    placeholder="e.g. Box Braids"
                     style={inputStyle}
+                    onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                    onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                   />
                 </Field>
 
-                <Field label="Duration *" style={{ flex: 1 }}>
-                  <select
-                    value={form.durationMinutes}
-                    onChange={e => setForm(f => ({ ...f, durationMinutes: e.target.value }))}
-                    style={{ ...inputStyle, cursor: 'pointer' }}
-                  >
-                    {DURATION_OPTIONS.map(o => (
-                      <option key={o.value} value={o.value}>{o.label}</option>
-                    ))}
-                  </select>
-                </Field>
-              </div>
-
-              <Field label="Category">
-                <input
-                  value={form.category}
-                  onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                  placeholder="e.g. Braids, Locs, Twists"
-                  style={inputStyle}
-                />
-              </Field>
-
-              <Field label="Where does this service take place?">
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-                  {SERVICE_LOCATION_TYPES.map(value => {
-                    const selected = form.serviceLocationType === value
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setForm(f => ({
-                          ...f,
-                          serviceLocationType: value,
-                          alternateAddress: '',
-                          alternateCity: '',
-                          alternateState: '',
-                          alternateZipCode: '',
-                          virtualLink: '',
-                        }))}
-                        style={{
-                          padding: '7px 12px',
-                          borderRadius: 8,
-                          border: `1.5px solid ${selected ? '#C9A84C' : 'rgba(0,0,0,0.12)'}`,
-                          background: selected ? 'rgba(201,168,76,0.14)' : '#F5F7F8',
-                          color: selected ? '#92740A' : 'rgba(0,0,0,0.55)',
-                          fontSize: 13,
-                          fontWeight: selected ? 600 : 400,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        {vendorLocationLabel(value)}
-                      </button>
-                    )
-                  })}
-                </div>
-              </Field>
-
-              {form.serviceLocationType === 'alternate' && (
-                <>
-                  <Field label="Address *">
-                    <input
-                      value={form.alternateAddress}
-                      onChange={e => setForm(f => ({ ...f, alternateAddress: e.target.value }))}
-                      placeholder="123 Main Street"
-                      style={inputStyle}
-                    />
-                  </Field>
-                  <div className="flex gap-4">
-                    <Field label="City *" style={{ flex: 1 }}>
-                      <input
-                        value={form.alternateCity}
-                        onChange={e => setForm(f => ({ ...f, alternateCity: e.target.value }))}
-                        placeholder="City"
-                        style={inputStyle}
-                      />
-                    </Field>
-                    <Field label="State *" style={{ flex: 1 }}>
-                      <input
-                        value={form.alternateState}
-                        onChange={e => setForm(f => ({ ...f, alternateState: e.target.value }))}
-                        placeholder="VA"
-                        style={inputStyle}
-                      />
-                    </Field>
-                  </div>
-                  <Field label="ZIP Code">
-                    <input
-                      value={form.alternateZipCode}
-                      onChange={e => setForm(f => ({ ...f, alternateZipCode: e.target.value }))}
-                      placeholder="23451"
-                      style={inputStyle}
-                    />
-                  </Field>
-                </>
-              )}
-
-              {form.serviceLocationType === 'virtual' && (
-                <Field label="Meeting Room Link *">
-                  <input
-                    value={form.virtualLink}
-                    onChange={e => setForm(f => ({ ...f, virtualLink: e.target.value }))}
-                    placeholder="https://zoom.us/j/..."
-                    style={inputStyle}
+                <Field label="Description">
+                  <textarea
+                    value={form.description}
+                    onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                    placeholder="Brief description of the service…"
+                    rows={3}
+                    style={{ ...inputStyle, height: 'auto', resize: 'vertical', padding: '10px 14px' }}
+                    onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                    onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                   />
                 </Field>
-              )}
 
-              <Field label="Service Photo (optional)">
-                <input
-                  type="file"
-                  accept="image/*"
-                  disabled={uploadingImage}
-                  onChange={e => {
-                    const file = e.target.files?.[0]
-                    if (file) handleImageUpload(file)
-                    e.target.value = ''
-                  }}
-                  style={{ ...inputStyle, padding: '7px 12px', cursor: 'pointer' }}
-                />
-                {uploadingImage && (
-                  <p style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>Uploading…</p>
-                )}
-                {formImageUrl && !uploadingImage && (
-                  <div style={{ marginTop: 8, position: 'relative', display: 'inline-block' }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={formImageUrl}
-                      alt="Service preview"
-                      style={{ width: 120, height: 80, objectFit: 'cover', borderRadius: 6, display: 'block', border: '1px solid rgba(0,0,0,0.1)' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setFormImageUrl(null)}
-                      style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', border: 'none', background: '#EF4444', color: '#fff', fontSize: 12, lineHeight: '20px', textAlign: 'center', cursor: 'pointer', padding: 0 }}
-                    >
-                      ×
-                    </button>
-                  </div>
-                )}
-              </Field>
-
-              <label className="flex items-center gap-3 cursor-pointer" style={{ fontSize: 14, color: 'rgba(0,0,0,0.6)' }}>
-                <div
-                  onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))}
-                  style={{
-                    width: 42, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer',
-                    background: form.isActive ? '#C9A84C' : 'rgba(0,0,0,0.15)',
-                    transition: 'background 0.2s',
-                  }}
-                >
-                  <div style={{
-                    position: 'absolute', top: 3, left: form.isActive ? 21 : 3,
-                    width: 18, height: 18, borderRadius: '50%', background: '#fff',
-                    transition: 'left 0.2s',
-                  }} />
-                </div>
-                Active (visible to clients when live)
-              </label>
-
-              {/* Deposit section */}
-              <div style={{ borderTop: '1px solid rgba(0,0,0,0.08)', paddingTop: 16 }}>
-                <label className="flex items-center gap-3 cursor-pointer" style={{ fontSize: 14, color: 'rgba(0,0,0,0.6)', marginBottom: form.depositEnabled ? 12 : 0 }}>
-                  <div
-                    onClick={() => setForm(f => ({ ...f, depositEnabled: !f.depositEnabled, depositAmount: f.depositEnabled ? '' : f.depositAmount }))}
-                    style={{
-                      width: 42, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer',
-                      background: form.depositEnabled ? '#C9A84C' : 'rgba(0,0,0,0.15)',
-                      transition: 'background 0.2s',
-                    }}
-                  >
-                    <div style={{
-                      position: 'absolute', top: 3, left: form.depositEnabled ? 21 : 3,
-                      width: 18, height: 18, borderRadius: '50%', background: '#fff',
-                      transition: 'left 0.2s',
-                    }} />
-                  </div>
-                  Require deposit at booking
-                </label>
-                {form.depositEnabled && (
-                  <div className="flex gap-3 items-end">
-                    <Field label="Deposit amount ($)" style={{ flex: 1 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  <Field label="Price ($) *">
+                    <div style={{ position: 'relative' }}>
+                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 500, color: '#C9A84C', pointerEvents: 'none', zIndex: 1 }}>$</span>
                       <input
                         type="number"
                         min="0"
                         step="0.01"
-                        value={form.depositAmount}
-                        onChange={e => setForm(f => ({ ...f, depositAmount: e.target.value }))}
+                        value={form.price}
+                        onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
                         placeholder="0.00"
+                        style={{ ...inputStyle, paddingLeft: 28 }}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                        onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                      />
+                    </div>
+                  </Field>
+
+                  <Field label="Duration *">
+                    <div style={{ position: 'relative' }}>
+                      <select
+                        value={form.durationMinutes}
+                        onChange={e => setForm(f => ({ ...f, durationMinutes: e.target.value }))}
+                        style={{
+                          ...inputStyle,
+                          WebkitAppearance: 'none',
+                          MozAppearance: 'none',
+                          appearance: 'none',
+                          paddingRight: 36,
+                          cursor: 'pointer',
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%234a6872' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 12px center',
+                        }}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                        onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                      >
+                        {DURATION_OPTIONS.map(o => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </Field>
+                </div>
+
+                <Field label="Category">
+                  <input
+                    value={form.category}
+                    onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                    placeholder="e.g. Braids, Locs, Twists"
+                    style={inputStyle}
+                    onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                    onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                  />
+                </Field>
+
+                {/* Divider 1 — after Category, before Location */}
+                <div style={{ height: 1, background: '#eef1f2', margin: '4px 0' }} />
+
+                <Field label="Where does this service take place?">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 2 }}>
+                    {SERVICE_LOCATION_TYPES.map(value => {
+                      const selected = form.serviceLocationType === value
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => setForm(f => ({
+                            ...f,
+                            serviceLocationType: value,
+                            alternateAddress: '',
+                            alternateCity: '',
+                            alternateState: '',
+                            alternateZipCode: '',
+                            virtualLink: '',
+                          }))}
+                          style={{
+                            padding: '8px 16px',
+                            borderRadius: 20,
+                            border: `1px solid ${selected ? '#29C5CC' : '#e0e0e0'}`,
+                            background: selected ? '#29C5CC' : '#fff',
+                            color: selected ? '#fff' : '#4a6872',
+                            fontSize: 13,
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                            transition: 'all 0.15s',
+                          }}
+                        >
+                          {vendorLocationLabel(value)}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </Field>
+
+                {form.serviceLocationType === 'alternate' && (
+                  <>
+                    <Field label="Address *">
+                      <input
+                        value={form.alternateAddress}
+                        onChange={e => setForm(f => ({ ...f, alternateAddress: e.target.value }))}
+                        placeholder="123 Main Street"
                         style={inputStyle}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                        onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                       />
                     </Field>
-                    <button
-                      type="button"
-                      onClick={handleApplyDepositToAll}
-                      disabled={applyingDeposit}
-                      title="Apply this deposit amount to all services"
-                      style={{ fontSize: 12, padding: '9px 14px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: applyingDeposit ? 'not-allowed' : 'pointer', opacity: applyingDeposit ? 0.6 : 1, whiteSpace: 'nowrap', marginBottom: 0 }}
-                    >
-                      {applyingDeposit ? 'Applying…' : 'Apply to all'}
-                    </button>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                      <Field label="City *">
+                        <input
+                          value={form.alternateCity}
+                          onChange={e => setForm(f => ({ ...f, alternateCity: e.target.value }))}
+                          placeholder="City"
+                          style={inputStyle}
+                          onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                          onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                        />
+                      </Field>
+                      <Field label="State *">
+                        <input
+                          value={form.alternateState}
+                          onChange={e => setForm(f => ({ ...f, alternateState: e.target.value }))}
+                          placeholder="VA"
+                          style={inputStyle}
+                          onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                          onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                        />
+                      </Field>
+                    </div>
+                    <Field label="ZIP Code">
+                      <input
+                        value={form.alternateZipCode}
+                        onChange={e => setForm(f => ({ ...f, alternateZipCode: e.target.value }))}
+                        placeholder="23451"
+                        style={inputStyle}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                        onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                      />
+                    </Field>
+                  </>
+                )}
+
+                {form.serviceLocationType === 'virtual' && (
+                  <Field label="Meeting Room Link *">
+                    <input
+                      value={form.virtualLink}
+                      onChange={e => setForm(f => ({ ...f, virtualLink: e.target.value }))}
+                      placeholder="https://zoom.us/j/..."
+                      style={inputStyle}
+                      onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                      onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                    />
+                  </Field>
+                )}
+
+                {/* Divider 2 — after Location, before Photo */}
+                <div style={{ height: 1, background: '#eef1f2', margin: '4px 0' }} />
+
+                <Field label="Service Photo (optional)">
+                  <label
+                    htmlFor="svc-photo-upload"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 12,
+                      padding: '12px 16px',
+                      border: '1px dashed #d0d5d8',
+                      borderRadius: 10,
+                      cursor: uploadingImage ? 'default' : 'pointer',
+                    }}
+                  >
+                    <div style={{ width: 40, height: 40, borderRadius: 8, background: '#f0f7f8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 5.5C1 4.672 1.672 4 2.5 4H4.05C4.557 4 5.038 3.79 5.38 3.42L6.62 2.08C6.962 1.71 7.443 1.5 7.95 1.5H12.05C12.557 1.5 13.038 1.71 13.38 2.08L14.62 3.42C14.962 3.79 15.443 4 15.95 4H17.5C18.328 4 19 4.672 19 5.5V14.5C19 15.328 18.328 16 17.5 16H2.5C1.672 16 1 15.328 1 14.5V5.5Z" stroke="#29C5CC" strokeWidth="1.4" fill="none"/>
+                        <circle cx="10" cy="10" r="2.75" fill="#29C5CC"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 14, fontWeight: 500, color: '#29C5CC' }}>
+                        {uploadingImage ? 'Uploading…' : 'Upload a photo'}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#4a6872', marginTop: 2 }}>JPG, PNG up to 5 MB</div>
+                    </div>
+                  </label>
+                  <input
+                    id="svc-photo-upload"
+                    type="file"
+                    accept="image/*"
+                    disabled={uploadingImage}
+                    onChange={e => {
+                      const file = e.target.files?.[0]
+                      if (file) handleImageUpload(file)
+                      e.target.value = ''
+                    }}
+                    style={{ display: 'none' }}
+                  />
+                  {formImageUrl && !uploadingImage && (
+                    <div style={{ marginTop: 8, position: 'relative', display: 'inline-block' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={formImageUrl}
+                        alt="Service preview"
+                        style={{ width: 120, height: 80, objectFit: 'cover', borderRadius: 6, display: 'block', border: '1px solid rgba(0,0,0,0.1)' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setFormImageUrl(null)}
+                        style={{ position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: '50%', border: 'none', background: '#EF4444', color: '#fff', fontSize: 12, lineHeight: '20px', textAlign: 'center', cursor: 'pointer', padding: 0 }}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )}
+                </Field>
+
+                {/* Divider 3 — after Photo, before Active toggle */}
+                <div style={{ height: 1, background: '#eef1f2', margin: '4px 0' }} />
+
+                {/* Active toggle */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0' }}>
+                  <div>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: '#0D2B35' }}>Active</div>
+                    <div style={{ fontSize: 12, color: '#4a6872', marginTop: 2 }}>Visible to clients when live</div>
                   </div>
+                  <div
+                    onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))}
+                    style={{
+                      width: 44, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer', flexShrink: 0,
+                      background: form.isActive ? '#29C5CC' : '#d0d5d8',
+                      transition: 'background 0.2s',
+                    }}
+                  >
+                    <div style={{
+                      position: 'absolute', top: 2, left: form.isActive ? 22 : 2,
+                      width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                      transition: 'left 0.2s',
+                    }} />
+                  </div>
+                </div>
+
+                {/* Deposit section */}
+                <div style={{ borderTop: '1px solid #eef1f2', paddingTop: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0' }}>
+                    <div style={{ flex: 1, paddingRight: 16 }}>
+                      <div style={{ fontSize: 14, fontWeight: 500, color: '#0D2B35' }}>Require deposit at booking</div>
+                      <div style={{ fontSize: 12, color: '#4a6872', marginTop: 2 }}>Collect a deposit at booking, balance due at appointment</div>
+                    </div>
+                    <div
+                      onClick={() => setForm(f => ({ ...f, depositEnabled: !f.depositEnabled, depositAmount: f.depositEnabled ? '' : f.depositAmount }))}
+                      style={{
+                        width: 44, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer', flexShrink: 0,
+                        background: form.depositEnabled ? '#29C5CC' : '#d0d5d8',
+                        transition: 'background 0.2s',
+                      }}
+                    >
+                      <div style={{
+                        position: 'absolute', top: 2, left: form.depositEnabled ? 22 : 2,
+                        width: 20, height: 20, borderRadius: '50%', background: '#fff',
+                        transition: 'left 0.2s',
+                      }} />
+                    </div>
+                  </div>
+                  {form.depositEnabled && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 8 }}>
+                      <div style={{ position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 500, color: '#C9A84C', pointerEvents: 'none' }}>$</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={form.depositAmount}
+                          onChange={e => setForm(f => ({ ...f, depositAmount: e.target.value }))}
+                          placeholder="0.00"
+                          style={{ ...inputStyle, width: 120, paddingLeft: 26, height: 38 }}
+                          onFocus={e => { e.currentTarget.style.borderColor = '#C9A84C'; e.currentTarget.style.background = '#fff' }}
+                          onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                        />
+                      </div>
+                      <span style={{ fontSize: 12, color: '#4a6872' }}>due at booking</span>
+                      <button
+                        type="button"
+                        onClick={handleApplyDepositToAll}
+                        disabled={applyingDeposit}
+                        title="Apply this deposit amount to all services"
+                        style={{ fontSize: 12, padding: '9px 14px', borderRadius: 8, border: '1px solid #e0e0e0', background: 'transparent', color: '#4a6872', cursor: applyingDeposit ? 'not-allowed' : 'pointer', opacity: applyingDeposit ? 0.6 : 1, whiteSpace: 'nowrap', marginLeft: 'auto' }}
+                      >
+                        {applyingDeposit ? 'Applying…' : 'Apply to all'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {formError && (
+                  <p style={{ fontSize: 13, color: '#991B1B', margin: 0 }}>{formError}</p>
                 )}
               </div>
-
-              {formError && (
-                <p style={{ fontSize: 13, color: '#991B1B', margin: 0 }}>{formError}</p>
-              )}
             </div>
 
-            <div className="flex gap-3 mt-6 justify-end">
+            {/* Modal footer */}
+            <div style={{ padding: '16px 28px 24px', display: 'flex', justifyContent: 'flex-end', gap: 12, borderTop: '1px solid #eef1f2', marginTop: 20 }}>
               <button
                 onClick={closeForm}
-                style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}
+                style={{ height: 42, padding: '0 24px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: 'none', color: '#4a6872', border: '1px solid #e0e0e0', cursor: 'pointer' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
+                style={{ height: 42, padding: '0 24px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#29C5CC', color: '#fff', border: 'none', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
               >
                 {saving ? 'Saving…' : editing ? 'Save changes' : 'Add service'}
               </button>
@@ -765,7 +856,7 @@ export default function ServicesPage() {
                       </span>
                     )}
                     {typeof service.depositAmountCents === 'number' && (
-                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(201,168,76,0.12)', color: '#92740A' }}>
+                      <span style={{ fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 4, background: 'rgba(201,168,76,0.1)', color: '#C9A84C', marginLeft: 0 }}>
                         {fmtPrice(service.depositAmountCents)} deposit
                       </span>
                     )}
@@ -841,20 +932,24 @@ export default function ServicesPage() {
 const inputStyle: React.CSSProperties = {
   width: '100%',
   fontSize: 16,
-  padding: '9px 12px',
+  padding: '0 14px',
+  height: 42,
   borderRadius: 8,
-  border: '1px solid rgba(0,0,0,0.12)',
-  background: '#F5F7F8',
-  color: '#1A1A1A',
+  border: '1px solid #e0e0e0',
+  background: '#fafafa',
+  color: '#0D2B35',
+  fontFamily: "'DM Sans', sans-serif",
   outline: 'none',
   boxSizing: 'border-box',
 }
 
 function Field({ label, children, style }: { label: string; children: React.ReactNode; style?: React.CSSProperties }) {
+  const hasRequired = label.includes(' *')
+  const displayLabel = hasRequired ? label.replace(' *', '') : label
   return (
     <div style={style}>
-      <label style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', display: 'block', marginBottom: 6, fontWeight: 500 }}>
-        {label}
+      <label style={{ fontSize: 13, color: '#4a6872', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+        {displayLabel}{hasRequired && <span style={{ color: '#C9A84C' }}> *</span>}
       </label>
       {children}
     </div>
