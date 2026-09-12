@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useWindowWidth } from '@/lib/useWindowWidth'
+import { consumerLocationLabel } from '@/lib/serviceLocation'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Service {
@@ -12,6 +13,7 @@ interface Service {
   durationMinutes: number
   imageUrl?: string
   category?: string
+  serviceLocationType?: 'business' | 'alternate' | 'customer' | 'virtual' | null
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -333,7 +335,7 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
                   </div>
                   <p style={{ fontSize: 13, color: '#6b8c94', lineHeight: 1.65, marginBottom: 18 }}>{s.description}</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: '#9ab3b8' }}>⏱ {fmtDur(s.durationMinutes)}</span>
+                    <span style={{ fontSize: 11, color: '#9ab3b8' }}>⏱ {fmtDur(s.durationMinutes)} · {consumerLocationLabel(s.serviceLocationType)}</span>
                     <Link href={`/book?serviceId=${s.id}`} style={{ background: '#29C5CC', border: 'none', borderRadius: 3, color: '#fff', fontSize: 12, fontWeight: 600, padding: '8px 18px', cursor: 'pointer', letterSpacing: '0.04em', textDecoration: 'none', display: 'inline-block' }}>
                       Book this →
                     </Link>
@@ -480,20 +482,13 @@ export default function HomePage() {
     const controller = new AbortController()
     const signal = controller.signal
 
-    const businessId = process.env.NEXT_PUBLIC_OUTSYDE_BUSINESS_ID
-    const apiUrl = process.env.NEXT_PUBLIC_OUTSYDE_API_URL
-    if (!businessId || !apiUrl) {
-      setServicesLoading(false)
-      return
-    }
-
-    fetch(`${apiUrl}/api/businesses/${businessId}/services`, { signal })
+    fetch('/api/bookings/services', { signal })
       .then(r => r.json())
       .then(data => setServices(data.services ?? []))
       .catch(err => { if (err.name !== 'AbortError') setServices([]) })
       .finally(() => setServicesLoading(false))
 
-    fetch(`${apiUrl}/api/businesses/${businessId}`, { signal })
+    fetch('/api/bookings/business', { signal })
       .then(r => r.json())
       .then(data => {
         const biz = data.business ?? data

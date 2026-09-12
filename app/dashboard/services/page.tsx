@@ -1,6 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import {
+  SERVICE_LOCATION_TYPES,
+  normalizeServiceLocationType,
+  vendorLocationLabel,
+  type ServiceLocationType,
+} from '@/lib/serviceLocation'
 
 interface VendorService {
   id: string
@@ -16,6 +22,12 @@ interface VendorService {
   stripeProductId: string | null
   stripePriceId: string | null
   depositAmountCents: number | null
+  serviceLocationType?: ServiceLocationType | null
+  alternateAddress?: string | null
+  alternateCity?: string | null
+  alternateState?: string | null
+  alternateZipCode?: string | null
+  virtualLink?: string | null
   createdAt: string
 }
 
@@ -28,11 +40,20 @@ type FormData = {
   isActive: boolean
   depositEnabled: boolean
   depositAmount: string  // dollars (user input)
+  serviceLocationType: ServiceLocationType
+  alternateAddress: string
+  alternateCity: string
+  alternateState: string
+  alternateZipCode: string
+  virtualLink: string
 }
 
 const EMPTY_FORM: FormData = {
   name: '', description: '', price: '', durationMinutes: '60', category: '', isActive: true,
   depositEnabled: false, depositAmount: '',
+  serviceLocationType: 'business',
+  alternateAddress: '', alternateCity: '', alternateState: '', alternateZipCode: '',
+  virtualLink: '',
 }
 
 const DURATION_OPTIONS = [
@@ -134,6 +155,12 @@ export default function ServicesPage() {
       depositAmount: typeof service.depositAmountCents === 'number'
         ? (service.depositAmountCents / 100).toFixed(2)
         : '',
+      serviceLocationType: normalizeServiceLocationType(service.serviceLocationType),
+      alternateAddress: service.alternateAddress ?? '',
+      alternateCity: service.alternateCity ?? '',
+      alternateState: service.alternateState ?? '',
+      alternateZipCode: service.alternateZipCode ?? '',
+      virtualLink: service.virtualLink ?? '',
     })
     setFormError(null)
     setFormImageUrl(service.imageUrl ?? null)
@@ -185,6 +212,17 @@ export default function ServicesPage() {
       depositAmountCents = Math.round(depositVal * 100)
     }
 
+    if (form.serviceLocationType === 'alternate') {
+      if (!form.alternateAddress.trim() || !form.alternateCity.trim() || !form.alternateState.trim()) {
+        setFormError('Enter the alternate street address, city, and state.')
+        return
+      }
+    }
+    if (form.serviceLocationType === 'virtual' && !form.virtualLink.trim()) {
+      setFormError('Enter a meeting link for virtual services.')
+      return
+    }
+
     setSaving(true)
     try {
       const token = localStorage.getItem('outsyde_access_token')
@@ -197,6 +235,12 @@ export default function ServicesPage() {
         isActive: form.isActive,
         imageUrl: formImageUrl,
         depositAmountCents,
+        serviceLocationType: form.serviceLocationType,
+        alternateAddress: form.serviceLocationType === 'alternate' ? form.alternateAddress.trim() : null,
+        alternateCity: form.serviceLocationType === 'alternate' ? form.alternateCity.trim() : null,
+        alternateState: form.serviceLocationType === 'alternate' ? form.alternateState.trim() : null,
+        alternateZipCode: form.serviceLocationType === 'alternate' ? (form.alternateZipCode.trim() || null) : null,
+        virtualLink: form.serviceLocationType === 'virtual' ? form.virtualLink.trim() : null,
       }
 
       const res = editing
@@ -348,7 +392,7 @@ export default function ServicesPage() {
       {/* Form modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
-          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+          <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)', maxHeight: '90vh', overflowY: 'auto' }}>
             <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 600, color: '#0D2B35', marginBottom: 24 }}>
               {editing ? 'Edit Service' : 'Add Service'}
             </h2>
@@ -407,6 +451,91 @@ export default function ServicesPage() {
                   style={inputStyle}
                 />
               </Field>
+
+              <Field label="Where does this service take place?">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {SERVICE_LOCATION_TYPES.map(value => {
+                    const selected = form.serviceLocationType === value
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setForm(f => ({
+                          ...f,
+                          serviceLocationType: value,
+                          alternateAddress: '',
+                          alternateCity: '',
+                          alternateState: '',
+                          alternateZipCode: '',
+                          virtualLink: '',
+                        }))}
+                        style={{
+                          padding: '7px 12px',
+                          borderRadius: 8,
+                          border: `1.5px solid ${selected ? '#C9A84C' : 'rgba(0,0,0,0.12)'}`,
+                          background: selected ? 'rgba(201,168,76,0.14)' : '#F5F7F8',
+                          color: selected ? '#92740A' : 'rgba(0,0,0,0.55)',
+                          fontSize: 13,
+                          fontWeight: selected ? 600 : 400,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {vendorLocationLabel(value)}
+                      </button>
+                    )
+                  })}
+                </div>
+              </Field>
+
+              {form.serviceLocationType === 'alternate' && (
+                <>
+                  <Field label="Address *">
+                    <input
+                      value={form.alternateAddress}
+                      onChange={e => setForm(f => ({ ...f, alternateAddress: e.target.value }))}
+                      placeholder="123 Main Street"
+                      style={inputStyle}
+                    />
+                  </Field>
+                  <div className="flex gap-4">
+                    <Field label="City *" style={{ flex: 1 }}>
+                      <input
+                        value={form.alternateCity}
+                        onChange={e => setForm(f => ({ ...f, alternateCity: e.target.value }))}
+                        placeholder="City"
+                        style={inputStyle}
+                      />
+                    </Field>
+                    <Field label="State *" style={{ flex: 1 }}>
+                      <input
+                        value={form.alternateState}
+                        onChange={e => setForm(f => ({ ...f, alternateState: e.target.value }))}
+                        placeholder="VA"
+                        style={inputStyle}
+                      />
+                    </Field>
+                  </div>
+                  <Field label="ZIP Code">
+                    <input
+                      value={form.alternateZipCode}
+                      onChange={e => setForm(f => ({ ...f, alternateZipCode: e.target.value }))}
+                      placeholder="23451"
+                      style={inputStyle}
+                    />
+                  </Field>
+                </>
+              )}
+
+              {form.serviceLocationType === 'virtual' && (
+                <Field label="Meeting Room Link *">
+                  <input
+                    value={form.virtualLink}
+                    onChange={e => setForm(f => ({ ...f, virtualLink: e.target.value }))}
+                    placeholder="https://zoom.us/j/..."
+                    style={inputStyle}
+                  />
+                </Field>
+              )}
 
               <Field label="Service Photo (optional)">
                 <input
@@ -640,6 +769,9 @@ export default function ServicesPage() {
                         {fmtPrice(service.depositAmountCents)} deposit
                       </span>
                     )}
+                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(41,197,204,0.12)', color: '#0D2B35' }}>
+                      {vendorLocationLabel(service.serviceLocationType)}
+                    </span>
                   </div>
                   {service.description && (
                     <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.45)', marginTop: 3, marginBottom: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>

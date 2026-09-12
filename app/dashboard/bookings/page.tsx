@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { buildDateMap, DateMap } from '@/lib/calendar'
 import DashboardCalendar from '@/components/calendar/DashboardCalendar'
+import { formatLocationLine } from '@/lib/serviceLocation'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -25,6 +26,11 @@ interface Booking {
   notes?: string
   total_amount?: number
   created_at: string
+  customerServiceAddress?: string | null
+  customerServiceCity?: string | null
+  customerServiceState?: string | null
+  customerServiceZipCode?: string | null
+  serviceLocationType?: string | null
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -257,6 +263,17 @@ export default function BookingsPage() {
                       {b.customer_name}
                     </div>
                     <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', marginTop: 2 }}>{b.serviceName ?? b.service_name}</div>
+                    {(b.customerServiceAddress || b.customerServiceCity) && (
+                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 4 }}>
+                        Client location: {formatLocationLine([
+                          b.customerServiceAddress,
+                          b.customerServiceCity && b.customerServiceState
+                            ? `${b.customerServiceCity}, ${b.customerServiceState}`
+                            : b.customerServiceCity || b.customerServiceState,
+                          b.customerServiceZipCode,
+                        ])}
+                      </div>
+                    )}
                     <div className="flex items-center gap-3 mt-3 flex-wrap">
                       <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.6)' }}>
                         {fmtDate(b.appointment_date ?? b.appointmentDate)}{time ? ` · ${time}` : ''}

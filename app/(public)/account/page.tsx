@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { consumerLocationLabel, formatLocationLine, normalizeServiceLocationType } from '@/lib/serviceLocation'
 
 // ─── Vendor config ───────────────────────────────────────────────────────────
 const VENDOR_CONFIG = { hasBookings: true, hasProducts: true } as const
@@ -47,9 +48,25 @@ interface Appointment {
   service?: string
   scheduledAt?: string
   date?: string
+  appointmentDate?: string
   durationMinutes?: number
+  serviceDurationMinutes?: number
   price?: number
+  totalPrice?: number
   status: string
+  serviceLocationType?: string | null
+  businessAddress?: string | null
+  businessCity?: string | null
+  businessState?: string | null
+  alternateAddress?: string | null
+  alternateCity?: string | null
+  alternateState?: string | null
+  alternateZipCode?: string | null
+  virtualLink?: string | null
+  customerServiceAddress?: string | null
+  customerServiceCity?: string | null
+  customerServiceState?: string | null
+  customerServiceZipCode?: string | null
 }
 
 interface PointTransaction {
@@ -223,7 +240,42 @@ function BookingsSection() {
 
 function BookingCard({ appt }: { appt: Appointment }) {
   const serviceName = appt.serviceName ?? appt.service ?? 'Service'
-  const dateStr = appt.scheduledAt ?? appt.date
+  const dateStr = appt.scheduledAt ?? appt.date ?? appt.appointmentDate
+  const locType = normalizeServiceLocationType(appt.serviceLocationType)
+  const confirmed = appt.status === 'confirmed' || appt.status === 'completed'
+  let locationLine = consumerLocationLabel(locType)
+  if (locType === 'customer') {
+    locationLine = formatLocationLine([
+      appt.customerServiceAddress,
+      appt.customerServiceCity && appt.customerServiceState
+        ? `${appt.customerServiceCity}, ${appt.customerServiceState}`
+        : appt.customerServiceCity || appt.customerServiceState,
+      appt.customerServiceZipCode,
+    ]) || locationLine
+  } else if (locType === 'alternate') {
+    locationLine = formatLocationLine([
+      appt.alternateAddress,
+      appt.alternateCity && appt.alternateState
+        ? `${appt.alternateCity}, ${appt.alternateState}`
+        : appt.alternateCity || appt.alternateState,
+      appt.alternateZipCode,
+    ]) || locationLine
+  } else if (locType === 'virtual') {
+    locationLine = appt.virtualLink || locationLine
+  } else if (confirmed) {
+    locationLine = formatLocationLine([
+      appt.businessAddress,
+      appt.businessCity && appt.businessState
+        ? `${appt.businessCity}, ${appt.businessState}`
+        : appt.businessCity || appt.businessState,
+    ]) || locationLine
+  } else {
+    locationLine = formatLocationLine([
+      appt.businessCity && appt.businessState
+        ? `${appt.businessCity}, ${appt.businessState}`
+        : appt.businessCity || appt.businessState,
+    ]) || 'Address shared after confirmation'
+  }
   return (
     <Card>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8, marginBottom: 4 }}>
@@ -242,13 +294,16 @@ function BookingCard({ appt }: { appt: Appointment }) {
           {formatDate(dateStr)}
         </p>
       )}
-      {(appt.durationMinutes != null || appt.price != null) && (
+      {(appt.durationMinutes != null || appt.serviceDurationMinutes != null || appt.price != null || appt.totalPrice != null) && (
         <p style={{ fontFamily: FONT_BODY, fontSize: '0.85rem', color: MUTED }}>
-          {appt.durationMinutes != null && `${appt.durationMinutes} min`}
-          {appt.durationMinutes != null && appt.price != null && ' · '}
-          {appt.price != null && formatCents(appt.price)}
+          {(appt.durationMinutes ?? appt.serviceDurationMinutes) != null && `${appt.durationMinutes ?? appt.serviceDurationMinutes} min`}
+          {(appt.durationMinutes ?? appt.serviceDurationMinutes) != null && (appt.price != null || appt.totalPrice != null) && ' · '}
+          {(appt.price != null || appt.totalPrice != null) && formatCents(appt.price ?? appt.totalPrice ?? 0)}
         </p>
       )}
+      <p style={{ fontFamily: FONT_BODY, fontSize: '0.85rem', color: MUTED, marginTop: 6 }}>
+        {locationLine}
+      </p>
     </Card>
   )
 }
