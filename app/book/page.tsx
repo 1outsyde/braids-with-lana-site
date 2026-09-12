@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, type ReactNode } from 'react'
 import { useWindowWidth } from '@/lib/useWindowWidth'
 import { loadStripe } from '@stripe/stripe-js'
 import {
@@ -10,6 +10,14 @@ import {
 } from '@stripe/react-stripe-js'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import {
+  consumerLocationLabel,
+  customerAddressComplete,
+  customerAddressPayload,
+  formatLocationLine,
+  normalizeServiceLocationType,
+  type ServiceLocationType,
+} from '@/lib/serviceLocation'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -24,6 +32,21 @@ interface Service {
   category?: string
   isActive: boolean
   depositAmountCents?: number | null
+  serviceLocationType?: ServiceLocationType | null
+  alternateAddress?: string | null
+  alternateCity?: string | null
+  alternateState?: string | null
+  alternateZipCode?: string | null
+  virtualLink?: string | null
+}
+
+interface PublicBusiness {
+  name?: string
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  zipCode?: string | null
+  showAddress?: boolean | null
 }
 
 interface Slot {
@@ -180,7 +203,9 @@ function ServiceStep({ onSelect }: { onSelect: (s: Service) => void }) {
                 {service.description && (
                   <div style={{ fontSize: 13, color: T.muted, lineHeight: 1.5 }}>{service.description}</div>
                 )}
-                <div style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>{service.durationMinutes} min</div>
+                <div style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>
+                  {service.durationMinutes} min · {consumerLocationLabel(service.serviceLocationType)}
+                </div>
               </div>
               <div style={{ fontWeight: 700, fontSize: 16, color: T.gold, marginLeft: 16, flexShrink: 0 }}>
                 ${(service.price / 100).toFixed(2)}
@@ -445,6 +470,23 @@ function PaymentForm({
   )
 }
 
+function LocationAck({
+  checked,
+  onToggle,
+  children,
+}: {
+  checked: boolean
+  onToggle: () => void
+  children: ReactNode
+}) {
+  return (
+    <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginTop: 12, cursor: 'pointer' }}>
+      <input type="checkbox" checked={checked} onChange={onToggle} style={{ marginTop: 3 }} />
+      <span style={{ fontSize: 13, color: T.navy, lineHeight: 1.45 }}>{children}</span>
+    </label>
+  )
+}
+
 function PaymentStep({
   service,
   date,
@@ -455,78 +497,129 @@ function PaymentStep({
   service: Service
   date: string
   slot: Slot
-  onSuccess: (conf: BookingConfirmation) => void
+  onSuccess: (conf: BookingConfirmation, locationSummary: string) => void
   onBack: () => void
 }) {
-  const [phase, setPhase] = useState<'holding' | 'ready' | 'error'>('holding')
+  const locType = normalizeServiceLocationType(service.serviceLocationType)
+  const [phase, setPhase] = useState<'review' | 'holding' | 'ready' | 'error'>('review')
   const [clientSecret, setClientSecret] = useState('')
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null)
   const [phaseError, setPhaseError] = useState<string | null>(null)
+  const [business, setBusiness] = useState<PublicBusiness | null>(null)
   const [depositInfo, setDepositInfo] = useState<{
     depositAmountCents: number | null
     servicePriceCents: number
     chargeAmountCents: number
   } | null>(null)
 
+  const [line1, setLine1] = useState('')
+  const [city, setCity] = useState('')
+  const [state, setState] = useState('')
+  const [zipCode, setZipCode] = useState('')
+  const [businessAck, setBusinessAck] = useState(false)
+  const [alternateAck, setAlternateAck] = useState(false)
+  const [virtualAck, setVirtualAck] = useState(false)
+  const [customerReady, setCustomerReady] = useState(false)
+
   useEffect(() => {
-    let cancelled = false
+    fetch('/api/bookings/business')
+      .then(r => r.json())
+      .then(data => setBusiness(data.business ?? data))
+      .catch(() => setBusiness(null))
+  }, [])
 
-    async function initPayment() {
-      try {
-        // 1. Create hold
-        const holdRes = await fetch('/api/bookings/hold', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            serviceId: service.id,
-            date,
-            startTime: slot.startTime,
-            endTime: slot.endTime,
-          }),
-        })
-        if (!holdRes.ok) throw new Error('Could not reserve time slot.')
-        const holdData = await holdRes.json()
-        const holdId: string = holdData.id ?? holdData.holdId ?? holdData.hold_id
-
-        if (!holdId) {
-          console.error('[book] hold response missing id field:', holdData)
-          throw new Error('Unable to reserve your time slot. Please try again.')
-        }
-
-        // 2. Create payment intent
-        const piRes = await fetch('/api/bookings/payment-intent', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ holdId }),
-        })
-        if (!piRes.ok) {
-          const errData = await piRes.json().catch(() => ({}))
-          console.error('[book] payment-intent error:', piRes.status, errData)
-          throw new Error(errData.message ?? 'Unable to initialize payment. Please try again.')
-        }
-        const piData = await piRes.json()
-
-        if (!cancelled) {
-          setClientSecret(piData.clientSecret)
-          setConfirmation({ bookingNumber: piData.bookingNumber, appointmentId: piData.appointmentId })
-          setDepositInfo({
-            depositAmountCents: piData.depositAmountCents ?? null,
-            servicePriceCents: piData.servicePriceCents ?? service.price,
-            chargeAmountCents: piData.chargeAmountCents ?? service.price,
-          })
-          setPhase('ready')
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setPhaseError(err instanceof Error ? err.message : 'Something went wrong.')
-          setPhase('error')
-        }
-      }
+  function locationSummary(): string {
+    if (locType === 'customer') {
+      return formatLocationLine([line1, city && state ? `${city}, ${state}` : city || state, zipCode])
     }
+    if (locType === 'alternate') {
+      return formatLocationLine([
+        service.alternateAddress,
+        service.alternateCity && service.alternateState
+          ? `${service.alternateCity}, ${service.alternateState}`
+          : service.alternateCity || service.alternateState,
+        service.alternateZipCode,
+      ]) || consumerLocationLabel(locType)
+    }
+    if (locType === 'virtual') {
+      return service.virtualLink || consumerLocationLabel(locType)
+    }
+    const showStreet = business?.showAddress !== false
+    return formatLocationLine([
+      showStreet ? business?.address : null,
+      business?.city && business?.state ? `${business.city}, ${business.state}` : business?.city || business?.state,
+    ]) || consumerLocationLabel(locType)
+  }
 
-    initPayment()
-    return () => { cancelled = true }
-  }, [service.id, date, slot.startTime, slot.endTime])
+  function canContinue(): boolean {
+    if (locType === 'customer') {
+      return customerAddressComplete({ line1, city, state, zipCode }) && customerReady
+    }
+    if (locType === 'alternate') return alternateAck
+    if (locType === 'virtual') return virtualAck
+    return businessAck
+  }
+
+  async function startPayment() {
+    if (!canContinue()) {
+      setPhaseError(
+        locType === 'customer'
+          ? 'Enter the service address and confirm you will be ready.'
+          : 'Please confirm the location details to continue.'
+      )
+      return
+    }
+    setPhaseError(null)
+    setPhase('holding')
+    try {
+      const holdRes = await fetch('/api/bookings/hold', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          serviceId: service.id,
+          date,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+        }),
+      })
+      if (!holdRes.ok) throw new Error('Could not reserve time slot.')
+      const holdData = await holdRes.json()
+      const holdId: string = holdData.id ?? holdData.holdId ?? holdData.hold_id
+
+      if (!holdId) {
+        console.error('[book] hold response missing id field:', holdData)
+        throw new Error('Unable to reserve your time slot. Please try again.')
+      }
+
+      const customerAddress = locType === 'customer'
+        ? customerAddressPayload({ line1, city, state, zipCode })
+        : {}
+
+      const piRes = await fetch('/api/bookings/payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ holdId, ...customerAddress }),
+      })
+      if (!piRes.ok) {
+        const errData = await piRes.json().catch(() => ({}))
+        console.error('[book] payment-intent error:', piRes.status, errData)
+        throw new Error(errData.message ?? 'Unable to initialize payment. Please try again.')
+      }
+      const piData = await piRes.json()
+
+      setClientSecret(piData.clientSecret)
+      setConfirmation({ bookingNumber: piData.bookingNumber, appointmentId: piData.appointmentId })
+      setDepositInfo({
+        depositAmountCents: piData.depositAmountCents ?? null,
+        servicePriceCents: piData.servicePriceCents ?? service.price,
+        chargeAmountCents: piData.chargeAmountCents ?? service.price,
+      })
+      setPhase('ready')
+    } catch (err) {
+      setPhaseError(err instanceof Error ? err.message : 'Something went wrong.')
+      setPhase('error')
+    }
+  }
 
   function formatDate(d: string) {
     return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
@@ -556,6 +649,7 @@ function PaymentStep({
         <div style={{ fontSize: 13, color: T.muted }}>{formatDate(date)}</div>
         <div style={{ fontSize: 13, color: T.muted }}>{formatTime(slot.startTime)} – {formatTime(slot.endTime)}</div>
         <div style={{ fontSize: 13, color: T.muted }}>{service.durationMinutes} min</div>
+        <div style={{ fontSize: 13, color: T.muted, marginTop: 6 }}>{consumerLocationLabel(locType)}</div>
         {depositInfo && typeof depositInfo.depositAmountCents === 'number' && (
           <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #c8e8ea', fontSize: 12, color: T.muted, display: 'flex', flexDirection: 'column', gap: 3 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -573,6 +667,110 @@ function PaymentStep({
           </div>
         )}
       </div>
+
+      <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px 20px', marginBottom: 20 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Location</div>
+
+        {(locType === 'business') && (
+          <>
+            {business?.showAddress !== false && business?.address ? (
+              <div style={{ fontSize: 14, color: T.navy, lineHeight: 1.5 }}>
+                {formatLocationLine([
+                  business.address,
+                  business.city && business.state ? `${business.city}, ${business.state}` : business.city || business.state,
+                ])}
+              </div>
+            ) : (
+              <>
+                <div style={{ fontSize: 14, color: T.navy }}>
+                  {business?.city && business?.state
+                    ? `${business.city}, ${business.state}`
+                    : business?.city || business?.state || `${business?.name ?? 'Studio'} location`}
+                </div>
+                <div style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>
+                  The exact address will be provided once your booking is confirmed.
+                </div>
+              </>
+            )}
+            <LocationAck checked={businessAck} onToggle={() => setBusinessAck(v => !v)}>
+              {business?.showAddress === false
+                ? 'I understand this appointment takes place in the listed city'
+                : 'I understand this appointment takes place at the address above'}
+            </LocationAck>
+          </>
+        )}
+
+        {locType === 'virtual' && (
+          <>
+            <div style={{ fontSize: 14, color: T.navy }}>You&apos;ll join this meeting link at your appointment time:</div>
+            <div style={{ fontSize: 14, color: T.teal, fontWeight: 600, marginTop: 6, wordBreak: 'break-all' }}>
+              {service.virtualLink || 'Meeting link not set'}
+            </div>
+            <LocationAck checked={virtualAck} onToggle={() => setVirtualAck(v => !v)}>
+              I understand I will join this meeting link at my scheduled appointment time.
+            </LocationAck>
+          </>
+        )}
+
+        {locType === 'alternate' && (
+          <>
+            <div style={{ fontSize: 14, color: T.navy, lineHeight: 1.5 }}>
+              {formatLocationLine([
+                service.alternateAddress,
+                service.alternateCity && service.alternateState
+                  ? `${service.alternateCity}, ${service.alternateState}`
+                  : service.alternateCity || service.alternateState,
+                service.alternateZipCode,
+              ])}
+            </div>
+            <LocationAck checked={alternateAck} onToggle={() => setAlternateAck(v => !v)}>
+              I understand this service takes place at the address above
+            </LocationAck>
+          </>
+        )}
+
+        {locType === 'customer' && (
+          <>
+            <div style={{ fontSize: 13, color: T.muted, marginBottom: 12 }}>Where should this service take place?</div>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.navy, marginBottom: 6 }}>Street address</label>
+              <input value={line1} onChange={e => setLine1(e.target.value)} placeholder="123 Main Street" style={inputStyle} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 90px 100px', gap: 10, marginBottom: 4 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.navy, marginBottom: 6 }}>City</label>
+                <input value={city} onChange={e => setCity(e.target.value)} placeholder="City" style={inputStyle} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.navy, marginBottom: 6 }}>State</label>
+                <input value={state} onChange={e => setState(e.target.value)} placeholder="VA" style={inputStyle} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.navy, marginBottom: 6 }}>ZIP</label>
+                <input value={zipCode} onChange={e => setZipCode(e.target.value)} placeholder="23451" style={inputStyle} />
+              </div>
+            </div>
+            <LocationAck checked={customerReady} onToggle={() => setCustomerReady(v => !v)}>
+              I confirm I will be ready for this service at the scheduled appointment time
+            </LocationAck>
+          </>
+        )}
+      </div>
+
+      {phase === 'review' && phaseError && (
+        <div style={{ background: T.errorBg, border: `1px solid ${T.errorBorder}`, borderRadius: 6, padding: '12px 16px', marginBottom: 16, color: T.error, fontSize: 13 }}>
+          {phaseError}
+        </div>
+      )}
+
+      {phase === 'review' && (
+        <div style={{ display: 'flex', gap: 12, marginBottom: 8 }}>
+          <button onClick={onBack} style={{ ...btnSecondary, flex: 1 }}>Back</button>
+          <button onClick={startPayment} disabled={!canContinue()} style={{ ...btnPrimary(!canContinue()), flex: 2 }}>
+            Continue to payment
+          </button>
+        </div>
+      )}
 
       {phase === 'holding' && (
         <div style={{ textAlign: 'center', padding: '20px 0', color: T.muted, fontSize: 14 }}>
@@ -594,7 +792,7 @@ function PaymentStep({
           <PaymentForm
             clientSecret={clientSecret}
             bookingInfo={confirmation}
-            onSuccess={() => onSuccess(confirmation)}
+            onSuccess={() => onSuccess(confirmation, locationSummary())}
           />
         </Elements>
       )}
@@ -608,11 +806,12 @@ function PaymentStep({
 
 // ─── Step 5: Confirmation ─────────────────────────────────────────────────────
 
-function ConfirmStep({ service, date, slot, confirmation }: {
+function ConfirmStep({ service, date, slot, confirmation, locationSummary }: {
   service: Service
   date: string
   slot: Slot
   confirmation: BookingConfirmation
+  locationSummary: string
 }) {
   function formatDate(d: string) {
     return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
@@ -653,6 +852,10 @@ function ConfirmStep({ service, date, slot, confirmation }: {
             <span style={{ fontSize: 13, color: T.muted }}>Time</span>
             <span style={{ fontSize: 13, fontWeight: 600, color: T.navy }}>{formatTime(slot.startTime)}</span>
           </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+            <span style={{ fontSize: 13, color: T.muted }}>Location</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: T.navy, textAlign: 'right' }}>{locationSummary}</span>
+          </div>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
             <span style={{ fontSize: 13, color: T.muted }}>Total</span>
             <span style={{ fontSize: 13, fontWeight: 700, color: T.gold }}>${(service.price / 100).toFixed(2)}</span>
@@ -678,6 +881,7 @@ export default function BookPage() {
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null)
+  const [locationSummary, setLocationSummary] = useState('')
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, padding: '40px 16px', fontFamily: "'DM Sans', sans-serif" }}>
@@ -724,8 +928,9 @@ export default function BookPage() {
               service={selectedService}
               date={selectedDate}
               slot={selectedSlot}
-              onSuccess={conf => {
+              onSuccess={(conf, summary) => {
                 setConfirmation(conf)
+                setLocationSummary(summary)
                 setStep('confirm')
               }}
               onBack={() => setStep('auth')}
@@ -738,6 +943,7 @@ export default function BookPage() {
               date={selectedDate}
               slot={selectedSlot}
               confirmation={confirmation}
+              locationSummary={locationSummary}
             />
           )}
         </div>

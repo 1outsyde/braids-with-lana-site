@@ -34,14 +34,24 @@ export interface Business {
 
 export interface VendorService {
   id: string;
-  business_id: string;
+  business_id?: string;
+  businessId?: string;
   name: string;
   description: string | null;
   category: string;
   price: number;
-  duration_minutes: number;
-  is_active: boolean;
-  created_at: string;
+  duration_minutes?: number;
+  durationMinutes?: number;
+  is_active?: boolean;
+  isActive?: boolean;
+  created_at?: string;
+  createdAt?: string;
+  serviceLocationType?: "business" | "alternate" | "customer" | "virtual" | null;
+  alternateAddress?: string | null;
+  alternateCity?: string | null;
+  alternateState?: string | null;
+  alternateZipCode?: string | null;
+  virtualLink?: string | null;
 }
 
 export interface BookingSlot {
@@ -160,11 +170,11 @@ export async function getBusinessServices(): Promise<VendorService[]> {
   if (!BUSINESS_ID) {
     throw new Error("[outsyde] NEXT_PUBLIC_BUSINESS_ID is not set.");
   }
-  const services = await outsydeFetch<VendorService[]>(
+  const data = await outsydeFetch<{ services: VendorService[] } | VendorService[]>(
     `/api/businesses/${BUSINESS_ID}/services`
   );
-  // Belt-and-suspenders: only show active services even if backend returns all
-  return services.filter((s) => s.is_active);
+  const list = Array.isArray(data) ? data : (data.services ?? []);
+  return list.filter((s) => s.is_active ?? s.isActive);
 }
 
 /**
