@@ -48,15 +48,15 @@ export default function MiniCalendar({ onSelect, blockedDates = new Set(), disab
         <button
           onClick={prevMonth}
           disabled={disabled}
-          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#0D2B35', fontSize: 16, padding: '2px 6px' }}
+          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#1C1008', fontSize: 16, padding: '2px 6px' }}
         >
           ‹
         </button>
-        <span style={{ fontSize: 13, fontWeight: 600, color: '#0D2B35' }}>{monthLabel}</span>
+        <span style={{ fontSize: 13, fontWeight: 600, color: '#1C1008' }}>{monthLabel}</span>
         <button
           onClick={nextMonth}
           disabled={disabled}
-          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#0D2B35', fontSize: 16, padding: '2px 6px' }}
+          style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#1C1008', fontSize: 16, padding: '2px 6px' }}
         >
           ›
         </button>
@@ -87,9 +87,9 @@ export default function MiniCalendar({ onSelect, blockedDates = new Set(), disab
                 height: 28, borderRadius: 6, border: 'none',
                 fontSize: 12, fontWeight: isToday ? 700 : 400,
                 cursor: disabled ? 'default' : 'pointer',
-                background: isBlocked ? 'rgba(201,168,76,0.18)' : isToday ? 'rgba(13,43,53,0.08)' : 'transparent',
-                color: isBlocked ? '#8b6800' : '#0D2B35',
-                outline: isToday ? '1.5px solid rgba(13,43,53,0.2)' : undefined,
+                background: isBlocked ? 'rgba(245,197,24,0.18)' : isToday ? 'rgba(28,16,8,0.08)' : 'transparent',
+                color: isBlocked ? '#8b6800' : '#1C1008',
+                outline: isToday ? '1.5px solid rgba(28,16,8,0.2)' : undefined,
               }}
             >
               {day}

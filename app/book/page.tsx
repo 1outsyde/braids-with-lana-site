@@ -65,13 +65,13 @@ type Step = 'service' | 'datetime' | 'auth' | 'payment' | 'confirm'
 // ─── Design tokens ───────────────────────────────────────────────────────────
 
 const T = {
-  teal: '#29C5CC',
+  teal: '#E8630A',
   tealLight: '#a0d8db',
-  navy: '#0D2B35',
-  gold: '#C9A84C',
-  muted: '#6b8c94',
+  navy: '#1C1008',
+  gold: '#F5C518',
+  muted: '#7A5C4A',
   border: '#d1dce0',
-  bg: '#f8fafa',
+  bg: '#FFFAF5',
   card: '#fff',
   error: '#c53030',
   errorBg: '#fff5f5',
@@ -637,7 +637,7 @@ function PaymentStep({
         Review & Pay
       </h2>
 
-      <div style={{ background: '#f0f9fa', border: `1px solid #c8e8ea`, borderRadius: 8, padding: '16px 20px', marginBottom: 24 }}>
+      <div style={{ background: '#FFF8F2', border: `1px solid #c8e8ea`, borderRadius: 8, padding: '16px 20px', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
           <span style={{ fontWeight: 600, color: T.navy, fontSize: 15 }}>{service.name}</span>
           {depositInfo ? (
@@ -833,7 +833,7 @@ function ConfirmStep({ service, date, slot, confirmation, locationSummary }: {
         A confirmation email is on its way to you.
       </p>
 
-      <div style={{ background: '#f0f9fa', border: `1px solid #c8e8ea`, borderRadius: 8, padding: '20px 24px', marginBottom: 28, textAlign: 'left' }}>
+      <div style={{ background: '#FFF8F2', border: `1px solid #c8e8ea`, borderRadius: 8, padding: '20px 24px', marginBottom: 28, textAlign: 'left' }}>
         <div style={{ marginBottom: 10 }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Booking #</span>
           <div style={{ fontWeight: 700, fontSize: 18, color: T.navy, fontFamily: 'monospace' }}>{confirmation.bookingNumber}</div>
@@ -894,7 +894,7 @@ export default function BookPage() {
 
         {step !== 'confirm' && <ProgressBar step={step} />}
 
-        <div style={{ background: T.card, borderRadius: 10, padding: '36px 32px', boxShadow: '0 2px 24px rgba(13,43,53,0.08)' }}>
+        <div style={{ background: T.card, borderRadius: 10, padding: '36px 32px', boxShadow: '0 2px 24px rgba(28,16,8,0.08)' }}>
           {step === 'service' && (
             <ServiceStep
               onSelect={service => {

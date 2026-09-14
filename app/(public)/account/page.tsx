@@ -9,11 +9,11 @@ import { consumerLocationLabel, formatLocationLine, normalizeServiceLocationType
 const VENDOR_CONFIG = { hasBookings: true, hasProducts: true } as const
 
 // ─── Design tokens ───────────────────────────────────────────────────────────
-const TEAL_DARK   = '#0D2B35'
-const TEAL_INK    = '#112F3D'
-const TEAL        = '#29C5CC'
-const GOLD        = '#C9A84C'
-const TEXT        = '#f0f9fa'
+const TEAL_DARK   = '#1C1008'
+const TEAL_INK    = '#2A1408'
+const TEAL        = '#E8630A'
+const GOLD        = '#F5C518'
+const TEXT        = '#FFF8F2'
 const MUTED       = 'rgba(240,249,250,0.5)'
 const BORDER      = 'rgba(255,255,255,0.1)'
 const CARD_BG     = 'rgba(255,255,255,0.05)'
@@ -95,8 +95,8 @@ function formatDateShort(iso: string) {
 
 const ORDER_STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   pending:   { bg: 'rgba(158,158,158,0.15)', color: '#9E9E9E' },
-  paid:      { bg: 'rgba(201,168,76,0.15)',  color: GOLD },
-  shipped:   { bg: 'rgba(41,197,204,0.15)',  color: TEAL },
+  paid:      { bg: 'rgba(245,197,24,0.15)',  color: GOLD },
+  shipped:   { bg: 'rgba(232,99,10,0.15)',  color: TEAL },
   delivered: { bg: 'rgba(76,175,80,0.15)',   color: '#4CAF50' },
   cancelled: { bg: 'rgba(220,38,38,0.15)',   color: '#DC2626' },
 }
@@ -161,7 +161,7 @@ function Avatar({ imageUrl, initial, size = 56 }: { imageUrl?: string | null; in
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 function StatusBadge({ status }: { status: string }) {
-  const colors = ORDER_STATUS_COLORS[status] ?? { bg: 'rgba(41,197,204,0.1)', color: TEAL }
+  const colors = ORDER_STATUS_COLORS[status] ?? { bg: 'rgba(232,99,10,0.1)', color: TEAL }
   return (
     <span style={{
       display: 'inline-block', padding: '3px 10px', borderRadius: 12,
@@ -395,7 +395,7 @@ function OrderCard({ order }: { order: Order }) {
       )}
 
       {order.shipment?.trackingNumber && (
-        <div style={{ background: 'rgba(201,168,76,0.07)', border: `1px solid rgba(201,168,76,0.2)`, borderRadius: 4, padding: '8px 12px', marginBottom: 12, fontFamily: FONT_BODY, fontSize: '0.8rem' }}>
+        <div style={{ background: 'rgba(245,197,24,0.07)', border: `1px solid rgba(245,197,24,0.2)`, borderRadius: 4, padding: '8px 12px', marginBottom: 12, fontFamily: FONT_BODY, fontSize: '0.8rem' }}>
           <span style={{ color: GOLD, fontWeight: 600 }}>
             {order.shipment.carrier ? `${order.shipment.carrier}: ` : 'Tracking: '}
           </span>
@@ -442,7 +442,7 @@ function RewardsSection({ loyaltyPoints }: { loyaltyPoints: number }) {
         <div style={{ fontFamily: FONT_DISPLAY, fontSize: '4.5rem', fontWeight: 600, color: TEAL_DARK, lineHeight: 1 }}>
           {loyaltyPoints}
         </div>
-        <p style={{ fontFamily: FONT_BODY, fontSize: '0.875rem', color: 'rgba(13,43,53,0.65)', marginTop: 6 }}>
+        <p style={{ fontFamily: FONT_BODY, fontSize: '0.875rem', color: 'rgba(28,16,8,0.65)', marginTop: 6 }}>
           loyalty points
         </p>
       </div>

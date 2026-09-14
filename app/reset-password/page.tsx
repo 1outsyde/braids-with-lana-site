@@ -61,7 +61,7 @@ function ResetPasswordForm() {
     background: 'rgba(255,255,255,0.06)',
     border: '1px solid rgba(255,255,255,0.12)',
     padding: '12px 14px',
-    color: '#f0f9fa',
+    color: '#FFF8F2',
     fontSize: '1rem',
     outline: 'none',
     boxSizing: 'border-box',
@@ -69,7 +69,7 @@ function ResetPasswordForm() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0D2B35', color: '#f0f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px' }}>
+    <div style={{ minHeight: '100vh', background: '#1C1008', color: '#FFF8F2', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px' }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
 
         <p style={{ fontSize: '0.7rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'rgba(240,249,250,0.4)', textAlign: 'center', marginBottom: 12 }}>
@@ -86,7 +86,7 @@ function ResetPasswordForm() {
             </p>
             <div style={{ padding: '16px', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.05)', color: '#fca5a5', fontSize: '0.85rem', lineHeight: 1.6, borderRadius: '4px' }}>
               Invalid or expired reset link.{' '}
-              <Link href="/forgot-password" style={{ color: '#f0f9fa', textDecoration: 'underline' }}>
+              <Link href="/forgot-password" style={{ color: '#FFF8F2', textDecoration: 'underline' }}>
                 Request a new one.
               </Link>
             </div>
@@ -100,7 +100,7 @@ function ResetPasswordForm() {
             {state === 'success' ? (
               <div style={{ padding: '16px', border: '1px solid rgba(100,200,100,0.3)', background: 'rgba(100,200,100,0.05)', color: '#86efac', fontSize: '0.85rem', lineHeight: 1.6, borderRadius: '4px' }} role="status">
                 Password updated. You can now{' '}
-                <Link href="/login" style={{ color: '#f0f9fa', textDecoration: 'underline' }}>
+                <Link href="/login" style={{ color: '#FFF8F2', textDecoration: 'underline' }}>
                   log in
                 </Link>.
               </div>
@@ -139,7 +139,7 @@ function ResetPasswordForm() {
                   <div style={{ padding: '12px 14px', border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.05)', color: '#fca5a5', fontSize: '0.85rem', lineHeight: 1.5, borderRadius: '4px' }} role="alert">
                     {errorMsg}{' '}
                     {errorMsg.includes('invalid or has expired') && (
-                      <Link href="/forgot-password" style={{ color: '#f0f9fa', textDecoration: 'underline' }}>
+                      <Link href="/forgot-password" style={{ color: '#FFF8F2', textDecoration: 'underline' }}>
                         Request a new link.
                       </Link>
                     )}
@@ -149,7 +149,7 @@ function ResetPasswordForm() {
                 <button
                   type="submit"
                   disabled={state === 'submitting'}
-                  style={{ marginTop: 8, background: '#29C5CC', color: '#0D0D0D', border: 'none', padding: '14px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', cursor: state === 'submitting' ? 'not-allowed' : 'pointer', opacity: state === 'submitting' ? 0.6 : 1, borderRadius: '4px' }}
+                  style={{ marginTop: 8, background: '#E8630A', color: '#0D0D0D', border: 'none', padding: '14px', fontSize: '0.72rem', fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', cursor: state === 'submitting' ? 'not-allowed' : 'pointer', opacity: state === 'submitting' ? 0.6 : 1, borderRadius: '4px' }}
                 >
                   {state === 'submitting' ? 'Updating…' : 'Set New Password'}
                 </button>
@@ -159,7 +159,7 @@ function ResetPasswordForm() {
         )}
 
         <p style={{ textAlign: 'center', fontSize: '0.82rem', color: 'rgba(240,249,250,0.4)', marginTop: 28 }}>
-          <Link href="/login" style={{ color: '#f0f9fa', textDecoration: 'underline' }}>
+          <Link href="/login" style={{ color: '#FFF8F2', textDecoration: 'underline' }}>
             ← Back to login
           </Link>
         </p>

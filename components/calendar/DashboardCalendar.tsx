@@ -33,7 +33,7 @@ function formatDateLabel(ds: string): string {
 
 const navBtnStyle: React.CSSProperties = {
   background: 'none', border: 'none', cursor: 'pointer',
-  color: '#0D2B35', fontSize: '1.4rem', lineHeight: 1,
+  color: '#1C1008', fontSize: '1.4rem', lineHeight: 1,
   padding: '2px 10px', borderRadius: 4,
   minHeight: 36, minWidth: 36,
 }
@@ -77,7 +77,7 @@ function EntryRow({ entry, compact = false }: { entry: DayEntry; compact?: boole
         flexShrink: 0, display: 'inline-block',
       }} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, color: '#0D2B35', fontWeight: 500 }}>
+        <div style={{ fontSize: 14, color: '#1C1008', fontWeight: 500 }}>
           {booking.serviceName}
         </div>
         <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>
@@ -117,8 +117,8 @@ function DayPanel({
   return (
     <div style={{
       marginTop: 16, padding: '16px 20px',
-      background: 'rgba(13,43,53,0.03)', borderRadius: 10,
-      border: '1px solid rgba(13,43,53,0.09)',
+      background: 'rgba(28,16,8,0.03)', borderRadius: 10,
+      border: '1px solid rgba(28,16,8,0.09)',
       width: '100%', boxSizing: 'border-box',
     }}>
       {/* Header */}
@@ -128,7 +128,7 @@ function DayPanel({
       }}>
         <span style={{
           fontFamily: 'Cormorant Garamond, serif',
-          fontSize: 17, fontWeight: 600, color: '#0D2B35',
+          fontSize: 17, fontWeight: 600, color: '#1C1008',
         }}>
           {formatDateLabel(dateStr)}
         </span>
@@ -256,7 +256,7 @@ export default function DashboardCalendar({ dateMap, mode }: DashboardCalendarPr
                 padding: '7px 20px', minHeight: 36, border: 'none',
                 borderLeft: i > 0 ? '1px solid rgba(0,0,0,0.1)' : 'none',
                 cursor: 'pointer', fontSize: 13,
-                background: viewMode === v ? '#0D2B35' : 'transparent',
+                background: viewMode === v ? '#1C1008' : 'transparent',
                 color: viewMode === v ? '#F5F5F5' : 'rgba(0,0,0,0.5)',
                 fontWeight: viewMode === v ? 600 : 400,
                 transition: 'all 0.15s',
@@ -274,7 +274,7 @@ export default function DashboardCalendar({ dateMap, mode }: DashboardCalendarPr
         <div>
           <div style={{
             fontFamily: 'Cormorant Garamond, serif',
-            fontSize: 20, fontWeight: 600, color: '#0D2B35', marginBottom: 16,
+            fontSize: 20, fontWeight: 600, color: '#1C1008', marginBottom: 16,
           }}>
             {MONTHS[month]} {year}
           </div>
@@ -287,7 +287,7 @@ export default function DashboardCalendar({ dateMap, mode }: DashboardCalendarPr
               {listEntries.map(([dateStr, entries]) => (
                 <div key={dateStr}>
                   <div style={{
-                    fontSize: 13, fontWeight: 600, color: '#0D2B35',
+                    fontSize: 13, fontWeight: 600, color: '#1C1008',
                     marginBottom: 8, paddingBottom: 6,
                     borderBottom: '1px solid rgba(0,0,0,0.07)',
                   }}>
@@ -316,7 +316,7 @@ export default function DashboardCalendar({ dateMap, mode }: DashboardCalendarPr
             <button onClick={prev} style={navBtnStyle} aria-label="Previous month">‹</button>
             <span style={{
               fontFamily: 'Cormorant Garamond, serif',
-              fontSize: '1.1rem', fontWeight: 500, color: '#0D2B35',
+              fontSize: '1.1rem', fontWeight: 500, color: '#1C1008',
             }}>
               {MONTHS[month]} {year}
             </span>
@@ -329,7 +329,7 @@ export default function DashboardCalendar({ dateMap, mode }: DashboardCalendarPr
               <div key={d} style={{
                 textAlign: 'center', fontSize: 10,
                 letterSpacing: '.08em', textTransform: 'uppercase',
-                color: 'rgba(13,43,53,0.35)', padding: '2px 0',
+                color: 'rgba(28,16,8,0.35)', padding: '2px 0',
               }}>
                 {d}
               </div>
@@ -364,8 +364,8 @@ export default function DashboardCalendar({ dateMap, mode }: DashboardCalendarPr
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                     width: 28, height: 28, minWidth: 24, borderRadius: '50%',
-                    background: isSelected ? '#29C5CC' : isToday ? '#0D2B35' : 'transparent',
-                    color: isSelected || isToday ? '#F5F5F5' : '#0D2B35',
+                    background: isSelected ? '#E8630A' : isToday ? '#1C1008' : 'transparent',
+                    color: isSelected || isToday ? '#F5F5F5' : '#1C1008',
                     fontSize: 13,
                     cursor: isClickable ? 'pointer' : 'default',
                     transition: 'background 0.12s',
@@ -412,7 +412,7 @@ export default function DashboardCalendar({ dateMap, mode }: DashboardCalendarPr
                   display: 'inline-block', width: 7, height: 7,
                   borderRadius: '50%', background: color, flexShrink: 0,
                 }} />
-                <span style={{ fontSize: 11, color: 'rgba(13,43,53,0.5)', letterSpacing: '.04em' }}>
+                <span style={{ fontSize: 11, color: 'rgba(28,16,8,0.5)', letterSpacing: '.04em' }}>
                   {label}
                 </span>
               </div>

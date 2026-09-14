@@ -51,7 +51,7 @@ export default function RegisterPage() {
     background: 'rgba(255,255,255,0.06)',
     border: '1px solid rgba(255,255,255,0.12)',
     padding: '12px 14px',
-    color: '#f0f9fa',
+    color: '#FFF8F2',
     fontSize: '1rem',
     outline: 'none',
     boxSizing: 'border-box',
@@ -68,13 +68,13 @@ export default function RegisterPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0D2B35', color: '#f0f9fa', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px' }}>
+    <div style={{ minHeight: '100vh', background: '#1C1008', color: '#FFF8F2', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 16px' }}>
       <div style={{ width: '100%', maxWidth: 420 }}>
 
         <p style={{ fontSize: '0.7rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'rgba(240,249,250,0.4)', textAlign: 'center', marginBottom: 12 }}>
           Braids With Lana
         </p>
-        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '2.4rem', fontWeight: 500, textAlign: 'center', marginBottom: 6, color: '#f0f9fa' }}>
+        <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '2.4rem', fontWeight: 500, textAlign: 'center', marginBottom: 6, color: '#FFF8F2' }}>
           Create Account
         </h1>
         <p style={{ textAlign: 'center', color: 'rgba(240,249,250,0.5)', fontSize: '0.85rem', marginBottom: 36 }}>
@@ -157,11 +157,11 @@ export default function RegisterPage() {
               checked={agreed}
               onChange={e => setAgreed(e.target.checked)}
               required
-              style={{ marginTop: 3, accentColor: '#29C5CC', flexShrink: 0 }}
+              style={{ marginTop: 3, accentColor: '#E8630A', flexShrink: 0 }}
             />
             <span style={{ fontSize: '0.78rem', color: 'rgba(240,249,250,0.6)', lineHeight: 1.5 }}>
               I understand that this site is powered by{' '}
-              <a href="https://goutsyde.com" target="_blank" rel="noopener noreferrer" style={{ color: '#29C5CC', textDecoration: 'underline' }}>
+              <a href="https://goutsyde.com" target="_blank" rel="noopener noreferrer" style={{ color: '#E8630A', textDecoration: 'underline' }}>
                 Outsyde
               </a>
               , a commerce platform for independent wellness brands, and that my account and order data are managed by Outsyde on behalf of Braids With Lana.
@@ -173,7 +173,7 @@ export default function RegisterPage() {
             disabled={loading}
             style={{
               marginTop: 8,
-              background: '#29C5CC',
+              background: '#E8630A',
               color: '#0D0D0D',
               border: 'none',
               padding: '14px',
@@ -192,7 +192,7 @@ export default function RegisterPage() {
 
         <p style={{ textAlign: 'center', fontSize: '0.82rem', color: 'rgba(240,249,250,0.5)', marginTop: 24 }}>
           Already have an account?{' '}
-          <Link href="/login" style={{ color: '#29C5CC', textDecoration: 'underline' }}>
+          <Link href="/login" style={{ color: '#E8630A', textDecoration: 'underline' }}>
             Sign in
           </Link>
         </p>

@@ -150,7 +150,7 @@ export default function BookingsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#1C1008', margin: 0, lineHeight: 1 }}>
             Bookings
           </h1>
           <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>
@@ -175,15 +175,15 @@ export default function BookingsPage() {
 
       {/* Up Next card */}
       {upNext && (
-        <div className="mb-8 p-5 rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(201,168,76,0.25)', boxShadow: '0 2px 12px rgba(201,168,76,0.08)' }}>
-          <div style={{ fontSize: 10, color: '#C9A84C', letterSpacing: '0.12em', marginBottom: 10, fontWeight: 700 }}>UP NEXT</div>
+        <div className="mb-8 p-5 rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(245,197,24,0.25)', boxShadow: '0 2px 12px rgba(245,197,24,0.08)' }}>
+          <div style={{ fontSize: 10, color: '#F5C518', letterSpacing: '0.12em', marginBottom: 10, fontWeight: 700 }}>UP NEXT</div>
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <div style={{ fontSize: 20, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#0D2B35' }}>
+              <div style={{ fontSize: 20, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#1C1008' }}>
                 {upNext.customer_name}
               </div>
               <div style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginTop: 3 }}>{upNext.serviceName ?? upNext.service_name}</div>
-              <div style={{ fontSize: 13, color: '#0D2B35', marginTop: 6, fontWeight: 500 }}>
+              <div style={{ fontSize: 13, color: '#1C1008', marginTop: 6, fontWeight: 500 }}>
                 {fmtDate(upNext.appointment_date ?? upNext.appointmentDate)}{fmtTime(upNext) ? ` · ${fmtTime(upNext)}` : ''}
               </div>
             </div>
@@ -217,9 +217,9 @@ export default function BookingsPage() {
               marginRight: 24,
               background: 'transparent',
               border: 'none',
-              borderBottom: `2px solid ${filter === f.value ? '#C9A84C' : 'transparent'}`,
+              borderBottom: `2px solid ${filter === f.value ? '#F5C518' : 'transparent'}`,
               marginBottom: -1,
-              color: filter === f.value ? '#0D2B35' : 'rgba(0,0,0,0.45)',
+              color: filter === f.value ? '#1C1008' : 'rgba(0,0,0,0.45)',
               fontWeight: filter === f.value ? 600 : 400,
               cursor: 'pointer',
               transition: 'all 0.15s',
@@ -252,14 +252,14 @@ export default function BookingsPage() {
                 <div className="flex items-start justify-between gap-4 flex-wrap">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <span style={{ fontSize: 12, color: '#C9A84C', fontFamily: 'DM Mono, monospace', fontWeight: 500 }}>
+                      <span style={{ fontSize: 12, color: '#F5C518', fontFamily: 'DM Mono, monospace', fontWeight: 500 }}>
                         {fmtBookingNum(b.bookingNumber)}
                       </span>
                       <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 10, background: st.bg, color: st.color, letterSpacing: '0.03em' }}>
                         {st.label.toUpperCase()}
                       </span>
                     </div>
-                    <div style={{ fontSize: 17, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#0D2B35' }}>
+                    <div style={{ fontSize: 17, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#1C1008' }}>
                       {b.customer_name}
                     </div>
                     <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.5)', marginTop: 2 }}>{b.serviceName ?? b.service_name}</div>
@@ -279,7 +279,7 @@ export default function BookingsPage() {
                         {fmtDate(b.appointment_date ?? b.appointmentDate)}{time ? ` · ${time}` : ''}
                       </span>
                       {b.total_amount != null && (
-                        <span style={{ fontSize: 14, fontWeight: 600, color: '#C9A84C' }}>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: '#F5C518' }}>
                           {fmtMoney(b.total_amount)}
                         </span>
                       )}
@@ -322,8 +322,8 @@ function ActionButton({
         padding: small ? '5px 14px' : '8px 20px',
         borderRadius: 8,
         border: '1px solid',
-        borderColor: primary ? '#C9A84C' : 'rgba(0,0,0,0.15)',
-        background: primary ? '#C9A84C' : 'transparent',
+        borderColor: primary ? '#F5C518' : 'rgba(0,0,0,0.15)',
+        background: primary ? '#F5C518' : 'transparent',
         color: primary ? '#0D0D0D' : 'rgba(0,0,0,0.55)',
         cursor: loading ? 'not-allowed' : 'pointer',
         opacity: loading ? 0.6 : 1,
@@ -368,10 +368,10 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 function EmptyState({ filter }: { filter: string }) {
   return (
     <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '56px 24px' }}>
-      <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+      <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
         ✂
       </div>
-      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 8 }}>
+      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', marginBottom: 8 }}>
         {filter ? `No ${filter} bookings` : 'No bookings yet'}
       </div>
       <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', margin: 0 }}>

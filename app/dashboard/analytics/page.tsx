@@ -36,7 +36,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
   return (
     <div className="rounded-2xl p-5" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}>
       <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', marginBottom: 10, fontWeight: 600, letterSpacing: '0.08em' }}>{label.toUpperCase()}</div>
-      <div style={{ fontSize: 30, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#0D2B35' }}>{value}</div>
+      <div style={{ fontSize: 30, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#1C1008' }}>{value}</div>
       {sub && <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.35)', marginTop: 4 }}>{sub}</div>}
     </div>
   )
@@ -82,13 +82,13 @@ export default function AnalyticsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>Analytics</h1>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#1C1008', margin: 0, lineHeight: 1 }}>Analytics</h1>
           <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>Business performance overview</p>
         </div>
         <button
           onClick={openPayouts}
           disabled={payoutsLoading}
-          style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: payoutsLoading ? 'not-allowed' : 'pointer', opacity: payoutsLoading ? 0.7 : 1 }}
+          style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: payoutsLoading ? 'not-allowed' : 'pointer', opacity: payoutsLoading ? 0.7 : 1 }}
         >
           {payoutsLoading ? 'Opening…' : 'Manage Payouts'}
         </button>
@@ -121,8 +121,8 @@ export default function AnalyticsPage() {
       ) : null}
 
       {/* Payouts CTA */}
-      <div className="rounded-2xl p-6 mb-4" style={{ background: '#FFFFFF', border: '1px solid rgba(201,168,76,0.2)' }}>
-        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 6 }}>
+      <div className="rounded-2xl p-6 mb-4" style={{ background: '#FFFFFF', border: '1px solid rgba(245,197,24,0.2)' }}>
+        <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', marginBottom: 6 }}>
           Ready to get paid?
         </div>
         <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginBottom: 20, maxWidth: 480 }}>
@@ -131,7 +131,7 @@ export default function AnalyticsPage() {
         <button
           onClick={openPayouts}
           disabled={payoutsLoading}
-          style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}
+          style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}
         >
           Open Payout Dashboard →
         </button>

@@ -6,7 +6,7 @@ export default function CalendarPage() {
       <div style={{ marginBottom: 32 }}>
         <h1 style={{
           fontFamily: 'Cormorant Garamond, serif',
-          fontSize: 38, fontWeight: 600, color: '#0D2B35',
+          fontSize: 38, fontWeight: 600, color: '#1C1008',
           margin: 0, lineHeight: 1,
         }}>
           Calendar

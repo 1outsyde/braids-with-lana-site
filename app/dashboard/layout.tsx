@@ -41,8 +41,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0D2B35' }}>
-        <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: '#C9A84C', borderTopColor: 'transparent' }} />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#1C1008' }}>
+        <div className="w-8 h-8 rounded-full border-2 animate-spin" style={{ borderColor: '#F5C518', borderTopColor: 'transparent' }} />
       </div>
     )
   }
@@ -58,7 +58,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-30 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:z-auto ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
-        style={{ width: 220, background: '#0D2B35', borderRight: '1px solid rgba(255,255,255,0.05)' }}
+        style={{ width: 220, background: '#1C1008', borderRight: '1px solid rgba(255,255,255,0.05)' }}
       >
         {/* Brand lockup */}
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
@@ -94,8 +94,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   letterSpacing: '0.1em',
                   color: active ? '#F5F5F5' : 'rgba(245,245,245,0.4)',
                   textDecoration: 'none',
-                  borderLeft: `3px solid ${active ? '#C9A84C' : 'transparent'}`,
-                  background: active ? 'rgba(201,168,76,0.06)' : 'transparent',
+                  borderLeft: `3px solid ${active ? '#F5C518' : 'transparent'}`,
+                  background: active ? 'rgba(245,197,24,0.06)' : 'transparent',
                   transition: 'all 0.15s',
                 }}
               >
@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Mobile top bar — 52px, sticky */}
         <header
           className="lg:hidden flex items-center gap-3 sticky top-0 z-10"
-          style={{ height: 52, padding: '0 16px', background: '#0D2B35', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
+          style={{ height: 52, padding: '0 16px', background: '#1C1008', borderBottom: '1px solid rgba(255,255,255,0.06)' }}
         >
           <button onClick={() => setSidebarOpen(true)} style={{ color: 'rgba(245,245,245,0.7)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 6, display: 'flex' }}>
             <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

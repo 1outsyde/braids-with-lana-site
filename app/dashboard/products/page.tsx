@@ -147,10 +147,10 @@ export default function ProductsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>Products</h1>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#1C1008', margin: 0, lineHeight: 1 }}>Products</h1>
           <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>{products.length} product{products.length !== 1 ? 's' : ''}</p>
         </div>
-        <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>
+        <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>
           + Add Product
         </button>
       </div>
@@ -159,7 +159,7 @@ export default function ProductsPage() {
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
           <div className="w-full max-w-lg rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 600, color: '#0D2B35', marginBottom: 24 }}>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 26, fontWeight: 600, color: '#1C1008', marginBottom: 24 }}>
               {editing ? 'Edit Product' : 'Add Product'}
             </h2>
             <div className="flex flex-col gap-4">
@@ -189,7 +189,7 @@ export default function ProductsPage() {
             </div>
             <div className="flex gap-3 mt-6 justify-end">
               <button onClick={closeForm} style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={handleSave} disabled={saving} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
+              <button onClick={handleSave} disabled={saving} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
                 {saving ? 'Saving…' : editing ? 'Save changes' : 'Add product'}
               </button>
             </div>
@@ -201,7 +201,7 @@ export default function ProductsPage() {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
           <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.2)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
-            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, color: '#0D2B35', marginBottom: 12 }}>Delete product?</h3>
+            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, color: '#1C1008', marginBottom: 12 }}>Delete product?</h3>
             <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginBottom: 24 }}>This is permanent and cannot be undone. The product will be removed from your storefront immediately.</p>
             <div className="flex gap-3 justify-end">
               <button onClick={() => setDeleteConfirm(null)} style={{ fontSize: 13, padding: '7px 16px', borderRadius: 8, border: '1px solid rgba(0,0,0,0.12)', background: 'transparent', color: 'rgba(0,0,0,0.55)', cursor: 'pointer' }}>Cancel</button>
@@ -230,12 +230,12 @@ export default function ProductsPage() {
         </div>
       ) : products.length === 0 ? (
         <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '56px 24px' }}>
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
             🏷
           </div>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 8 }}>No products yet</div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', marginBottom: 8 }}>No products yet</div>
           <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', marginBottom: 24 }}>Add products to sell through your storefront</p>
-          <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>Add your first product</button>
+          <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>Add your first product</button>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -247,7 +247,7 @@ export default function ProductsPage() {
               <div key={product.id} className="flex items-center gap-4 px-5 py-4 rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }}>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span style={{ fontSize: 15, fontWeight: 500, color: '#0D2B35' }}>{product.name}</span>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#1C1008' }}>{product.name}</span>
                     <span style={{ fontSize: 11, fontWeight: 600, padding: '2px 9px', borderRadius: 10, background: badge.bg, color: badge.color }}>
                       {badge.label}
                     </span>
@@ -255,14 +255,14 @@ export default function ProductsPage() {
                   {product.category && <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 3, display: 'block' }}>{product.category}</span>}
                 </div>
                 <div className="text-right flex-shrink-0 hidden sm:block">
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#C9A84C' }}>{fmtPrice(product.price)}</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#F5C518' }}>{fmtPrice(product.price)}</div>
                   {product.inventory != null && <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>Stock: {product.inventory}</div>}
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   <button
                     onClick={() => handlePublish(product)}
                     disabled={publishLoading === product.id}
-                    style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid', borderColor: isLive ? 'rgba(0,0,0,0.12)' : 'rgba(201,168,76,0.5)', background: isLive ? 'transparent' : 'rgba(201,168,76,0.08)', color: isLive ? 'rgba(0,0,0,0.45)' : '#C9A84C', cursor: 'pointer', opacity: publishLoading === product.id ? 0.6 : 1 }}
+                    style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: '1px solid', borderColor: isLive ? 'rgba(0,0,0,0.12)' : 'rgba(245,197,24,0.5)', background: isLive ? 'transparent' : 'rgba(245,197,24,0.08)', color: isLive ? 'rgba(0,0,0,0.45)' : '#F5C518', cursor: 'pointer', opacity: publishLoading === product.id ? 0.6 : 1 }}
                   >
                     {publishLoading === product.id ? '…' : isLive ? 'Unpublish' : 'Publish'}
                   </button>

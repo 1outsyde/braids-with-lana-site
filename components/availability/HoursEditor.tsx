@@ -36,11 +36,11 @@ export default function HoursEditor({ hours, onChange, disabled }: Props) {
               checked={day.isActive}
               disabled={disabled}
               onChange={e => update(i, { isActive: e.target.checked })}
-              style={{ accentColor: '#C9A84C', width: 16, height: 16, cursor: disabled ? 'default' : 'pointer' }}
+              style={{ accentColor: '#F5C518', width: 16, height: 16, cursor: disabled ? 'default' : 'pointer' }}
             />
             <span style={{
               fontSize: 13, fontWeight: 500,
-              color: day.isActive ? '#0D2B35' : 'rgba(0,0,0,0.3)',
+              color: day.isActive ? '#1C1008' : 'rgba(0,0,0,0.3)',
             }}>
               {DAY_NAMES[day.dayOfWeek].slice(0, 3)}
             </span>
@@ -94,7 +94,7 @@ function TimeSelect({
         borderRadius: 8,
         border: '1px solid rgba(0,0,0,0.14)',
         background: disabled ? 'rgba(0,0,0,0.04)' : '#fff',
-        color: '#0D2B35',
+        color: '#1C1008',
         cursor: disabled ? 'default' : 'pointer',
         outline: 'none',
       }}

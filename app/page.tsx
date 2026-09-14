@@ -39,12 +39,12 @@ function Nav({ isMobile }: { isMobile: boolean }) {
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       zIndex: 3,
       // Subtle top fade to help nav items read on any photo
-      background: 'linear-gradient(to bottom, rgba(13,43,53,0.5) 0%, transparent 100%)',
+      background: 'linear-gradient(to bottom, rgba(28,16,8,0.5) 0%, transparent 100%)',
     }}>
       {/* Logo */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid rgba(41,197,204,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(41,197,204,0.1)' }}>
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 600, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
+        <div style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid rgba(232,99,10,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(232,99,10,0.1)' }}>
+          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 600, color: '#E8630A', fontStyle: 'italic' }}>B</span>
         </div>
         <div>
           <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 600, color: '#fff', lineHeight: 1.1 }}>Braids With Lana</div>
@@ -58,7 +58,7 @@ function Nav({ isMobile }: { isMobile: boolean }) {
           {['Services', 'Gallery', 'About', 'Contact'].map(l => (
             <a key={l} href={`#${l.toLowerCase()}`}
               style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', letterSpacing: '0.03em', fontWeight: 400 }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#29C5CC')}
+              onMouseEnter={e => (e.currentTarget.style.color = '#E8630A')}
               onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.85)')}>{l}</a>
           ))}
         </div>
@@ -68,7 +68,7 @@ function Nav({ isMobile }: { isMobile: boolean }) {
       {!isMobile && (
         <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
           <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Sign in</Link>
-          <a href="#book" style={{ background: '#29C5CC', color: '#0D2B35', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(41,197,204,0.4)' }}>Book Now</a>
+          <a href="#book" style={{ background: '#E8630A', color: '#1C1008', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(232,99,10,0.4)' }}>Book Now</a>
         </div>
       )}
 
@@ -90,15 +90,15 @@ function Nav({ isMobile }: { isMobile: boolean }) {
         <div style={{
           position: 'fixed',
           top: 0, left: 0, right: 0,
-          background: '#0D2B35',
+          background: '#1C1008',
           zIndex: 1000,
           padding: '20px 20px 32px',
         }}>
           {/* Close row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(41,197,204,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(232,99,10,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#E8630A', fontStyle: 'italic' }}>B</span>
               </div>
               <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Lana</span>
             </div>
@@ -118,7 +118,7 @@ function Nav({ isMobile }: { isMobile: boolean }) {
             <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
               Sign in
             </Link>
-            <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#29C5CC', color: '#0D2B35', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
+            <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#E8630A', color: '#1C1008', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
               Book Now
             </a>
           </div>
@@ -143,7 +143,7 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
       height: isMobile ? '90vh' : '100vh',
       minHeight: isMobile ? 580 : 640,
       overflow: 'hidden',
-      backgroundColor: '#0D2B35',  // fallback while image loads
+      backgroundColor: '#1C1008',  // fallback while image loads
     }}>
 
       {/* Layer 1 — Cover image (background) */}
@@ -168,7 +168,7 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
         // Fallback gradient — shown before fetch resolves, on fetch timeout, or if image URL fails
         <div style={{
           position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, #0D2B35 0%, #1a4050 100%)',
+          background: 'linear-gradient(135deg, #1C1008 0%, #3D1F0A 100%)',
         }} />
       )}
 
@@ -177,11 +177,11 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
         position: 'absolute', inset: 0,
         background: `linear-gradient(
           to bottom,
-          rgba(13,43,53,0.15) 0%,
-          rgba(13,43,53,0.05) 25%,
-          rgba(13,43,53,0.4) 55%,
-          rgba(13,43,53,0.82) 75%,
-          rgba(13,43,53,0.96) 100%
+          rgba(28,16,8,0.15) 0%,
+          rgba(28,16,8,0.05) 25%,
+          rgba(28,16,8,0.4) 55%,
+          rgba(28,16,8,0.82) 75%,
+          rgba(28,16,8,0.96) 100%
         )`,
         zIndex: 1,
       }} />
@@ -199,13 +199,13 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
         {/* Availability pill */}
         <div style={{
           display: 'inline-flex', alignItems: 'center', gap: 6,
-          background: 'rgba(41,197,204,0.15)',
-          border: '0.5px solid rgba(41,197,204,0.4)',
+          background: 'rgba(232,99,10,0.15)',
+          border: '0.5px solid rgba(232,99,10,0.4)',
           borderRadius: 20, padding: '5px 12px',
           marginBottom: 14,
         }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#29C5CC' }} />
-          <span style={{ fontSize: 12, color: '#29C5CC', fontWeight: 500 }}>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8630A' }} />
+          <span style={{ fontSize: 12, color: '#E8630A', fontWeight: 500 }}>
             Now accepting bookings
           </span>
         </div>
@@ -220,7 +220,7 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
           margin: '0 0 12px',
         }}>
           Where every braid tells{' '}
-          <em style={{ color: '#29C5CC', fontStyle: 'italic' }}>your story.</em>
+          <em style={{ color: '#E8630A', fontStyle: 'italic' }}>your story.</em>
         </h1>
 
         {/* Subheadline */}
@@ -257,7 +257,7 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
         }}>
           <a href="/book" style={{
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            background: '#29C5CC', color: '#0D2B35',
+            background: '#E8630A', color: '#1C1008',
             borderRadius: 12, padding: '14px 28px',
             fontWeight: 700, fontSize: 15,
             textDecoration: 'none',
@@ -282,61 +282,61 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
 // ── Services ─────────────────────────────────────────────────────────────────
 function Services({ services, loading }: { services: Service[]; loading: boolean }) {
   const isMobile = useWindowWidth() < 768
-  const CARD_COLORS = ['#e8f9fa', '#fff5e6', '#f0f9ff', '#f5f0ff', '#e8faf5']
+  const CARD_COLORS = ['#FFF3E8', '#fff5e6', '#FFF3E8', '#f5f0ff', '#FFF3E8']
   return (
     <section id="services" style={{ padding: '96px 0', background: '#fff' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 24px' : '0 40px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 52, flexWrap: 'wrap', gap: 16 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <div style={{ width: 32, height: 2, background: '#29C5CC', borderRadius: 1 }} />
-              <span style={{ fontSize: 12, color: '#29C5CC', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>What we offer</span>
+              <div style={{ width: 32, height: 2, background: '#E8630A', borderRadius: 1 }} />
+              <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>What we offer</span>
             </div>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px,4vw,52px)', fontWeight: 400, lineHeight: 1.1, color: '#0D2B35' }}>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px,4vw,52px)', fontWeight: 400, lineHeight: 1.1, color: '#1C1008' }}>
               Services crafted<br />
-              <em style={{ color: '#29C5CC' }}>for your hair.</em>
+              <em style={{ color: '#E8630A' }}>for your hair.</em>
             </h2>
           </div>
-          <a href="#book" style={{ fontSize: 13, color: '#29C5CC', textDecoration: 'none', fontWeight: 600, marginBottom: 8 }}>All services →</a>
+          <a href="#book" style={{ fontSize: 13, color: '#E8630A', textDecoration: 'none', fontWeight: 600, marginBottom: 8 }}>All services →</a>
         </div>
         {loading && (
           <div style={{ display: 'flex', gap: 20, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'none' as const }}>
             {[1, 2, 3].map(i => (
-              <div key={i} style={{ flex: '0 0 268px', height: 340, background: '#f8fafa', borderRadius: 12, border: '1.5px solid #eef2f3', flexShrink: 0 }} />
+              <div key={i} style={{ flex: '0 0 268px', height: 340, background: '#FFFAF5', borderRadius: 12, border: '1.5px solid #F0D9C8', flexShrink: 0 }} />
             ))}
           </div>
         )}
         {!loading && services.length === 0 && (
-          <div style={{ padding: '64px 0', textAlign: 'center', color: '#9ab3b8' }}>
+          <div style={{ padding: '64px 0', textAlign: 'center', color: '#B5977A' }}>
             <p style={{ fontSize: 15 }}>Services coming soon.</p>
           </div>
         )}
         {!loading && services.length > 0 && (
           <div style={{ display: 'flex', gap: 20, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'none' as const }}>
             {services.map((s, i) => (
-              <div key={s.id} style={{ flex: '0 0 268px', background: '#fff', borderRadius: 12, overflow: 'hidden', border: '1.5px solid #eef2f3', cursor: 'pointer', transition: 'all 0.25s', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#29C5CC'; el.style.transform = 'translateY(-6px)'; el.style.boxShadow = '0 12px 32px rgba(41,197,204,0.15)' }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#eef2f3'; el.style.transform = 'translateY(0)'; el.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)' }}>
+              <div key={s.id} style={{ flex: '0 0 268px', background: '#fff', borderRadius: 12, overflow: 'hidden', border: '1.5px solid #F0D9C8', cursor: 'pointer', transition: 'all 0.25s', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#E8630A'; el.style.transform = 'translateY(-6px)'; el.style.boxShadow = '0 12px 32px rgba(232,99,10,0.15)' }}
+                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#F0D9C8'; el.style.transform = 'translateY(0)'; el.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)' }}>
                 {/* Image area */}
                 <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
                   {s.imageUrl
                     ? <img src={s.imageUrl} alt={s.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <div style={{ width: '100%', height: '100%', background: CARD_COLORS[i % CARD_COLORS.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#29C5CC', opacity: 0.5, fontSize: 32 }}>✂</div>
+                    : <div style={{ width: '100%', height: '100%', background: CARD_COLORS[i % CARD_COLORS.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E8630A', opacity: 0.5, fontSize: 32 }}>✂</div>
                   }
                   {s.category && (
-                    <div style={{ position: 'absolute', top: 12, left: 12, background: '#29C5CC', borderRadius: 20, padding: '3px 12px', fontSize: 10, color: '#fff', fontWeight: 600, letterSpacing: '0.06em' }}>{s.category}</div>
+                    <div style={{ position: 'absolute', top: 12, left: 12, background: '#E8630A', borderRadius: 20, padding: '3px 12px', fontSize: 10, color: '#fff', fontWeight: 600, letterSpacing: '0.06em' }}>{s.category}</div>
                   )}
                 </div>
                 {/* Body */}
                 <div style={{ padding: '20px 20px 24px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                    <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 21, fontWeight: 600, color: '#0D2B35', lineHeight: 1.2 }}>{s.name}</h3>
-                    <span style={{ color: '#C9A84C', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap', marginLeft: 10 }}>From {fmtPrice(s.price)}</span>
+                    <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 21, fontWeight: 600, color: '#1C1008', lineHeight: 1.2 }}>{s.name}</h3>
+                    <span style={{ color: '#F5C518', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap', marginLeft: 10 }}>From {fmtPrice(s.price)}</span>
                   </div>
-                  <p style={{ fontSize: 13, color: '#6b8c94', lineHeight: 1.65, marginBottom: 18 }}>{s.description}</p>
+                  <p style={{ fontSize: 13, color: '#7A5C4A', lineHeight: 1.65, marginBottom: 18 }}>{s.description}</p>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: '#9ab3b8' }}>⏱ {fmtDur(s.durationMinutes)} · {consumerLocationLabel(s.serviceLocationType)}</span>
-                    <Link href={`/book?serviceId=${s.id}`} style={{ background: '#29C5CC', border: 'none', borderRadius: 3, color: '#fff', fontSize: 12, fontWeight: 600, padding: '8px 18px', cursor: 'pointer', letterSpacing: '0.04em', textDecoration: 'none', display: 'inline-block' }}>
+                    <span style={{ fontSize: 11, color: '#B5977A' }}>⏱ {fmtDur(s.durationMinutes)} · {consumerLocationLabel(s.serviceLocationType)}</span>
+                    <Link href={`/book?serviceId=${s.id}`} style={{ background: '#E8630A', border: 'none', borderRadius: 3, color: '#fff', fontSize: 12, fontWeight: 600, padding: '8px 18px', cursor: 'pointer', letterSpacing: '0.04em', textDecoration: 'none', display: 'inline-block' }}>
                       Book this →
                     </Link>
                   </div>
@@ -353,11 +353,11 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
 // ── Why ───────────────────────────────────────────────────────────────────────
 function Why() {
   return (
-    <section style={{ padding: '88px 0', background: '#f8fafa' }}>
+    <section style={{ padding: '88px 0', background: '#FFFAF5' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 52 }}>
-          <div style={{ width: 32, height: 2, background: '#29C5CC', borderRadius: 1 }} />
-          <span style={{ fontSize: 12, color: '#29C5CC', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Why choose us</span>
+          <div style={{ width: 32, height: 2, background: '#E8630A', borderRadius: 1 }} />
+          <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Why choose us</span>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 2 }}>
           {[
@@ -365,13 +365,13 @@ function Why() {
             { n: '02', t: 'Hair health first', b: 'Every style installed with care for your edges and scalp. Never over-tensioned.', icon: '💚' },
             { n: '03', t: 'Earn every visit', b: 'Loyalty points added automatically. Redeem for money off your next appointment.', icon: '⭐' },
           ].map((item, i) => (
-            <div key={item.n} style={{ background: '#fff', padding: '40px 36px', border: '1.5px solid #eef2f3', borderRadius: i === 0 ? '12px 0 0 12px' : i === 2 ? '0 12px 12px 0' : '0', transition: 'border-color 0.2s' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#29C5CC'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#eef2f3'}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(41,197,204,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 20 }}>{item.icon}</div>
-              <div style={{ fontSize: 11, color: '#29C5CC', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>{item.n}</div>
-              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 600, color: '#0D2B35', marginBottom: 12, lineHeight: 1.2 }}>{item.t}</h3>
-              <p style={{ fontSize: 14, color: '#6b8c94', lineHeight: 1.8 }}>{item.b}</p>
+            <div key={item.n} style={{ background: '#fff', padding: '40px 36px', border: '1.5px solid #F0D9C8', borderRadius: i === 0 ? '12px 0 0 12px' : i === 2 ? '0 12px 12px 0' : '0', transition: 'border-color 0.2s' }}
+              onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#E8630A'}
+              onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#F0D9C8'}>
+              <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(232,99,10,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 20 }}>{item.icon}</div>
+              <div style={{ fontSize: 11, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>{item.n}</div>
+              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 600, color: '#1C1008', marginBottom: 12, lineHeight: 1.2 }}>{item.t}</h3>
+              <p style={{ fontSize: 14, color: '#7A5C4A', lineHeight: 1.8 }}>{item.b}</p>
             </div>
           ))}
         </div>
@@ -384,22 +384,22 @@ function Why() {
 function BookCTA() {
   const isMobile = useWindowWidth() < 768
   return (
-    <section id="book" style={{ background: '#0D2B35', padding: isMobile ? '64px 24px' : '100px 40px' }}>
+    <section id="book" style={{ background: '#1C1008', padding: isMobile ? '64px 24px' : '100px 40px' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr auto', gap: isMobile ? 36 : 64, alignItems: 'center' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 32, height: 2, background: '#29C5CC', borderRadius: 1 }} />
-            <span style={{ fontSize: 12, color: '#29C5CC', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Ready to book?</span>
+            <div style={{ width: 32, height: 2, background: '#E8630A', borderRadius: 1 }} />
+            <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Ready to book?</span>
           </div>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px,5vw,64px)', fontWeight: 300, lineHeight: 1.05, color: '#fff', marginBottom: 16 }}>
-            Your next look<br /><em style={{ color: '#29C5CC', fontWeight: 400 }}>starts here.</em>
+            Your next look<br /><em style={{ color: '#E8630A', fontWeight: 400 }}>starts here.</em>
           </h2>
           <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', lineHeight: 1.75, maxWidth: 480 }}>
             Pick your style, choose a date, pay securely. Address confirmed after booking.
           </p>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: isMobile ? 'stretch' : 'center', gap: 14 }}>
-          <Link href="/book" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#29C5CC', color: '#fff', fontSize: 15, fontWeight: 600, padding: '16px 36px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.03em', boxShadow: '0 4px 24px rgba(41,197,204,0.4)', whiteSpace: 'nowrap' }}>
+          <Link href="/book" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#E8630A', color: '#fff', fontSize: 15, fontWeight: 600, padding: '16px 36px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.03em', boxShadow: '0 4px 24px rgba(232,99,10,0.4)', whiteSpace: 'nowrap' }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
             Book your appointment
           </Link>
@@ -414,17 +414,17 @@ function BookCTA() {
 function Contact() {
   const isMobile = useWindowWidth() < 768
   return (
-    <section id="contact" style={{ padding: isMobile ? '56px 24px' : '88px 40px', background: '#fff', borderTop: '1px solid #eef2f3' }}>
+    <section id="contact" style={{ padding: isMobile ? '56px 24px' : '88px 40px', background: '#fff', borderTop: '1px solid #F0D9C8' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 40 : 80, alignItems: 'start' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
-            <div style={{ width: 32, height: 2, background: '#29C5CC', borderRadius: 1 }} />
-            <span style={{ fontSize: 12, color: '#29C5CC', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Get in touch</span>
+            <div style={{ width: 32, height: 2, background: '#E8630A', borderRadius: 1 }} />
+            <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Get in touch</span>
           </div>
-          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, color: '#0D2B35', lineHeight: 1.1, marginBottom: 20 }}>
-            Questions?<br /><em style={{ color: '#6b8c94', fontWeight: 300 }}>We&apos;re here.</em>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 44, fontWeight: 400, color: '#1C1008', lineHeight: 1.1, marginBottom: 20 }}>
+            Questions?<br /><em style={{ color: '#7A5C4A', fontWeight: 300 }}>We&apos;re here.</em>
           </h2>
-          <p style={{ fontSize: 14, color: '#6b8c94', lineHeight: 1.85, maxWidth: 340 }}>
+          <p style={{ fontSize: 14, color: '#7A5C4A', lineHeight: 1.85, maxWidth: 340 }}>
             Have a question about a style, pricing, or availability? Reach out — or book online and we handle the rest.
           </p>
         </div>
@@ -434,10 +434,10 @@ function Contact() {
             { label: 'Email', value: 'donialana15@gmail.com', sub: '' },
             { label: 'Hours', value: 'By appointment only', sub: 'Book online to see availability' },
           ].map(item => (
-            <div key={item.label} style={{ borderTop: '1px solid #eef2f3', padding: '22px 0' }}>
-              <div style={{ fontSize: 10, color: '#29C5CC', letterSpacing: '0.14em', fontWeight: 700, marginBottom: 6, textTransform: 'uppercase' as const }}>{item.label}</div>
-              <div style={{ fontSize: 15, color: '#0D2B35', fontWeight: 500, wordBreak: 'break-word' }}>{item.value}</div>
-              {item.sub && <div style={{ fontSize: 12, color: '#9ab3b8', marginTop: 3 }}>{item.sub}</div>}
+            <div key={item.label} style={{ borderTop: '1px solid #F0D9C8', padding: '22px 0' }}>
+              <div style={{ fontSize: 10, color: '#E8630A', letterSpacing: '0.14em', fontWeight: 700, marginBottom: 6, textTransform: 'uppercase' as const }}>{item.label}</div>
+              <div style={{ fontSize: 15, color: '#1C1008', fontWeight: 500, wordBreak: 'break-word' }}>{item.value}</div>
+              {item.sub && <div style={{ fontSize: 12, color: '#B5977A', marginTop: 3 }}>{item.sub}</div>}
             </div>
           ))}
         </div>
@@ -449,11 +449,11 @@ function Contact() {
 // ── Footer ────────────────────────────────────────────────────────────────────
 function Footer() {
   return (
-    <footer style={{ padding: '28px 20px', background: '#0D2B35' }}>
+    <footer style={{ padding: '28px 20px', background: '#1C1008' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1.5px solid rgba(41,197,204,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
+          <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1.5px solid rgba(232,99,10,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14, color: '#E8630A', fontStyle: 'italic' }}>B</span>
           </div>
           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Lana</span>
         </div>
@@ -464,7 +464,7 @@ function Footer() {
           <Link href="/account" style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', textDecoration: 'none', letterSpacing: '0.04em' }}>My Account</Link>
         </div>
         <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.04em' }}>
-          Powered by <span style={{ color: '#29C5CC' }}>Outsyde</span>
+          Powered by <span style={{ color: '#E8630A' }}>Outsyde</span>
         </div>
       </div>
     </footer>
@@ -506,7 +506,7 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div style={{ fontFamily: 'DM Sans, sans-serif', color: '#4a6872', background: '#f8fafa' }}>
+    <div style={{ fontFamily: 'DM Sans, sans-serif', color: '#5C3D2E', background: '#FFFAF5' }}>
       <Hero
         heroImage={heroImage}
         heroImageFailed={heroImageFailed}

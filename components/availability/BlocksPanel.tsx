@@ -57,7 +57,7 @@ export default function BlocksPanel({ blocks, onAdd, onDelete, disabled }: Props
         background: '#fff', borderRadius: 14, border: '1px solid #e8f0f1',
         padding: '16px', marginBottom: 20,
       }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: '#0D2B35', marginBottom: 12 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#1C1008', marginBottom: 12 }}>
           Block a date
         </div>
         <MiniCalendar
@@ -68,7 +68,7 @@ export default function BlocksPanel({ blocks, onAdd, onDelete, disabled }: Props
 
         {selectedDate && (
           <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-            <div style={{ fontSize: 13, fontWeight: 500, color: '#0D2B35' }}>
+            <div style={{ fontSize: 13, fontWeight: 500, color: '#1C1008' }}>
               {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
             </div>
 
@@ -78,7 +78,7 @@ export default function BlocksPanel({ blocks, onAdd, onDelete, disabled }: Props
                 type="checkbox"
                 checked={isFullDay}
                 onChange={e => setIsFullDay(e.target.checked)}
-                style={{ accentColor: '#C9A84C' }}
+                style={{ accentColor: '#F5C518' }}
               />
               Full day
             </label>
@@ -98,7 +98,7 @@ export default function BlocksPanel({ blocks, onAdd, onDelete, disabled }: Props
               onChange={e => setReason(e.target.value)}
               style={{
                 fontSize: 13, padding: '7px 10px', borderRadius: 8,
-                border: '1px solid rgba(0,0,0,0.14)', outline: 'none', color: '#0D2B35',
+                border: '1px solid rgba(0,0,0,0.14)', outline: 'none', color: '#1C1008',
               }}
             />
 
@@ -108,7 +108,7 @@ export default function BlocksPanel({ blocks, onAdd, onDelete, disabled }: Props
                 disabled={saving || disabled}
                 style={{
                   fontSize: 13, fontWeight: 600, padding: '7px 16px', borderRadius: 8,
-                  background: '#C9A84C', color: '#fff', border: 'none',
+                  background: '#F5C518', color: '#fff', border: 'none',
                   cursor: saving || disabled ? 'default' : 'pointer',
                   opacity: saving || disabled ? 0.6 : 1,
                 }}
@@ -131,7 +131,7 @@ export default function BlocksPanel({ blocks, onAdd, onDelete, disabled }: Props
       </div>
 
       {/* Existing blocks list */}
-      <div style={{ fontSize: 13, fontWeight: 600, color: '#0D2B35', marginBottom: 10 }}>
+      <div style={{ fontSize: 13, fontWeight: 600, color: '#1C1008', marginBottom: 10 }}>
         Upcoming blocked dates
       </div>
       {blocks.length === 0 ? (
@@ -148,7 +148,7 @@ export default function BlocksPanel({ blocks, onAdd, onDelete, disabled }: Props
               }}
             >
               <div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: '#0D2B35' }}>
+                <div style={{ fontSize: 13, fontWeight: 500, color: '#1C1008' }}>
                   {formatBlockDate(b.startAt, b.endAt)}
                 </div>
                 {b.reason && (
@@ -182,7 +182,7 @@ function TimeInput({ value, onChange }: { value: string; onChange: (v: string) =
       onChange={e => onChange(e.target.value)}
       style={{
         fontSize: 13, padding: '5px 8px', borderRadius: 8,
-        border: '1px solid rgba(0,0,0,0.14)', outline: 'none', color: '#0D2B35',
+        border: '1px solid rgba(0,0,0,0.14)', outline: 'none', color: '#1C1008',
       }}
     />
   )

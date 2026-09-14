@@ -108,7 +108,7 @@ export default function OrdersPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>Orders</h1>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#1C1008', margin: 0, lineHeight: 1 }}>Orders</h1>
           <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>
             {pendingOrders.length > 0 ? `${pendingOrders.length} awaiting fulfillment` : 'All orders fulfilled'}
           </p>
@@ -122,7 +122,7 @@ export default function OrdersPage() {
       {shipModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
           <div className="w-full max-w-md rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.1)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
-            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 600, color: '#0D2B35', marginBottom: 6 }}>
+            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 600, color: '#1C1008', marginBottom: 6 }}>
               Ship {fmtOrderNum(shipModal.order_number)}
             </h3>
             <p style={{ fontSize: 13, color: 'rgba(0,0,0,0.45)', marginBottom: 24 }}>
@@ -161,7 +161,7 @@ export default function OrdersPage() {
               <button
                 onClick={() => handleShip(shipModal)}
                 disabled={!!actionLoading}
-                style={{ fontSize: 13, padding: '7px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: actionLoading ? 'not-allowed' : 'pointer', opacity: actionLoading ? 0.7 : 1 }}
+                style={{ fontSize: 13, padding: '7px 20px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: actionLoading ? 'not-allowed' : 'pointer', opacity: actionLoading ? 0.7 : 1 }}
               >
                 {actionLoading ? 'Shipping…' : 'Mark shipped'}
               </button>
@@ -189,10 +189,10 @@ export default function OrdersPage() {
         </div>
       ) : orders.length === 0 ? (
         <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '56px 24px' }}>
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
             📦
           </div>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 8 }}>No orders yet</div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', marginBottom: 8 }}>No orders yet</div>
           <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', margin: 0 }}>Orders will appear here once customers purchase</p>
         </div>
       ) : (
@@ -206,14 +206,14 @@ export default function OrdersPage() {
                   className="flex items-center gap-4 px-5 py-4 cursor-pointer"
                   onClick={() => setExpanded(isOpen ? null : order.id)}
                 >
-                  <span style={{ fontSize: 13, color: '#C9A84C', fontFamily: 'DM Mono, monospace', flexShrink: 0, fontWeight: 500 }}>
+                  <span style={{ fontSize: 13, color: '#F5C518', fontFamily: 'DM Mono, monospace', flexShrink: 0, fontWeight: 500 }}>
                     {fmtOrderNum(order.order_number)}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div style={{ fontSize: 14, color: '#0D2B35', fontWeight: 500 }}>{order.customer_name}</div>
+                    <div style={{ fontSize: 14, color: '#1C1008', fontWeight: 500 }}>{order.customer_name}</div>
                     <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>{fmtDate(order.created_at)}</div>
                   </div>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#C9A84C', flexShrink: 0 }}>{fmtMoney(order.total_amount)}</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#F5C518', flexShrink: 0 }}>{fmtMoney(order.total_amount)}</div>
                   <span style={{ fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 10, background: st.bg, color: st.color, flexShrink: 0 }}>
                     {order.status.toUpperCase()}
                   </span>
@@ -245,7 +245,7 @@ export default function OrdersPage() {
                       {order.status === 'paid' && (
                         <button
                           onClick={() => { setShipModal(order); setShipForm({ trackingNumber: '', carrier: '' }) }}
-                          style={{ fontSize: 13, padding: '6px 16px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}
+                          style={{ fontSize: 13, padding: '6px 16px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}
                         >
                           Ship order
                         </button>

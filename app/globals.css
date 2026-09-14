@@ -4,10 +4,10 @@
 /* ─── Brand Tokens ────────────────────────────────────────────────── */
 :root {
   /* Color */
-  --color-teal: #29C5CC;
-  --color-teal-dark: #0D2B35;
-  --color-teal-ink: #112F3D;
-  --color-gold: #C9A84C;
+  --color-teal: #E8630A;
+  --color-teal-dark: #1C1008;
+  --color-teal-ink: #2A1408;
+  --color-gold: #F5C518;
   --color-white: #FFFFFF;
   --color-onyx: #0D0D0D;
   --color-surface: #141414;
@@ -17,9 +17,9 @@
   --color-border-subtle: rgba(255, 255, 255, 0.04);
 
   /* Gradients */
-  --gradient-bwl: linear-gradient(to bottom, #29C5CC, #C9A84C);
-  --gradient-bwl-h: linear-gradient(to right, #29C5CC, #C9A84C);
-  --gradient-hero-glow: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(41, 197, 204, 0.12), transparent);
+  --gradient-bwl: linear-gradient(to bottom, #E8630A, #F5C518);
+  --gradient-bwl-h: linear-gradient(to right, #E8630A, #F5C518);
+  --gradient-hero-glow: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(232, 99, 10, 0.12), transparent);
 
   /* Typography */
   --font-display: var(--font-cormorant), Georgia, serif;
@@ -109,11 +109,11 @@ img {
   background: var(--color-surface);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(41, 197, 204, 0.3);
+  background: rgba(232, 99, 10, 0.3);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(41, 197, 204, 0.6);
+  background: rgba(232, 99, 10, 0.6);
 }
 
 /* ─── Focus Visible ───────────────────────────────────────────────── */
@@ -125,7 +125,7 @@ img {
 
 /* ─── Selection ──────────────────────────────────────────────────── */
 ::selection {
-  background-color: rgba(41, 197, 204, 0.25);
+  background-color: rgba(232, 99, 10, 0.25);
   color: var(--color-white);
 }
 
@@ -139,7 +139,7 @@ img {
     background-repeat: no-repeat;
   }
 
-  /* Gradient hairline — the BWL signature detail */
+  /* Gradient hairline */
   .hairline-gradient {
     position: relative;
   }
@@ -180,8 +180,8 @@ img {
     transition: box-shadow var(--transition-base), border-color var(--transition-base);
   }
   .card:hover {
-    border-color: rgba(41, 197, 204, 0.2);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 12px 40px rgba(41, 197, 204, 0.08);
+    border-color: rgba(232, 99, 10, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5), 0 12px 40px rgba(232, 99, 10, 0.08);
   }
 
   /* Button base */
@@ -215,8 +215,8 @@ img {
     font-weight: 600;
   }
   .btn-primary:hover {
-    background-color: #DEB84E;
-    box-shadow: 0 0 24px rgba(201, 168, 76, 0.35);
+    background-color: #F7CE3A;
+    box-shadow: 0 0 24px rgba(245, 197, 24, 0.35);
     transform: translateY(-1px);
   }
   .btn-primary:active {
@@ -232,18 +232,18 @@ img {
   .btn-outline:hover {
     border-color: var(--color-teal);
     color: var(--color-teal);
-    box-shadow: 0 0 16px rgba(41, 197, 204, 0.15);
+    box-shadow: 0 0 16px rgba(232, 99, 10, 0.15);
   }
 
-  /* Teal ghost variant */
+  /* Orange ghost variant */
   .btn-teal {
-    background-color: rgba(41, 197, 204, 0.1);
+    background-color: rgba(232, 99, 10, 0.1);
     color: var(--color-teal);
-    border: 1px solid rgba(41, 197, 204, 0.2);
+    border: 1px solid rgba(232, 99, 10, 0.2);
   }
   .btn-teal:hover {
-    background-color: rgba(41, 197, 204, 0.2);
-    box-shadow: 0 0 20px rgba(41, 197, 204, 0.2);
+    background-color: rgba(232, 99, 10, 0.2);
+    box-shadow: 0 0 20px rgba(232, 99, 10, 0.2);
   }
 
   /* Eyebrow label */

@@ -70,8 +70,8 @@ const DURATION_OPTIONS = [
 ]
 
 const STATUS_BADGE: Record<string, { bg: string; color: string; label: string }> = {
-  live:     { bg: '#29C5CC', color: '#fff', label: 'LIVE'     },
-  paused:   { bg: '#C9A84C', color: '#fff', label: 'PAUSED'   },
+  live:     { bg: '#E8630A', color: '#fff', label: 'LIVE'     },
+  paused:   { bg: '#F5C518', color: '#fff', label: 'PAUSED'   },
   draft:    { bg: '#9CA3AF', color: '#fff', label: 'DRAFT'    },
   archived: { bg: '#7F1D1D', color: '#fff', label: 'ARCHIVED' },
 }
@@ -374,7 +374,7 @@ export default function ServicesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>
+          <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#1C1008', margin: 0, lineHeight: 1 }}>
             Services
           </h1>
           <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>
@@ -383,7 +383,7 @@ export default function ServicesPage() {
         </div>
         <button
           onClick={openAdd}
-          style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}
+          style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}
         >
           + Add Service
         </button>
@@ -391,15 +391,15 @@ export default function ServicesPage() {
 
       {/* Form modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(13,43,53,0.55)' }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(28,16,8,0.55)' }}>
           <div style={{ background: '#fff', borderRadius: 16, maxWidth: 520, width: '100%', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.18)' }}>
 
             {/* Modal header */}
             <div style={{ padding: '24px 28px 20px', borderBottom: '1px solid #eef1f2' }}>
-              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', margin: 0 }}>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', margin: 0 }}>
                 {editing ? 'Edit Service' : 'Add Service'}
               </h2>
-              <p style={{ fontSize: 13, color: '#4a6872', margin: '4px 0 0' }}>
+              <p style={{ fontSize: 13, color: '#5C3D2E', margin: '4px 0 0' }}>
                 {editing ? 'Update this service\'s details' : 'Create a new bookable service for your clients'}
               </p>
             </div>
@@ -414,7 +414,7 @@ export default function ServicesPage() {
                     onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                     placeholder="e.g. Box Braids"
                     style={inputStyle}
-                    onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                    onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                     onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                   />
                 </Field>
@@ -426,7 +426,7 @@ export default function ServicesPage() {
                     placeholder="Brief description of the service…"
                     rows={3}
                     style={{ ...inputStyle, height: 'auto', resize: 'vertical', padding: '10px 14px' }}
-                    onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                    onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                     onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                   />
                 </Field>
@@ -434,7 +434,7 @@ export default function ServicesPage() {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
                   <Field label="Price ($) *">
                     <div style={{ position: 'relative' }}>
-                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 500, color: '#C9A84C', pointerEvents: 'none', zIndex: 1 }}>$</span>
+                      <span style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 500, color: '#F5C518', pointerEvents: 'none', zIndex: 1 }}>$</span>
                       <input
                         type="number"
                         min="0"
@@ -443,7 +443,7 @@ export default function ServicesPage() {
                         onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
                         placeholder="0.00"
                         style={{ ...inputStyle, paddingLeft: 28 }}
-                        onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                         onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                       />
                     </div>
@@ -465,7 +465,7 @@ export default function ServicesPage() {
                           backgroundRepeat: 'no-repeat',
                           backgroundPosition: 'right 12px center',
                         }}
-                        onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                         onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                       >
                         {DURATION_OPTIONS.map(o => (
@@ -482,7 +482,7 @@ export default function ServicesPage() {
                     onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                     placeholder="e.g. Braids, Locs, Twists"
                     style={inputStyle}
-                    onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                    onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                     onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                   />
                 </Field>
@@ -510,9 +510,9 @@ export default function ServicesPage() {
                           style={{
                             padding: '8px 16px',
                             borderRadius: 20,
-                            border: `1px solid ${selected ? '#29C5CC' : '#e0e0e0'}`,
-                            background: selected ? '#29C5CC' : '#fff',
-                            color: selected ? '#fff' : '#4a6872',
+                            border: `1px solid ${selected ? '#E8630A' : '#e0e0e0'}`,
+                            background: selected ? '#E8630A' : '#fff',
+                            color: selected ? '#fff' : '#5C3D2E',
                             fontSize: 13,
                             fontWeight: 500,
                             cursor: 'pointer',
@@ -534,7 +534,7 @@ export default function ServicesPage() {
                         onChange={e => setForm(f => ({ ...f, alternateAddress: e.target.value }))}
                         placeholder="123 Main Street"
                         style={inputStyle}
-                        onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                         onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                       />
                     </Field>
@@ -545,7 +545,7 @@ export default function ServicesPage() {
                           onChange={e => setForm(f => ({ ...f, alternateCity: e.target.value }))}
                           placeholder="City"
                           style={inputStyle}
-                          onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                          onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                           onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                         />
                       </Field>
@@ -555,7 +555,7 @@ export default function ServicesPage() {
                           onChange={e => setForm(f => ({ ...f, alternateState: e.target.value }))}
                           placeholder="VA"
                           style={inputStyle}
-                          onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                          onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                           onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                         />
                       </Field>
@@ -566,7 +566,7 @@ export default function ServicesPage() {
                         onChange={e => setForm(f => ({ ...f, alternateZipCode: e.target.value }))}
                         placeholder="23451"
                         style={inputStyle}
-                        onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                        onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                         onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                       />
                     </Field>
@@ -580,7 +580,7 @@ export default function ServicesPage() {
                       onChange={e => setForm(f => ({ ...f, virtualLink: e.target.value }))}
                       placeholder="https://zoom.us/j/..."
                       style={inputStyle}
-                      onFocus={e => { e.currentTarget.style.borderColor = '#29C5CC'; e.currentTarget.style.background = '#fff' }}
+                      onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
                       onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                     />
                   </Field>
@@ -604,15 +604,15 @@ export default function ServicesPage() {
                   >
                     <div style={{ width: 40, height: 40, borderRadius: 8, background: '#f0f7f8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                       <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M1 5.5C1 4.672 1.672 4 2.5 4H4.05C4.557 4 5.038 3.79 5.38 3.42L6.62 2.08C6.962 1.71 7.443 1.5 7.95 1.5H12.05C12.557 1.5 13.038 1.71 13.38 2.08L14.62 3.42C14.962 3.79 15.443 4 15.95 4H17.5C18.328 4 19 4.672 19 5.5V14.5C19 15.328 18.328 16 17.5 16H2.5C1.672 16 1 15.328 1 14.5V5.5Z" stroke="#29C5CC" strokeWidth="1.4" fill="none"/>
-                        <circle cx="10" cy="10" r="2.75" fill="#29C5CC"/>
+                        <path d="M1 5.5C1 4.672 1.672 4 2.5 4H4.05C4.557 4 5.038 3.79 5.38 3.42L6.62 2.08C6.962 1.71 7.443 1.5 7.95 1.5H12.05C12.557 1.5 13.038 1.71 13.38 2.08L14.62 3.42C14.962 3.79 15.443 4 15.95 4H17.5C18.328 4 19 4.672 19 5.5V14.5C19 15.328 18.328 16 17.5 16H2.5C1.672 16 1 15.328 1 14.5V5.5Z" stroke="#E8630A" strokeWidth="1.4" fill="none"/>
+                        <circle cx="10" cy="10" r="2.75" fill="#E8630A"/>
                       </svg>
                     </div>
                     <div>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: '#29C5CC' }}>
+                      <div style={{ fontSize: 14, fontWeight: 500, color: '#E8630A' }}>
                         {uploadingImage ? 'Uploading…' : 'Upload a photo'}
                       </div>
-                      <div style={{ fontSize: 12, color: '#4a6872', marginTop: 2 }}>JPG, PNG up to 5 MB</div>
+                      <div style={{ fontSize: 12, color: '#5C3D2E', marginTop: 2 }}>JPG, PNG up to 5 MB</div>
                     </div>
                   </label>
                   <input
@@ -652,14 +652,14 @@ export default function ServicesPage() {
                 {/* Active toggle */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0' }}>
                   <div>
-                    <div style={{ fontSize: 14, fontWeight: 500, color: '#0D2B35' }}>Active</div>
-                    <div style={{ fontSize: 12, color: '#4a6872', marginTop: 2 }}>Visible to clients when live</div>
+                    <div style={{ fontSize: 14, fontWeight: 500, color: '#1C1008' }}>Active</div>
+                    <div style={{ fontSize: 12, color: '#5C3D2E', marginTop: 2 }}>Visible to clients when live</div>
                   </div>
                   <div
                     onClick={() => setForm(f => ({ ...f, isActive: !f.isActive }))}
                     style={{
                       width: 44, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer', flexShrink: 0,
-                      background: form.isActive ? '#29C5CC' : '#d0d5d8',
+                      background: form.isActive ? '#E8630A' : '#d0d5d8',
                       transition: 'background 0.2s',
                     }}
                   >
@@ -675,14 +675,14 @@ export default function ServicesPage() {
                 <div style={{ borderTop: '1px solid #eef1f2', paddingTop: 4 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0' }}>
                     <div style={{ flex: 1, paddingRight: 16 }}>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: '#0D2B35' }}>Require deposit at booking</div>
-                      <div style={{ fontSize: 12, color: '#4a6872', marginTop: 2 }}>Collect a deposit at booking, balance due at appointment</div>
+                      <div style={{ fontSize: 14, fontWeight: 500, color: '#1C1008' }}>Require deposit at booking</div>
+                      <div style={{ fontSize: 12, color: '#5C3D2E', marginTop: 2 }}>Collect a deposit at booking, balance due at appointment</div>
                     </div>
                     <div
                       onClick={() => setForm(f => ({ ...f, depositEnabled: !f.depositEnabled, depositAmount: f.depositEnabled ? '' : f.depositAmount }))}
                       style={{
                         width: 44, height: 24, borderRadius: 12, position: 'relative', cursor: 'pointer', flexShrink: 0,
-                        background: form.depositEnabled ? '#29C5CC' : '#d0d5d8',
+                        background: form.depositEnabled ? '#E8630A' : '#d0d5d8',
                         transition: 'background 0.2s',
                       }}
                     >
@@ -696,7 +696,7 @@ export default function ServicesPage() {
                   {form.depositEnabled && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 8 }}>
                       <div style={{ position: 'relative' }}>
-                        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 500, color: '#C9A84C', pointerEvents: 'none' }}>$</span>
+                        <span style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', fontSize: 15, fontWeight: 500, color: '#F5C518', pointerEvents: 'none' }}>$</span>
                         <input
                           type="number"
                           min="0"
@@ -705,17 +705,17 @@ export default function ServicesPage() {
                           onChange={e => setForm(f => ({ ...f, depositAmount: e.target.value }))}
                           placeholder="0.00"
                           style={{ ...inputStyle, width: 120, paddingLeft: 26, height: 38 }}
-                          onFocus={e => { e.currentTarget.style.borderColor = '#C9A84C'; e.currentTarget.style.background = '#fff' }}
+                          onFocus={e => { e.currentTarget.style.borderColor = '#F5C518'; e.currentTarget.style.background = '#fff' }}
                           onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
                         />
                       </div>
-                      <span style={{ fontSize: 12, color: '#4a6872' }}>due at booking</span>
+                      <span style={{ fontSize: 12, color: '#5C3D2E' }}>due at booking</span>
                       <button
                         type="button"
                         onClick={handleApplyDepositToAll}
                         disabled={applyingDeposit}
                         title="Apply this deposit amount to all services"
-                        style={{ fontSize: 12, padding: '9px 14px', borderRadius: 8, border: '1px solid #e0e0e0', background: 'transparent', color: '#4a6872', cursor: applyingDeposit ? 'not-allowed' : 'pointer', opacity: applyingDeposit ? 0.6 : 1, whiteSpace: 'nowrap', marginLeft: 'auto' }}
+                        style={{ fontSize: 12, padding: '9px 14px', borderRadius: 8, border: '1px solid #e0e0e0', background: 'transparent', color: '#5C3D2E', cursor: applyingDeposit ? 'not-allowed' : 'pointer', opacity: applyingDeposit ? 0.6 : 1, whiteSpace: 'nowrap', marginLeft: 'auto' }}
                       >
                         {applyingDeposit ? 'Applying…' : 'Apply to all'}
                       </button>
@@ -733,14 +733,14 @@ export default function ServicesPage() {
             <div style={{ padding: '16px 28px 24px', display: 'flex', justifyContent: 'flex-end', gap: 12, borderTop: '1px solid #eef1f2', marginTop: 20 }}>
               <button
                 onClick={closeForm}
-                style={{ height: 42, padding: '0 24px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: 'none', color: '#4a6872', border: '1px solid #e0e0e0', cursor: 'pointer' }}
+                style={{ height: 42, padding: '0 24px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: 'none', color: '#5C3D2E', border: '1px solid #e0e0e0', cursor: 'pointer' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving}
-                style={{ height: 42, padding: '0 24px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#29C5CC', color: '#fff', border: 'none', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
+                style={{ height: 42, padding: '0 24px', borderRadius: 8, fontSize: 14, fontWeight: 500, background: '#E8630A', color: '#fff', border: 'none', cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
               >
                 {saving ? 'Saving…' : editing ? 'Save changes' : 'Add service'}
               </button>
@@ -753,7 +753,7 @@ export default function ServicesPage() {
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
           <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#FFFFFF', border: '1px solid rgba(239,68,68,0.2)', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
-            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, color: '#0D2B35', marginBottom: 12 }}>Delete service?</h3>
+            <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, color: '#1C1008', marginBottom: 12 }}>Delete service?</h3>
             <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginBottom: 24 }}>
               This cannot be undone. Any future bookings for this service will need to be manually managed.
             </p>
@@ -789,14 +789,14 @@ export default function ServicesPage() {
         </div>
       ) : services.length === 0 ? (
         <div className="rounded-2xl text-center" style={{ background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)', padding: '56px 24px' }}>
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(201,168,76,0.1)', border: '1px solid rgba(201,168,76,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', fontSize: 24 }}>
             ✂
           </div>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', marginBottom: 8 }}>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', marginBottom: 8 }}>
             No services added yet
           </div>
           <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', marginBottom: 24 }}>Add your services so clients can book online</p>
-          <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>
+          <button onClick={openAdd} style={{ fontSize: 13, padding: '8px 20px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}>
             Add your first service
           </button>
         </div>
@@ -820,7 +820,7 @@ export default function ServicesPage() {
                     title={service.isActive ? 'Click to pause (hide from homepage)' : 'Click to make visible'}
                     style={{
                       width: 38, height: 22, borderRadius: 11, position: 'relative', cursor: 'pointer', flexShrink: 0,
-                      background: service.isActive ? '#C9A84C' : 'rgba(0,0,0,0.15)',
+                      background: service.isActive ? '#F5C518' : 'rgba(0,0,0,0.15)',
                       transition: 'background 0.2s',
                     }}
                   >
@@ -849,18 +849,18 @@ export default function ServicesPage() {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span style={{ fontSize: 15, fontWeight: 500, color: '#0D2B35' }}>{service.name}</span>
+                    <span style={{ fontSize: 15, fontWeight: 500, color: '#1C1008' }}>{service.name}</span>
                     {service.category && (
-                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(13,43,53,0.07)', color: '#0D2B35' }}>
+                      <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(28,16,8,0.07)', color: '#1C1008' }}>
                         {service.category}
                       </span>
                     )}
                     {typeof service.depositAmountCents === 'number' && (
-                      <span style={{ fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 4, background: 'rgba(201,168,76,0.1)', color: '#C9A84C', marginLeft: 0 }}>
+                      <span style={{ fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 4, background: 'rgba(245,197,24,0.1)', color: '#F5C518', marginLeft: 0 }}>
                         {fmtPrice(service.depositAmountCents)} deposit
                       </span>
                     )}
-                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(41,197,204,0.12)', color: '#0D2B35' }}>
+                    <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: 'rgba(232,99,10,0.12)', color: '#1C1008' }}>
                       {vendorLocationLabel(service.serviceLocationType)}
                     </span>
                   </div>
@@ -873,7 +873,7 @@ export default function ServicesPage() {
 
                 {/* Price + duration */}
                 <div className="text-right flex-shrink-0 hidden sm:block">
-                  <div style={{ fontSize: 15, fontWeight: 600, color: '#C9A84C' }}>{fmtPrice(service.price)}</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: '#F5C518' }}>{fmtPrice(service.price)}</div>
                   <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>{fmtDuration(service.durationMinutes)}</div>
                 </div>
 
@@ -883,7 +883,7 @@ export default function ServicesPage() {
                     <button
                       onClick={() => handlePublish(service)}
                       disabled={isPublishing}
-                      style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: 'none', background: '#29C5CC', color: '#fff', fontWeight: 600, cursor: isPublishing ? 'not-allowed' : 'pointer', opacity: isPublishing ? 0.7 : 1 }}
+                      style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: 'none', background: '#E8630A', color: '#fff', fontWeight: 600, cursor: isPublishing ? 'not-allowed' : 'pointer', opacity: isPublishing ? 0.7 : 1 }}
                     >
                       {isPublishing ? 'Publishing…' : 'Publish'}
                     </button>
@@ -892,7 +892,7 @@ export default function ServicesPage() {
                     <button
                       onClick={() => handlePublish(service)}
                       disabled={isPublishing}
-                      style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: 'none', background: '#29C5CC', color: '#fff', fontWeight: 600, cursor: isPublishing ? 'not-allowed' : 'pointer', opacity: isPublishing ? 0.7 : 1 }}
+                      style={{ fontSize: 12, padding: '5px 14px', borderRadius: 7, border: 'none', background: '#E8630A', color: '#fff', fontWeight: 600, cursor: isPublishing ? 'not-allowed' : 'pointer', opacity: isPublishing ? 0.7 : 1 }}
                     >
                       {isPublishing ? 'Activating…' : 'Re-activate'}
                     </button>
@@ -937,7 +937,7 @@ const inputStyle: React.CSSProperties = {
   borderRadius: 8,
   border: '1px solid #e0e0e0',
   background: '#fafafa',
-  color: '#0D2B35',
+  color: '#1C1008',
   fontFamily: "'DM Sans', sans-serif",
   outline: 'none',
   boxSizing: 'border-box',
@@ -948,8 +948,8 @@ function Field({ label, children, style }: { label: string; children: React.Reac
   const displayLabel = hasRequired ? label.replace(' *', '') : label
   return (
     <div style={style}>
-      <label style={{ fontSize: 13, color: '#4a6872', display: 'block', marginBottom: 6, fontWeight: 500 }}>
-        {displayLabel}{hasRequired && <span style={{ color: '#C9A84C' }}> *</span>}
+      <label style={{ fontSize: 13, color: '#5C3D2E', display: 'block', marginBottom: 6, fontWeight: 500 }}>
+        {displayLabel}{hasRequired && <span style={{ color: '#F5C518' }}> *</span>}
       </label>
       {children}
     </div>

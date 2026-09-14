@@ -36,9 +36,9 @@ function greeting() {
 }
 
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
-  pending:   { bg: 'rgba(201,168,76,0.15)',  color: '#C9A84C' },
-  confirmed: { bg: 'rgba(41,197,204,0.15)',  color: '#29C5CC' },
-  completed: { bg: 'rgba(13,43,53,0.12)',    color: '#0D2B35' },
+  pending:   { bg: 'rgba(245,197,24,0.15)',  color: '#F5C518' },
+  confirmed: { bg: 'rgba(232,99,10,0.15)',  color: '#E8630A' },
+  completed: { bg: 'rgba(28,16,8,0.12)',    color: '#1C1008' },
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -61,10 +61,10 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
       background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
       border: '1px solid #e8f0f1', padding: '24px',
     }}>
-      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: '#6b8c94', marginBottom: 8, fontWeight: 500 }}>
+      <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: '#7A5C4A', marginBottom: 8, fontWeight: 500 }}>
         {label}
       </div>
-      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 34, fontWeight: 600, color: '#0D2B35', lineHeight: 1 }}>
+      <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 34, fontWeight: 600, color: '#1C1008', lineHeight: 1 }}>
         {value}
       </div>
       {sub && (
@@ -127,7 +127,7 @@ export default function DashboardOverviewPage() {
     <div style={{ fontFamily: 'DM Sans, sans-serif' }}>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#1C1008', margin: 0, lineHeight: 1 }}>
           {greeting()}, Braids With Lana
         </h1>
         <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', marginTop: 8 }}>
@@ -162,11 +162,11 @@ export default function DashboardOverviewPage() {
       {/* Quick action: no services yet */}
       {showAddServiceCTA && (
         <div style={{
-          background: 'rgba(201,168,76,0.08)', border: '1px solid rgba(201,168,76,0.25)',
+          background: 'rgba(245,197,24,0.08)', border: '1px solid rgba(245,197,24,0.25)',
           borderRadius: 14, padding: '16px 20px', marginBottom: 28, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8,
         }}>
-          <span style={{ fontSize: 14, color: '#0D2B35' }}>You have no services listed yet.</span>
-          <Link href="/dashboard/services" style={{ fontSize: 13, fontWeight: 600, color: '#C9A84C', textDecoration: 'none' }}>
+          <span style={{ fontSize: 14, color: '#1C1008' }}>You have no services listed yet.</span>
+          <Link href="/dashboard/services" style={{ fontSize: 13, fontWeight: 600, color: '#F5C518', textDecoration: 'none' }}>
             Add your first service →
           </Link>
         </div>
@@ -177,7 +177,7 @@ export default function DashboardOverviewPage() {
         background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
         border: '1px solid #e8f0f1', padding: '24px', marginBottom: 24,
       }}>
-        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', margin: '0 0 20px' }}>
+        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', margin: '0 0 20px' }}>
           Calendar
         </h2>
         <DashboardCalendar dateMap={dateMap} mode="overview" />
@@ -188,7 +188,7 @@ export default function DashboardOverviewPage() {
         background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
         border: '1px solid #e8f0f1', padding: '24px',
       }}>
-        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#0D2B35', margin: '0 0 20px' }}>
+        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', margin: '0 0 20px' }}>
           Today's Appointments
         </h2>
 
@@ -211,7 +211,7 @@ export default function DashboardOverviewPage() {
                 background: 'rgba(0,0,0,0.025)', border: '1px solid rgba(0,0,0,0.05)',
               }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 500, color: '#0D2B35', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 14, fontWeight: 500, color: '#1C1008', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {appt.clientName || 'Client'}
                   </div>
                   <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -220,7 +220,7 @@ export default function DashboardOverviewPage() {
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 8 }}>
                   {appt.totalPrice != null && (
-                    <span style={{ fontSize: 14, color: '#0D2B35', fontWeight: 500 }}>
+                    <span style={{ fontSize: 14, color: '#1C1008', fontWeight: 500 }}>
                       {formatCents(appt.totalPrice)}
                     </span>
                   )}

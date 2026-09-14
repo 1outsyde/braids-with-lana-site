@@ -60,12 +60,12 @@ export default function SubscriptionPage() {
   return (
     <div>
       <div className="mb-8">
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#0D2B35', margin: 0, lineHeight: 1 }}>Subscription</h1>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#1C1008', margin: 0, lineHeight: 1 }}>Subscription</h1>
         <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.45)', marginTop: 6 }}>Manage your Outsyde plan</p>
       </div>
 
       {/* Current plan */}
-      <div className="rounded-2xl p-6 mb-4" style={{ background: '#FFFFFF', border: '1px solid rgba(201,168,76,0.2)' }}>
+      <div className="rounded-2xl p-6 mb-4" style={{ background: '#FFFFFF', border: '1px solid rgba(245,197,24,0.2)' }}>
         <div style={{ fontSize: 10, color: 'rgba(0,0,0,0.4)', fontWeight: 700, letterSpacing: '0.1em', marginBottom: 12 }}>CURRENT PLAN</div>
         {loading ? (
           <div style={{ height: 36, width: 160, borderRadius: 6, background: 'rgba(0,0,0,0.07)' }} />
@@ -74,7 +74,7 @@ export default function SubscriptionPage() {
         ) : sub ? (
           <div>
             <div className="flex items-baseline gap-3 flex-wrap">
-              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 30, fontWeight: 600, color: '#0D2B35' }}>
+              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 30, fontWeight: 600, color: '#1C1008' }}>
                 {sub.planName}
               </span>
               <span style={{
@@ -100,7 +100,7 @@ export default function SubscriptionPage() {
 
         <button
           onClick={() => window.open('https://www.goutsyde.com/subscription/manage', '_blank')}
-          style={{ marginTop: 20, fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#C9A84C', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}
+          style={{ marginTop: 20, fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#F5C518', color: '#0D0D0D', fontWeight: 600, cursor: 'pointer' }}
         >
           Manage Plan →
         </button>
@@ -117,12 +117,12 @@ export default function SubscriptionPage() {
               className="flex items-center gap-4 px-5 py-4 rounded-2xl"
               style={{
                 background: '#FFFFFF',
-                border: `1px solid ${isCurrent ? 'rgba(201,168,76,0.35)' : 'rgba(0,0,0,0.07)'}`,
+                border: `1px solid ${isCurrent ? 'rgba(245,197,24,0.35)' : 'rgba(0,0,0,0.07)'}`,
               }}
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span style={{ fontSize: 15, fontWeight: 500, color: '#0D2B35' }}>{tier.name}</span>
+                  <span style={{ fontSize: 15, fontWeight: 500, color: '#1C1008' }}>{tier.name}</span>
                   {isCurrent && (
                     <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 10, background: '#FEF3C7', color: '#92400E', fontWeight: 600 }}>
                       Current
@@ -131,7 +131,7 @@ export default function SubscriptionPage() {
                 </div>
                 <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.45)', marginTop: 3 }}>{tier.description}</div>
               </div>
-              <div style={{ fontSize: 20, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#C9A84C', flexShrink: 0 }}>
+              <div style={{ fontSize: 20, fontFamily: 'Cormorant Garamond, serif', fontWeight: 600, color: '#F5C518', flexShrink: 0 }}>
                 ${tier.price}<span style={{ fontSize: 13, color: 'rgba(0,0,0,0.4)', fontFamily: 'DM Sans, sans-serif', fontWeight: 400 }}>/mo</span>
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function SubscriptionPage() {
 
       <p style={{ fontSize: 12, color: 'rgba(0,0,0,0.35)', marginTop: 20 }}>
         To upgrade or downgrade your plan, visit{' '}
-        <a href="https://www.goutsyde.com/subscription/manage" target="_blank" rel="noopener noreferrer" style={{ color: '#0D2B35', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+        <a href="https://www.goutsyde.com/subscription/manage" target="_blank" rel="noopener noreferrer" style={{ color: '#1C1008', textDecoration: 'underline', textUnderlineOffset: 3 }}>
           goutsyde.com/subscription/manage
         </a>
       </p>

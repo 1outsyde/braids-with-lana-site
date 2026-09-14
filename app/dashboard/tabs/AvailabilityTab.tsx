@@ -105,7 +105,7 @@ export default function AvailabilityTab() {
       <div style={{ marginBottom: 28 }}>
         <h1 style={{
           fontFamily: 'Cormorant Garamond, serif', fontSize: 32, fontWeight: 600,
-          color: '#0D2B35', margin: 0, lineHeight: 1,
+          color: '#1C1008', margin: 0, lineHeight: 1,
         }}>
           Availability
         </h1>
@@ -129,7 +129,7 @@ export default function AvailabilityTab() {
           boxShadow: '0 1px 4px rgba(0,0,0,0.06)', border: '1px solid #e8f0f1',
           padding: '24px',
         }}>
-          <div style={{ fontSize: 16, fontWeight: 600, color: '#0D2B35', marginBottom: 18, fontFamily: 'Cormorant Garamond, serif' }}>
+          <div style={{ fontSize: 16, fontWeight: 600, color: '#1C1008', marginBottom: 18, fontFamily: 'Cormorant Garamond, serif' }}>
             Weekly hours
           </div>
 
@@ -163,7 +163,7 @@ export default function AvailabilityTab() {
                   disabled={saveState === 'saving'}
                   style={{
                     fontSize: 13, fontWeight: 600, padding: '9px 20px', borderRadius: 10,
-                    background: saveState === 'saved' ? '#27ae60' : '#C9A84C',
+                    background: saveState === 'saved' ? '#27ae60' : '#F5C518',
                     color: '#fff', border: 'none',
                     cursor: saveState === 'saving' ? 'default' : 'pointer',
                     opacity: saveState === 'saving' ? 0.65 : 1,
@@ -183,7 +183,7 @@ export default function AvailabilityTab() {
           border: '1px solid #e8f0f1',
           padding: '24px',
         }}>
-          <div style={{ fontSize: 16, fontWeight: 600, color: '#0D2B35', marginBottom: 18, fontFamily: 'Cormorant Garamond, serif' }}>
+          <div style={{ fontSize: 16, fontWeight: 600, color: '#1C1008', marginBottom: 18, fontFamily: 'Cormorant Garamond, serif' }}>
             Blocked dates
           </div>
 

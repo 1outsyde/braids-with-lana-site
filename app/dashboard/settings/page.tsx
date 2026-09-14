@@ -81,19 +81,19 @@ export default function SettingsPage() {
         fontFamily: 'Cormorant Garamond, serif',
         fontSize: 32,
         fontWeight: 600,
-        color: '#0D2B35',
+        color: '#1C1008',
         marginBottom: 8,
       }}>
         Site Settings
       </h1>
-      <p style={{ fontSize: 13, color: '#6b8c94', marginBottom: 36, lineHeight: 1.6 }}>
+      <p style={{ fontSize: 13, color: '#7A5C4A', marginBottom: 36, lineHeight: 1.6 }}>
         Manage how your public-facing site looks to clients.
       </p>
 
       {/* Hero Image */}
       <div style={{
         background: '#fff',
-        border: '1.5px solid #eef2f3',
+        border: '1.5px solid #F0D9C8',
         borderRadius: 12,
         padding: isMobile ? '24px 20px' : '28px 32px',
       }}>
@@ -101,12 +101,12 @@ export default function SettingsPage() {
           fontFamily: 'Cormorant Garamond, serif',
           fontSize: 24,
           fontWeight: 600,
-          color: '#0D2B35',
+          color: '#1C1008',
           marginBottom: 6,
         }}>
           Cover Image
         </h2>
-        <p style={{ fontSize: 13, color: '#6b8c94', marginBottom: 20, lineHeight: 1.6 }}>
+        <p style={{ fontSize: 13, color: '#7A5C4A', marginBottom: 20, lineHeight: 1.6 }}>
           This is your business cover photo. It appears on your homepage and across the Outsyde platform.
           Upload a high-quality braiding photo — at least 1200px wide.
         </p>
@@ -122,11 +122,11 @@ export default function SettingsPage() {
                 height: 220,
                 objectFit: 'cover',
                 borderRadius: 8,
-                border: '1.5px solid #eef2f3',
+                border: '1.5px solid #F0D9C8',
                 display: 'block',
               }}
             />
-            <p style={{ fontSize: 11, color: '#9ab3b8', marginTop: 6 }}>Current cover image</p>
+            <p style={{ fontSize: 11, color: '#B5977A', marginTop: 6 }}>Current cover image</p>
           </div>
         )}
 
@@ -134,7 +134,7 @@ export default function SettingsPage() {
           display: 'inline-flex',
           alignItems: 'center',
           gap: 8,
-          background: heroUploading ? '#9ab3b8' : '#29C5CC',
+          background: heroUploading ? '#B5977A' : '#E8630A',
           color: '#fff',
           fontSize: 13,
           fontWeight: 600,
@@ -163,7 +163,7 @@ export default function SettingsPage() {
           <p style={{ fontSize: 12, color: '#e05252', marginTop: 12 }}>{heroError}</p>
         )}
         {heroSuccess && (
-          <p style={{ fontSize: 12, color: '#29C5CC', marginTop: 12 }}>
+          <p style={{ fontSize: 12, color: '#E8630A', marginTop: 12 }}>
             ✓ Cover image updated
           </p>
         )}
