@@ -63,10 +63,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Brand lockup */}
         <div style={{ padding: '24px 20px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <Link href="/" className="flex items-center gap-3" style={{ textDecoration: 'none' }}>
-            <Image src="/logo.png" alt="Braids With Love" width={36} height={36} className="rounded-full flex-shrink-0" style={{ objectFit: 'cover' }} />
+            <Image src="/logo.png" alt="Braids With Lana" width={36} height={36} className="rounded-full flex-shrink-0" style={{ objectFit: 'cover' }} />
             <div>
               <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 16, fontWeight: 600, color: '#F5F5F5', lineHeight: 1.2 }}>
-                Braids With Love
+                Braids With Lana
               </div>
               <div style={{ fontSize: 10, color: 'rgba(245,245,245,0.35)', marginTop: 2, letterSpacing: '0.1em' }}>
                 ADMIN
@@ -132,9 +132,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </svg>
           </button>
           <Link href="/" className="flex items-center gap-3" style={{ textDecoration: 'none' }}>
-            <Image src="/logo.png" alt="Braids With Love" width={28} height={28} className="rounded-full" />
+            <Image src="/logo.png" alt="Braids With Lana" width={28} height={28} className="rounded-full" />
             <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 600, color: '#F5F5F5' }}>
-              Braids With Love
+              Braids With Lana
             </span>
           </Link>
         </header>

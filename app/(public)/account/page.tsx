@@ -701,8 +701,8 @@ function ProfileSection() {
         </p>
         <p style={{ fontFamily: FONT_BODY, fontSize: '0.8rem', color: MUTED }}>
           To change your email address, contact{' '}
-          <a href="mailto:braidswithlove757@gmail.com" style={{ color: TEAL, textDecoration: 'underline' }}>
-            braidswithlove757@gmail.com
+          <a href="mailto:donialana15@gmail.com" style={{ color: TEAL, textDecoration: 'underline' }}>
+            donialana15@gmail.com
           </a>
         </p>
       </Card>

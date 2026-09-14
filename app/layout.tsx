@@ -31,48 +31,48 @@ const dmMono = DM_Mono({
 
 // ─── Metadata ─────────────────────────────────────────────────────
 export const metadata: Metadata = {
-  metadataBase: new URL("https://braidswithlove.com"),
+  metadataBase: new URL("https://braidsbylana.com"),
   title: {
-    default: "Braids With Love | Professional Hair Braiding — Norfolk, VA",
-    template: "%s | Braids With Love",
+    default: "Braids With Lana | Professional Hair Braiding — Saint Albans, Queens, NY",
+    template: "%s | Braids With Lana",
   },
   description:
-    "Luxury hair braiding by Danny Nicole. Serving Norfolk, VA and the Hampton Roads area. Book your appointment online.",
+    "Luxury hair braiding by Lana. Serving Saint Albans, Queens, NY. Book your appointment online.",
   keywords: [
     "hair braiding",
     "braids",
-    "Norfolk VA",
-    "Hampton Roads",
+    "Saint Albans Queens NY",
+    "New York",
     "protective styles",
     "box braids",
     "knotless braids",
-    "Danny Nicole",
-    "Braids With Love",
+    "Lana",
+    "Braids With Lana",
   ],
-  authors: [{ name: "Danny Nicole" }],
-  creator: "Braids With Love",
+  authors: [{ name: "Lana" }],
+  creator: "Braids With Lana",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://braidswithlove.com",
-    siteName: "Braids With Love",
-    title: "Braids With Love | Professional Hair Braiding",
+    url: "https://braidsbylana.com",
+    siteName: "Braids With Lana",
+    title: "Braids With Lana | Professional Hair Braiding",
     description:
-      "Luxury hair braiding by Danny Nicole. Serving Norfolk, VA and the Hampton Roads area.",
+      "Luxury hair braiding by Lana. Serving Saint Albans, Queens, NY.",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Braids With Love — Professional Hair Braiding",
+        alt: "Braids With Lana — Professional Hair Braiding",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Braids With Love | Professional Hair Braiding",
+    title: "Braids With Lana | Professional Hair Braiding",
     description:
-      "Luxury hair braiding by Danny Nicole. Serving Norfolk, VA and the Hampton Roads area.",
+      "Luxury hair braiding by Lana. Serving Saint Albans, Queens, NY.",
     images: ["/og-image.jpg"],
   },
   robots: {

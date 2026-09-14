@@ -888,7 +888,7 @@ export default function BookPage() {
       <div style={{ width: '100%', maxWidth: 520, margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
-            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 600, color: T.navy, letterSpacing: '0.02em' }}>Braids With Love</span>
+            <span style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 600, color: T.navy, letterSpacing: '0.02em' }}>Braids With Lana</span>
           </Link>
         </div>
 

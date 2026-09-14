@@ -15,7 +15,7 @@ export default function Footer() {
             </p>
             <p className="text-body-sm text-muted leading-relaxed">
               Professional hair braiding by {VENDOR_CONFIG.ownerName}. Serving
-              Virginia Beach, VA and the Hampton Roads area.
+              Saint Albans, Queens, NY.
             </p>
             <Link href="/book" className="btn btn-primary self-start">
               Book an appointment

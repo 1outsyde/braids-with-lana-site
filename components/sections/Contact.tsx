@@ -11,7 +11,7 @@ export default function Contact() {
           <div className="flex flex-col gap-8">
             <div className="flex flex-col gap-2">
               <p className="eyebrow">Location</p>
-              <p className="text-body-lg text-white">Virginia Beach, VA</p>
+              <p className="text-body-lg text-white">Saint Albans, Queens, NY</p>
               <p className="text-body-sm text-muted">
                 Exact address provided upon booking confirmation.
               </p>
@@ -20,10 +20,10 @@ export default function Contact() {
             <div className="flex flex-col gap-2">
               <p className="eyebrow">Email</p>
               <a
-                href="mailto:Braidswithlove757@gmail.com"
+                href="mailto:donialana15@gmail.com"
                 className="text-body-lg text-teal hover:text-teal-300 transition-colors"
               >
-                Braidswithlove757@gmail.com
+                donialana15@gmail.com
               </a>
             </div>
           </div>

@@ -72,13 +72,13 @@ export default function RegisterPage() {
       <div style={{ width: '100%', maxWidth: 420 }}>
 
         <p style={{ fontSize: '0.7rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'rgba(240,249,250,0.4)', textAlign: 'center', marginBottom: 12 }}>
-          Braids With Love
+          Braids With Lana
         </p>
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '2.4rem', fontWeight: 500, textAlign: 'center', marginBottom: 6, color: '#f0f9fa' }}>
           Create Account
         </h1>
         <p style={{ textAlign: 'center', color: 'rgba(240,249,250,0.5)', fontSize: '0.85rem', marginBottom: 36 }}>
-          Join Braids With Love
+          Join Braids With Lana
         </p>
 
         {error && (
