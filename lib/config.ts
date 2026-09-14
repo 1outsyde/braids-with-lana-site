@@ -3,21 +3,25 @@ export const API_URL = process.env.NEXT_PUBLIC_OUTSYDE_API_URL!
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL!
 
 export const VENDOR_CONFIG = {
-  vendorName: "Braids With Love",
-  ownerName: "Danei Johnson",
+  vendorName: "Braids With Lana",
+  businessName: "Braids With Lana",
+  businessSlug: "braids-with-lana",
+  location: "Saint Albans, Queens, NY",
+  ownerName: "Dede L Dounou",
   hasBookings: true,
   hasServices: true,
-  hasProducts: true,
+  hasProducts: false,
   hasAnalytics: true,
   hasSubscription: true,
 } as const
 
 export const ADMIN_EMAILS = [
-  "braidswithlove757@gmail.com",
+  "donialana15@gmail.com",
   "info@goutsyde.com",
 ]
 
 export function isAdminEmail(email: string | null | undefined): boolean {
   if (!email) return false
-  return ADMIN_EMAILS.includes(email.toLowerCase())
+  const lower = email.toLowerCase()
+  return lower === "donialana15@gmail.com" || lower === "info@goutsyde.com"
 }

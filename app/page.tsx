@@ -47,8 +47,8 @@ function Nav({ isMobile }: { isMobile: boolean }) {
           <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 600, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
         </div>
         <div>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 600, color: '#fff', lineHeight: 1.1 }}>Braids With Love</div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Virginia Beach, VA</div>
+          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 600, color: '#fff', lineHeight: 1.1 }}>Braids With Lana</div>
+          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Saint Albans, Queens, NY</div>
         </div>
       </div>
 
@@ -100,7 +100,7 @@ function Nav({ isMobile }: { isMobile: boolean }) {
               <div style={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(41,197,204,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
               </div>
-              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Love</span>
+              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Lana</span>
             </div>
             <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 24, lineHeight: 1, padding: '4px', minHeight: 44 }} aria-label="Close menu">×</button>
           </div>
@@ -150,7 +150,7 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
       {heroImage && !heroImageFailed ? (
         <img
           src={heroImage}
-          alt="Braids With Love"
+          alt="Braids With Lana"
           loading="eager"
           onError={() => setHeroImageFailed(true)}
           style={{
@@ -430,8 +430,8 @@ function Contact() {
         </div>
         <div>
           {[
-            { label: 'Location', value: 'Virginia Beach, VA', sub: 'Address confirmed after booking' },
-            { label: 'Email', value: 'braidswithlove757@gmail.com', sub: '' },
+            { label: 'Location', value: 'Saint Albans, Queens, NY', sub: 'Address confirmed after booking' },
+            { label: 'Email', value: 'donialana15@gmail.com', sub: '' },
             { label: 'Hours', value: 'By appointment only', sub: 'Book online to see availability' },
           ].map(item => (
             <div key={item.label} style={{ borderTop: '1px solid #eef2f3', padding: '22px 0' }}>
@@ -455,7 +455,7 @@ function Footer() {
           <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1.5px solid rgba(41,197,204,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14, color: '#29C5CC', fontStyle: 'italic' }}>B</span>
           </div>
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Love</span>
+          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Lana</span>
         </div>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' as const }}>
           {['Services', 'Gallery', 'Contact'].map(l => (

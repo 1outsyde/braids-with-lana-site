@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       name: `${formData.firstName} ${formData.lastName}`,
       username,
       role: 'consumer',
-      source: 'braids-with-love',
+      source: 'braids-with-lana',
     })
     if (data.accessToken && typeof window !== 'undefined') {
       localStorage.setItem('outsyde_access_token', data.accessToken)

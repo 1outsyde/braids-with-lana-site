@@ -164,7 +164,7 @@ export default function RegisterPage() {
               <a href="https://goutsyde.com" target="_blank" rel="noopener noreferrer" style={{ color: '#29C5CC', textDecoration: 'underline' }}>
                 Outsyde
               </a>
-              , a commerce platform for independent wellness brands, and that my account and order data are managed by Outsyde on behalf of Braids With Love.
+              , a commerce platform for independent wellness brands, and that my account and order data are managed by Outsyde on behalf of Braids With Lana.
             </span>
           </label>
 
