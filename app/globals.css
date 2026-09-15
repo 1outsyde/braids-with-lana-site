@@ -1,6 +1,26 @@
 @config "../tailwind.config.ts";
 @import "tailwindcss";
 
+@theme {
+  --color-teal: #E8630A;
+  --color-teal-dark: #1C1008;
+  --color-teal-ink: #2A1408;
+  --color-teal-light: #3D1F0A;
+  --color-teal-50: #FFF3E8;
+  --color-teal-100: #FDDBB3;
+  --color-teal-200: #FBB87E;
+  --color-teal-300: #F8904A;
+  --color-teal-400: #F0721E;
+  --color-teal-500: #E8630A;
+  --color-teal-600: #C2510A;
+  --color-teal-700: #9C3F08;
+  --color-teal-800: #762E05;
+  --color-teal-900: #4F1E03;
+  --color-gold: #F5C518;
+  --color-gold-light: #F7CE3A;
+  --color-gold-dark: #D4A80E;
+}
+
 /* ─── Brand Tokens ────────────────────────────────────────────────── */
 :root {
   /* Color */
