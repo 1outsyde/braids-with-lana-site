@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     for (const [key, value] of incoming.entries()) {
       forwarded.append(key, value)
     }
-    forwarded.append('folder', 'services')
+    forwarded.append('folder', 'gallery')
 
     const token = req.cookies.get('outsyde_access_token')?.value
     const cookieHeader = req.headers.get('cookie')

@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
 
     const token = req.cookies.get('outsyde_access_token')?.value
     const cookieHeader = req.headers.get('cookie')
+    const INTERNAL_KEY = process.env.INTERNAL_API_KEY ?? ''
 
     const res = await fetch(`${API_URL}/api/media/upload-image`, {
       method: 'POST',
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest) {
         'x-business-id': BUSINESS_ID ?? '',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+        ...(INTERNAL_KEY ? { 'x-internal-key': INTERNAL_KEY } : {}),
         // Do NOT set Content-Type — let fetch set multipart/form-data boundary
       },
       body: forwarded,
