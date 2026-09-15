@@ -128,6 +128,53 @@ function Nav({ isMobile }: { isMobile: boolean }) {
   )
 }
 
+function HeroPhoto({
+  heroImage,
+  heroImageFailed,
+  setHeroImageFailed,
+  rounded,
+}: {
+  heroImage: string | null
+  heroImageFailed: boolean
+  setHeroImageFailed?: (v: boolean) => void
+  rounded?: number | string
+}) {
+  return (
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+      borderRadius: rounded ?? 24,
+      background: 'linear-gradient(145deg, #E8630A 0%, #F5C518 42%, #1C1008 100%)',
+    }}>
+      {heroImage && !heroImageFailed ? (
+        <img
+          src={heroImage}
+          alt="Braids With Lana"
+          loading="eager"
+          onError={setHeroImageFailed ? () => setHeroImageFailed(true) : undefined}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: 'center top',
+            display: 'block',
+          }}
+        />
+      ) : null}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: heroImage && !heroImageFailed
+          ? 'linear-gradient(180deg, rgba(232,99,10,0.18) 0%, rgba(28,16,8,0.28) 100%)'
+          : 'transparent',
+        pointerEvents: 'none',
+      }} />
+    </div>
+  )
+}
+
 // ── Hero ─────────────────────────────────────────────────────────────────────
 function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
   heroImage: string | null
@@ -140,141 +187,127 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
     <section style={{
       position: 'relative',
       width: '100%',
-      height: isMobile ? '90vh' : '100vh',
-      minHeight: isMobile ? 580 : 640,
+      backgroundColor: '#FFFAF5',
       overflow: 'hidden',
-      backgroundColor: '#1C1008',  // fallback while image loads
     }}>
-
-      {/* Layer 1 — Cover image (background) */}
-      {heroImage && !heroImageFailed ? (
-        <img
-          src={heroImage}
-          alt="Braids With Lana"
-          loading="eager"
-          onError={() => setHeroImageFailed(true)}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            // objectPosition: 'center top' keeps subject's face in frame on tall mobile viewports
-            // Change to 'center center' if cover image is landscape-oriented
-            objectPosition: 'center top',
-          }}
-        />
-      ) : (
-        // Fallback gradient — shown before fetch resolves, on fetch timeout, or if image URL fails
-        <div style={{
-          position: 'absolute', inset: 0,
-          background: 'linear-gradient(135deg, #1C1008 0%, #3D1F0A 100%)',
-        }} />
-      )}
-
-      {/* Layer 2 — Gradient overlay (readability) */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: `linear-gradient(
-          to bottom,
-          rgba(28,16,8,0.15) 0%,
-          rgba(28,16,8,0.05) 25%,
-          rgba(28,16,8,0.4) 55%,
-          rgba(28,16,8,0.82) 75%,
-          rgba(28,16,8,0.96) 100%
-        )`,
-        zIndex: 1,
-      }} />
-
-      {/* Layer 3 — Nav (floats at top) */}
-      <Nav isMobile={isMobile} />
-
-      {/* Layer 4 — Hero content (floats at bottom) */}
+      {/* Espresso strip so existing white Nav stays readable on cream */}
       <div style={{
         position: 'absolute',
-        bottom: 0, left: 0, right: 0,
-        padding: isMobile ? '0 20px 32px' : '0 64px 64px',
+        top: 0, left: 0, right: 0,
+        height: isMobile ? 76 : 92,
+        background: '#1C1008',
         zIndex: 2,
+      }} />
+
+      <Nav isMobile={isMobile} />
+
+      <div style={{
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        alignItems: 'stretch',
+        minHeight: isMobile ? undefined : '100vh',
+        paddingTop: isMobile ? 76 : 92,
       }}>
-        {/* Availability pill */}
+        {/* Photo first on mobile */}
+        {isMobile && (
+          <div style={{ width: '100%', height: 340, padding: '16px 20px 8px' }}>
+            <HeroPhoto
+              heroImage={heroImage}
+              heroImageFailed={heroImageFailed}
+              setHeroImageFailed={setHeroImageFailed}
+              rounded={20}
+            />
+          </div>
+        )}
+
+        {/* Left — copy */}
         <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6,
-          background: 'rgba(232,99,10,0.15)',
-          border: '0.5px solid rgba(232,99,10,0.4)',
-          borderRadius: 20, padding: '5px 12px',
-          marginBottom: 14,
-        }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#E8630A' }} />
-          <span style={{ fontSize: 12, color: '#E8630A', fontWeight: 500 }}>
-            Now accepting bookings
-          </span>
-        </div>
-
-        {/* Headline */}
-        <h1 style={{
-          fontFamily: 'Cormorant Garamond, Georgia, serif',
-          fontSize: isMobile ? 38 : 56,
-          fontWeight: 400,
-          color: '#ffffff',
-          lineHeight: 1.1,
-          margin: '0 0 12px',
-        }}>
-          Where every braid tells{' '}
-          <em style={{ color: '#E8630A', fontStyle: 'italic' }}>your story.</em>
-        </h1>
-
-        {/* Subheadline */}
-        <p style={{
-          fontSize: isMobile ? 14 : 16,
-          color: 'rgba(255,255,255,0.7)',
-          lineHeight: 1.6,
-          margin: '0 0 20px',
-          maxWidth: isMobile ? '100%' : 480,
-        }}>
-          Knotless braids, box braids, faux locs, and more — booked online in minutes.
-          No DMs, no waiting.
-        </p>
-
-        {/* Trust badges row */}
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 20 }}>
-          {[
-            { icon: '📅', text: 'Book online 24/7' },
-            { icon: '🔒', text: 'Secure checkout' },
-            { icon: '⭐', text: 'Earn rewards' },
-          ].map(({ icon, text }) => (
-            <div key={text} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ fontSize: 13 }}>{icon}</span>
-              <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)' }}>{text}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* CTA button */}
-        <div style={{
+          flex: 1,
           display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
-          gap: 12, alignItems: isMobile ? 'stretch' : 'center',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          background: '#FFFAF5',
+          padding: isMobile ? '28px 20px 48px' : '48px 64px 72px',
         }}>
-          <a href="/book" style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            background: '#E8630A', color: '#1C1008',
-            borderRadius: 12, padding: '14px 28px',
-            fontWeight: 700, fontSize: 15,
-            textDecoration: 'none',
+          <p style={{
+            fontSize: 11,
+            color: '#7A5C4A',
+            letterSpacing: '0.18em',
+            fontWeight: 600,
+            textTransform: 'uppercase' as const,
+            margin: '0 0 18px',
           }}>
-            📅 Book an appointment
-          </a>
-          <a href="#services" style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: 'rgba(255,255,255,0.7)',
-            fontSize: 14, textDecoration: 'none',
-            padding: isMobile ? '8px 0' : '14px 0',
+            BEAUTIFUL HAIR · CONFIDENCE · COMMUNITY
+          </p>
+          <h1 style={{
+            fontFamily: 'Cormorant Garamond, Georgia, serif',
+            fontSize: isMobile ? 42 : 72,
+            fontWeight: 400,
+            color: '#1C1008',
+            lineHeight: 1.05,
+            margin: '0 0 18px',
           }}>
-            View services →
-          </a>
+            Your Next Look<br />
+            <em style={{ color: '#E8630A', fontStyle: 'italic' }}>Starts Here</em>
+          </h1>
+          <p style={{
+            fontSize: isMobile ? 15 : 17,
+            color: '#7A5C4A',
+            lineHeight: 1.7,
+            margin: '0 0 32px',
+            maxWidth: 460,
+          }}>
+            Professional braids, styles and more — crafted with care and experience.
+          </p>
+          <div style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            gap: 12,
+            alignItems: isMobile ? 'stretch' : 'center',
+          }}>
+            <a href="/book" style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: '#E8630A', color: '#fff',
+              borderRadius: 4, padding: '14px 28px',
+              fontWeight: 700, fontSize: 15,
+              textDecoration: 'none',
+              boxShadow: '0 4px 18px rgba(232,99,10,0.28)',
+            }}>
+              Book Appointment →
+            </a>
+            <a href="#services" style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#E8630A',
+              fontSize: 14, fontWeight: 600,
+              textDecoration: 'none',
+              padding: isMobile ? '12px 28px' : '14px 28px',
+              border: '1.5px solid #E8630A',
+              borderRadius: 4,
+              background: 'transparent',
+            }}>
+              View Services
+            </a>
+          </div>
         </div>
-      </div>
 
+        {/* Photo on the right for desktop */}
+        {!isMobile && (
+          <div style={{
+            flex: 1,
+            padding: '32px 48px 48px 16px',
+            display: 'flex',
+            alignItems: 'stretch',
+            minHeight: 0,
+          }}>
+            <HeroPhoto
+              heroImage={heroImage}
+              heroImageFailed={heroImageFailed}
+              setHeroImageFailed={setHeroImageFailed}
+              rounded={28}
+            />
+          </div>
+        )}
+      </div>
     </section>
   )
 }
@@ -284,20 +317,17 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
   const isMobile = useWindowWidth() < 768
   const CARD_COLORS = ['#FFF3E8', '#fff5e6', '#FFF3E8', '#f5f0ff', '#FFF3E8']
   return (
-    <section id="services" style={{ padding: '96px 0', background: '#fff' }}>
+    <section id="services" style={{ padding: isMobile ? '64px 0' : '96px 0', background: '#fff' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 24px' : '0 40px' }}>
         <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 52, flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <div style={{ width: 32, height: 2, background: '#E8630A', borderRadius: 1 }} />
-              <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>What we offer</span>
-            </div>
-            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px,4vw,52px)', fontWeight: 400, lineHeight: 1.1, color: '#1C1008' }}>
-              Services crafted<br />
-              <em style={{ color: '#E8630A' }}>for your hair.</em>
+            <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.14em', fontWeight: 600, textTransform: 'uppercase' as const }}>OUR SERVICES</span>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px,4vw,52px)', fontWeight: 400, lineHeight: 1.1, color: '#1C1008', marginTop: 10 }}>
+              Find Your Look
             </h2>
+            <div style={{ width: 72, height: 3, background: '#E8630A', borderRadius: 2, marginTop: 14 }} />
           </div>
-          <a href="#book" style={{ fontSize: 13, color: '#E8630A', textDecoration: 'none', fontWeight: 600, marginBottom: 8 }}>All services →</a>
+          <a href="#book" style={{ fontSize: 13, color: '#E8630A', textDecoration: 'none', fontWeight: 600, marginBottom: 8 }}>View All Services →</a>
         </div>
         {loading && (
           <div style={{ display: 'flex', gap: 20, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'none' as const }}>
@@ -312,9 +342,26 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
           </div>
         )}
         {!loading && services.length > 0 && (
-          <div style={{ display: 'flex', gap: 20, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'none' as const }}>
+          <div style={{
+            display: isMobile ? 'flex' : 'grid',
+            gridTemplateColumns: isMobile ? undefined : 'repeat(auto-fill, minmax(260px, 1fr))',
+            gap: 20,
+            overflowX: isMobile ? 'auto' : 'visible',
+            flexWrap: isMobile ? 'nowrap' : undefined,
+            paddingBottom: 12,
+            scrollbarWidth: 'none' as const,
+          }}>
             {services.map((s, i) => (
-              <div key={s.id} style={{ flex: '0 0 268px', background: '#fff', borderRadius: 12, overflow: 'hidden', border: '1.5px solid #F0D9C8', cursor: 'pointer', transition: 'all 0.25s', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+              <div key={s.id} style={{
+                flex: isMobile ? '0 0 268px' : undefined,
+                background: '#fff',
+                borderRadius: 12,
+                overflow: 'hidden',
+                border: '1.5px solid #F0D9C8',
+                cursor: 'pointer',
+                transition: 'all 0.25s',
+                boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+              }}
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#E8630A'; el.style.transform = 'translateY(-6px)'; el.style.boxShadow = '0 12px 32px rgba(232,99,10,0.15)' }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#F0D9C8'; el.style.transform = 'translateY(0)'; el.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)' }}>
                 {/* Image area */}
@@ -329,17 +376,14 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
                 </div>
                 {/* Body */}
                 <div style={{ padding: '20px 20px 24px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                    <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 21, fontWeight: 600, color: '#1C1008', lineHeight: 1.2 }}>{s.name}</h3>
-                    <span style={{ color: '#F5C518', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap', marginLeft: 10 }}>From {fmtPrice(s.price)}</span>
-                  </div>
-                  <p style={{ fontSize: 13, color: '#7A5C4A', lineHeight: 1.65, marginBottom: 18 }}>{s.description}</p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 11, color: '#B5977A' }}>⏱ {fmtDur(s.durationMinutes)} · {consumerLocationLabel(s.serviceLocationType)}</span>
-                    <Link href={`/book?serviceId=${s.id}`} style={{ background: '#E8630A', border: 'none', borderRadius: 3, color: '#fff', fontSize: 12, fontWeight: 600, padding: '8px 18px', cursor: 'pointer', letterSpacing: '0.04em', textDecoration: 'none', display: 'inline-block' }}>
-                      Book this →
+                  <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 21, fontWeight: 600, color: '#1C1008', lineHeight: 1.2, marginBottom: 8 }}>{s.name}</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                    <span style={{ color: '#E8630A', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap' }}>From {fmtPrice(s.price)}</span>
+                    <Link href={`/book?serviceId=${s.id}`} style={{ color: '#E8630A', fontSize: 20, fontWeight: 600, textDecoration: 'none', lineHeight: 1 }}>
+                      →
                     </Link>
                   </div>
+                  <p style={{ fontSize: 11, color: '#B5977A', marginTop: 10 }}>⏱ {fmtDur(s.durationMinutes)} · {consumerLocationLabel(s.serviceLocationType)}</p>
                 </div>
               </div>
             ))}
@@ -350,28 +394,128 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
   )
 }
 
-// ── Why ───────────────────────────────────────────────────────────────────────
-function Why() {
+// ── Stylist bio ───────────────────────────────────────────────────────────────
+function Stylist({ heroImage, heroImageFailed }: { heroImage: string | null; heroImageFailed: boolean }) {
+  const isMobile = useWindowWidth() < 768
   return (
-    <section style={{ padding: '88px 0', background: '#FFFAF5' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 40px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 52 }}>
-          <div style={{ width: 32, height: 2, background: '#E8630A', borderRadius: 1 }} />
-          <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Why choose us</span>
+    <section id="about" style={{ padding: isMobile ? '64px 24px' : '96px 40px', background: '#FFFAF5' }}>
+      <div style={{
+        maxWidth: 1200,
+        margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+        gap: isMobile ? 36 : 72,
+        alignItems: 'center',
+      }}>
+        <div style={{
+          position: 'relative',
+          width: '100%',
+          aspectRatio: '1 / 1',
+          maxWidth: isMobile ? '100%' : 520,
+        }}>
+          <HeroPhoto heroImage={heroImage} heroImageFailed={heroImageFailed} rounded={24} />
+          <div style={{
+            position: 'absolute',
+            left: 20,
+            right: 20,
+            bottom: 24,
+            fontFamily: 'Cormorant Garamond, serif',
+            fontStyle: 'italic',
+            fontSize: isMobile ? 26 : 32,
+            color: '#fff',
+            textShadow: '0 2px 16px rgba(28,16,8,0.45)',
+            lineHeight: 1.2,
+          }}>
+            More Than Just Hair ♡
+          </div>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 2 }}>
-          {[
-            { n: '01', t: 'Book in minutes', b: 'Live availability, instant confirmation, secure online payment. No back-and-forth needed.', icon: '📅' },
-            { n: '02', t: 'Hair health first', b: 'Every style installed with care for your edges and scalp. Never over-tensioned.', icon: '💚' },
-            { n: '03', t: 'Earn every visit', b: 'Loyalty points added automatically. Redeem for money off your next appointment.', icon: '⭐' },
-          ].map((item, i) => (
-            <div key={item.n} style={{ background: '#fff', padding: '40px 36px', border: '1.5px solid #F0D9C8', borderRadius: i === 0 ? '12px 0 0 12px' : i === 2 ? '0 12px 12px 0' : '0', transition: 'border-color 0.2s' }}
-              onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderColor = '#E8630A'}
-              onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderColor = '#F0D9C8'}>
-              <div style={{ width: 48, height: 48, borderRadius: 12, background: 'rgba(232,99,10,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, marginBottom: 20 }}>{item.icon}</div>
-              <div style={{ fontSize: 11, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, marginBottom: 10 }}>{item.n}</div>
-              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 600, color: '#1C1008', marginBottom: 12, lineHeight: 1.2 }}>{item.t}</h3>
-              <p style={{ fontSize: 14, color: '#7A5C4A', lineHeight: 1.8 }}>{item.b}</p>
+        <div>
+          <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.14em', fontWeight: 600, textTransform: 'uppercase' as const }}>MEET YOUR STYLIST</span>
+          <h2 style={{
+            fontFamily: 'Cormorant Garamond, serif',
+            fontSize: isMobile ? 32 : 44,
+            fontWeight: 400,
+            color: '#1C1008',
+            lineHeight: 1.15,
+            margin: '14px 0 20px',
+          }}>
+            Hair has always been more than a service.
+          </h2>
+          <p style={{ fontSize: 15, color: '#7A5C4A', lineHeight: 1.85, marginBottom: 28, maxWidth: 480 }}>
+            For more than 10 years, Lana has been braiding with intention — protecting edges, honoring texture, and making space for every client to feel seen. What started as a gift in the community is now a studio built on care, conversation, and looks that last.
+          </p>
+          <a href="#contact" style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            background: '#E8630A',
+            color: '#fff',
+            fontSize: 14,
+            fontWeight: 600,
+            padding: '12px 24px',
+            borderRadius: 4,
+            textDecoration: 'none',
+            letterSpacing: '0.02em',
+          }}>
+            Learn More →
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Recent work ───────────────────────────────────────────────────────────────
+function Gallery({ heroImage, heroImageFailed }: { heroImage: string | null; heroImageFailed: boolean }) {
+  const isMobile = useWindowWidth() < 768
+  const overlays = [0.12, 0.22, 0.32, 0.42]
+  return (
+    <section id="gallery" style={{ padding: isMobile ? '64px 24px' : '96px 40px', background: '#fff' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 40, flexWrap: 'wrap', gap: 16 }}>
+          <div>
+            <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.14em', fontWeight: 600, textTransform: 'uppercase' as const }}>OUR WORK</span>
+            <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px,4vw,52px)', fontWeight: 400, color: '#1C1008', margin: '10px 0 8px' }}>
+              Recent Work
+            </h2>
+            <p style={{ fontSize: 15, color: '#7A5C4A' }}>Real people. Real styles. Real love.</p>
+          </div>
+          <a href="#gallery" style={{ fontSize: 13, color: '#E8630A', textDecoration: 'none', fontWeight: 600 }}>See More →</a>
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)',
+          gap: 12,
+        }}>
+          {overlays.map((opacity, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'relative',
+                aspectRatio: '1 / 1',
+                overflow: 'hidden',
+                borderRadius: 8,
+                background: 'linear-gradient(145deg, #E8630A 0%, #F5C518 42%, #1C1008 100%)',
+              }}
+              onMouseEnter={e => { const o = e.currentTarget.querySelector('[data-overlay]') as HTMLElement | null; if (o) o.style.background = 'rgba(28,16,8,0.45)' }}
+              onMouseLeave={e => { const o = e.currentTarget.querySelector('[data-overlay]') as HTMLElement | null; if (o) o.style.background = `rgba(28,16,8,${opacity})` }}
+            >
+              {heroImage && !heroImageFailed ? (
+                <img
+                  src={heroImage}
+                  alt="Recent work"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              ) : null}
+              <div
+                data-overlay
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: `rgba(28,16,8,${opacity})`,
+                  transition: 'background 0.25s',
+                  pointerEvents: 'none',
+                }}
+              />
             </div>
           ))}
         </div>
@@ -513,7 +657,8 @@ export default function HomePage() {
         setHeroImageFailed={setHeroImageFailed}
       />
       <Services services={services} loading={servicesLoading} />
-      <Why />
+      <Stylist heroImage={heroImage} heroImageFailed={heroImageFailed} />
+      <Gallery heroImage={heroImage} heroImageFailed={heroImageFailed} />
       <BookCTA />
       <Contact />
       <Footer />
