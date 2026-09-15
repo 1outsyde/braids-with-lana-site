@@ -59,7 +59,7 @@ function StatCard({ label, value, sub }: { label: string; value: string; sub?: s
   return (
     <div style={{
       background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-      border: '1px solid #e8f0f1', padding: '24px',
+      border: '1px solid #F0D9C8', padding: '24px',
     }}>
       <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, color: '#7A5C4A', marginBottom: 8, fontWeight: 500 }}>
         {label}
@@ -175,7 +175,7 @@ export default function DashboardOverviewPage() {
       {/* Calendar overview */}
       <div style={{
         background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-        border: '1px solid #e8f0f1', padding: '24px', marginBottom: 24,
+        border: '1px solid #F0D9C8', padding: '24px', marginBottom: 24,
       }}>
         <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', margin: '0 0 20px' }}>
           Calendar
@@ -186,7 +186,7 @@ export default function DashboardOverviewPage() {
       {/* Today's appointments */}
       <div style={{
         background: '#fff', borderRadius: 16, boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
-        border: '1px solid #e8f0f1', padding: '24px',
+        border: '1px solid #F0D9C8', padding: '24px',
       }}>
         <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', margin: '0 0 20px' }}>
           Today's Appointments
