@@ -72,13 +72,13 @@ export default function RegisterPage() {
       <div style={{ width: '100%', maxWidth: 420 }}>
 
         <p style={{ fontSize: '0.7rem', letterSpacing: '.22em', textTransform: 'uppercase', color: 'rgba(240,249,250,0.4)', textAlign: 'center', marginBottom: 12 }}>
-          Braids With Lana
+          Braids by Lana
         </p>
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '2.4rem', fontWeight: 500, textAlign: 'center', marginBottom: 6, color: '#FFF8F2' }}>
           Create Account
         </h1>
         <p style={{ textAlign: 'center', color: 'rgba(240,249,250,0.5)', fontSize: '0.85rem', marginBottom: 36 }}>
-          Join Braids With Lana
+          Join Braids by Lana
         </p>
 
         {error && (
@@ -164,7 +164,7 @@ export default function RegisterPage() {
               <a href="https://goutsyde.com" target="_blank" rel="noopener noreferrer" style={{ color: '#E8630A', textDecoration: 'underline' }}>
                 Outsyde
               </a>
-              , a commerce platform for independent wellness brands, and that my account and order data are managed by Outsyde on behalf of Braids With Lana.
+              , a commerce platform for independent wellness brands, and that my account and order data are managed by Outsyde on behalf of Braids by Lana.
             </span>
           </label>
 

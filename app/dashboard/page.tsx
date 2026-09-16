@@ -128,7 +128,7 @@ export default function DashboardOverviewPage() {
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 38, fontWeight: 600, color: '#1C1008', margin: 0, lineHeight: 1 }}>
-          {greeting()}, Braids With Lana
+          {greeting()}, Braids by Lana
         </h1>
         <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', marginTop: 8 }}>
           {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}

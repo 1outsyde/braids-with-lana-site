@@ -31,48 +31,49 @@ const dmMono = DM_Mono({
 
 // ─── Metadata ─────────────────────────────────────────────────────
 export const metadata: Metadata = {
-  metadataBase: new URL("https://braidsbylana.com"),
+  metadataBase: new URL("https://braidsbyLana.com"),
   title: {
-    default: "Braids With Lana | Professional Hair Braiding — Saint Albans, Queens, NY",
-    template: "%s | Braids With Lana",
+    default: "Braids by Lana | Professional Hair Braiding — Saint Albans, Queens, NY",
+    template: "%s | Braids by Lana",
   },
   description:
-    "Luxury hair braiding by Lana. Serving Saint Albans, Queens, NY. Book your appointment online.",
+    "Professional hair braiding by Lana. Serving Saint Albans, Queens, NY. Book your appointment online.",
   keywords: [
     "hair braiding",
     "braids",
+    "Braids by Lana",
     "Saint Albans Queens NY",
     "New York",
     "protective styles",
     "box braids",
     "knotless braids",
+    "faux locs",
     "Lana",
-    "Braids With Lana",
   ],
   authors: [{ name: "Lana" }],
-  creator: "Braids With Lana",
+  creator: "Braids by Lana",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://braidsbylana.com",
-    siteName: "Braids With Lana",
-    title: "Braids With Lana | Professional Hair Braiding",
+    url: "https://braidsbyLana.com",
+    siteName: "Braids by Lana",
+    title: "Braids by Lana | Professional Hair Braiding",
     description:
-      "Luxury hair braiding by Lana. Serving Saint Albans, Queens, NY.",
+      "Professional hair braiding by Lana. Serving Saint Albans, Queens, NY.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/og-image.jpg", // TODO: replace with a proper 1200x630 design
         width: 1200,
         height: 630,
-        alt: "Braids With Lana — Professional Hair Braiding",
+        alt: "Braids by Lana — Professional Hair Braiding",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Braids With Lana | Professional Hair Braiding",
+    title: "Braids by Lana | Professional Hair Braiding",
     description:
-      "Luxury hair braiding by Lana. Serving Saint Albans, Queens, NY.",
+      "Professional hair braiding by Lana. Serving Saint Albans, Queens, NY.",
     images: ["/og-image.jpg"],
   },
   robots: {
