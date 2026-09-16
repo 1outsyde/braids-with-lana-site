@@ -70,7 +70,7 @@ export default function SettingsPage() {
     try {
       const token = localStorage.getItem('outsyde_access_token')
       const form = new FormData()
-      form.append('image', file)
+      form.append('file', file)
 
       const uploadRes = await fetch('/api/admin/hero-image', {
         method: 'POST',
@@ -123,7 +123,7 @@ export default function SettingsPage() {
     try {
       const token = localStorage.getItem('outsyde_access_token')
       const form = new FormData()
-      form.append('image', file)
+      form.append('file', file)
 
       const uploadRes = await fetch('/api/admin/stylist/upload-image', {
         method: 'POST',
@@ -166,7 +166,7 @@ export default function SettingsPage() {
     try {
       const token = localStorage.getItem('outsyde_access_token')
       const form = new FormData()
-      form.append('image', file)
+      form.append('file', file)
 
       const uploadRes = await fetch('/api/admin/gallery/upload-image', {
         method: 'POST',
