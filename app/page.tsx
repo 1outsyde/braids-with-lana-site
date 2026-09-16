@@ -42,14 +42,13 @@ function Nav({ isMobile }: { isMobile: boolean }) {
       background: 'linear-gradient(to bottom, rgba(28,16,8,0.5) 0%, transparent 100%)',
     }}>
       {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ width: 38, height: 38, borderRadius: '50%', border: '2px solid rgba(232,99,10,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(232,99,10,0.1)' }}>
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 18, fontWeight: 600, color: '#E8630A', fontStyle: 'italic' }}>B</span>
-        </div>
-        <div>
-          <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 17, fontWeight: 600, color: '#fff', lineHeight: 1.1 }}>Braids With Lana</div>
-          <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Saint Albans, Queens, NY</div>
-        </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <img
+          src="/braids-by-lana-logo.png"
+          alt="Braids by Lana"
+          style={{ height: 44, width: 'auto', display: 'block', mixBlendMode: 'multiply', objectFit: 'contain' }}
+        />
+        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Saint Albans, Queens, NY</div>
       </div>
 
       {/* Desktop links */}
@@ -97,10 +96,11 @@ function Nav({ isMobile }: { isMobile: boolean }) {
           {/* Close row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(232,99,10,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#E8630A', fontStyle: 'italic' }}>B</span>
-              </div>
-              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Lana</span>
+              <img
+                src="/braids-by-lana-logo.png"
+                alt="Braids by Lana"
+                style={{ height: 36, width: 'auto', display: 'block', mixBlendMode: 'multiply', objectFit: 'contain' }}
+              />
             </div>
             <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 24, lineHeight: 1, padding: '4px', minHeight: 44 }} aria-label="Close menu">×</button>
           </div>
@@ -151,7 +151,7 @@ function HeroPhoto({
       {heroImage && !heroImageFailed ? (
         <img
           src={heroImage}
-          alt="Braids With Lana"
+          alt="Braids by Lana"
           loading="eager"
           onError={setHeroImageFailed ? () => setHeroImageFailed(true) : undefined}
           style={{
@@ -229,6 +229,17 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
           background: '#FFFAF5',
           padding: isMobile ? '28px 20px 48px' : '48px 64px 72px',
         }}>
+          <img
+            src="/braids-by-lana-logo.png"
+            alt="Braids by Lana"
+            style={{
+              height: isMobile ? 80 : 100,
+              width: 'auto',
+              marginBottom: 20,
+              objectFit: 'contain',
+              display: 'block',
+            }}
+          />
           <p style={{
             fontSize: 11,
             color: '#7A5C4A',
@@ -237,7 +248,7 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
             textTransform: 'uppercase' as const,
             margin: '0 0 18px',
           }}>
-            BEAUTIFUL HAIR · CONFIDENCE · COMMUNITY
+            Quality Braids · Styles · Confidence
           </p>
           <h1 style={{
             fontFamily: 'Cormorant Garamond, Georgia, serif',
@@ -596,10 +607,12 @@ function Footer() {
     <footer style={{ padding: '28px 20px', background: '#1C1008' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ width: 30, height: 30, borderRadius: '50%', border: '1.5px solid rgba(232,99,10,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 14, color: '#E8630A', fontStyle: 'italic' }}>B</span>
-          </div>
-          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids With Lana</span>
+          <img
+            src="/braids-by-lana-logo.png"
+            alt="Braids by Lana"
+            style={{ height: 36, width: 'auto', display: 'block', mixBlendMode: 'multiply', objectFit: 'contain' }}
+          />
+          <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 15, color: '#fff', fontWeight: 600 }}>Braids by Lana</span>
         </div>
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' as const }}>
           {['Services', 'Gallery', 'Contact'].map(l => (
