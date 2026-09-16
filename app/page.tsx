@@ -615,12 +615,85 @@ function Footer() {
   )
 }
 
+// ── Meet Your Stylist ─────────────────────────────────────────────────────────
+function MeetStylist({ photo, fallback }: { photo: string | null; fallback: string | null }) {
+  const isMobile = useWindowWidth() < 768
+  const img = photo ?? fallback
+  return (
+    <section id="about" style={{ padding: isMobile ? '72px 24px' : '96px 40px', background: '#1C1008' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 40 : 80, alignItems: 'center' }}>
+        <div style={{ order: isMobile ? 1 : 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
+            <div style={{ width: 32, height: 2, background: '#E8630A', borderRadius: 1 }} />
+            <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Meet your stylist</span>
+          </div>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(36px,4vw,52px)', fontWeight: 400, color: '#fff', lineHeight: 1.1, marginBottom: 20 }}>
+            Hi, I&apos;m <em style={{ color: '#E8630A' }}>Lana.</em>
+          </h2>
+          <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', lineHeight: 1.85, maxWidth: 420, marginBottom: 28 }}>
+            I&apos;ve been braiding hair in Saint Albans, Queens for years — specializing in knotless braids, box braids, and faux locs that protect your hair and last.
+          </p>
+          <a href="/book" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#E8630A', color: '#fff', fontSize: 13, fontWeight: 600, padding: '11px 24px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
+            Book with Lana →
+          </a>
+        </div>
+        <div style={{ order: isMobile ? 0 : 1 }}>
+          {img ? (
+            <img
+              src={img}
+              alt="Lana, your stylist"
+              style={{ width: '100%', maxWidth: 420, height: isMobile ? 300 : 440, objectFit: 'cover', borderRadius: 12, display: 'block', border: '1.5px solid rgba(232,99,10,0.2)' }}
+            />
+          ) : (
+            <div style={{ width: '100%', maxWidth: 420, height: isMobile ? 300 : 440, borderRadius: 12, background: 'rgba(232,99,10,0.08)', border: '1.5px dashed rgba(232,99,10,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 40, color: 'rgba(232,99,10,0.4)', fontStyle: 'italic' }}>Lana</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ── Recent Work Gallery ───────────────────────────────────────────────────────
+function Gallery({ photos, fallback }: { photos: (string | null)[]; fallback: string | null }) {
+  const isMobile = useWindowWidth() < 768
+  const slots = photos.slice(0, 4)
+  const hasPhotos = slots.some(p => p !== null)
+  if (!hasPhotos) return null
+  return (
+    <section id="gallery" style={{ padding: isMobile ? '72px 24px' : '96px 40px', background: '#FFFAF5' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 48 }}>
+          <div style={{ width: 32, height: 2, background: '#E8630A', borderRadius: 1 }} />
+          <span style={{ fontSize: 12, color: '#E8630A', letterSpacing: '0.1em', fontWeight: 600, textTransform: 'uppercase' as const }}>Recent work</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 12 }}>
+          {slots.map((photo, i) => {
+            const src = photo ?? fallback
+            return src ? (
+              <img
+                key={i}
+                src={src}
+                alt={`Recent work ${i + 1}`}
+                style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
+              />
+            ) : null
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [services, setServices] = useState<Service[]>([])
   const [servicesLoading, setServicesLoading] = useState(true)
   const [heroImage, setHeroImage] = useState<string | null>(null)
   const [heroImageFailed, setHeroImageFailed] = useState(false)
+  const [stylistPhoto, setStylistPhoto] = useState<string | null>(null)
+  const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null, null])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -638,6 +711,8 @@ export default function HomePage() {
         const biz = data.business ?? data
         setHeroImage(biz.coverImage ?? biz.cover_image ?? null)
         setHeroImageFailed(false)
+        setStylistPhoto(biz.siteConfig?.stylistPhoto ?? null)
+        setGalleryPhotos(biz.siteConfig?.galleryPhotos ?? [null, null, null, null])
       })
       .catch(err => { if (err.name === 'AbortError') return })
 
