@@ -656,7 +656,7 @@ function MeetStylist({ photo, fallback }: { photo: string | null; fallback: stri
 }
 
 // ── Recent Work Gallery ───────────────────────────────────────────────────────
-function Gallery({ photos, fallback }: { photos: (string | null)[]; fallback: string | null }) {
+function RecentWorkGallery({ photos, fallback }: { photos: (string | null)[]; fallback: string | null }) {
   const isMobile = useWindowWidth() < 768
   const slots = photos.slice(0, 4)
   const hasPhotos = slots.some(p => p !== null)
