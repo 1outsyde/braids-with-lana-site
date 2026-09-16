@@ -62,7 +62,7 @@ export const metadata: Metadata = {
       "Professional hair braiding by Lana. Serving Saint Albans, Queens, NY.",
     images: [
       {
-        url: "/og-image.jpg", // TODO: replace with a proper 1200x630 design
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Braids by Lana — Professional Hair Braiding",
@@ -74,7 +74,7 @@ export const metadata: Metadata = {
     title: "Braids by Lana | Professional Hair Braiding",
     description:
       "Professional hair braiding by Lana. Serving Saint Albans, Queens, NY.",
-    images: ["/og-image.jpg"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
