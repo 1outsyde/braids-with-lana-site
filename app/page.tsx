@@ -732,8 +732,8 @@ export default function HomePage() {
         setHeroImageFailed={setHeroImageFailed}
       />
       <Services services={services} loading={servicesLoading} />
-      <Stylist heroImage={heroImage} heroImageFailed={heroImageFailed} />
-      <Gallery heroImage={heroImage} heroImageFailed={heroImageFailed} />
+      <MeetStylist photo={stylistPhoto} fallback={heroImage} />
+      <RecentWorkGallery photos={galleryPhotos} fallback={null} />
       <BookCTA />
       <Contact />
       <Footer />
