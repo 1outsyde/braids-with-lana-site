@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    if (!isLoading && (!user || !isAdminEmail(user.email))) {
+    if (isLoading === false && user === null) {
       router.replace('/login')
     }
   }, [user, isLoading, router])
@@ -46,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
-  if (!user || !isAdminEmail(user.email)) return null
+  if (isLoading || !user || !isAdminEmail(user.email)) return null
 
   return (
     <div className="min-h-screen flex" style={{ background: '#F5F7F8' }}>
