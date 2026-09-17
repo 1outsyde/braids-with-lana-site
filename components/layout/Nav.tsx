@@ -2,8 +2,9 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useState, useEffect } from "react"
-import { isAuthenticated } from "@/lib/auth"
+import { useState } from "react"
+import { useAuth } from "@/lib/auth-context"
+import { isAdminEmail } from "@/lib/config"
 
 const NAV_LINKS = [
   { label: "Services", href: "/#services" },
@@ -12,11 +13,9 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false)
-  const [authed, setAuthed] = useState(false)
-
-  useEffect(() => {
-    setAuthed(isAuthenticated())
-  }, [])
+  const { user } = useAuth()
+  const authed = !!user
+  const isAdmin = !!user && isAdminEmail(user.email)
 
   return (
     <nav className="sticky top-0 z-50 bg-teal-dark border-b border-[var(--color-border)] backdrop-blur-sm">
@@ -49,12 +48,22 @@ export default function Nav() {
         {/* Desktop auth */}
         <div className="hidden md:flex items-center gap-4">
           {authed ? (
-            <Link
-              href="/account"
-              className="text-body-sm text-muted hover:text-white transition-colors"
-            >
-              My Account
-            </Link>
+            <>
+              {isAdmin && (
+                <Link
+                  href="/dashboard"
+                  className="text-body-sm text-muted hover:text-white transition-colors"
+                >
+                  Dashboard
+                </Link>
+              )}
+              <Link
+                href="/account"
+                className="text-body-sm text-muted hover:text-white transition-colors"
+              >
+                My Account
+              </Link>
+            </>
           ) : (
             <>
               <Link
@@ -105,13 +114,24 @@ export default function Nav() {
             ))}
             <div className="section-divider" />
             {authed ? (
-              <Link
-                href="/account"
-                className="text-body-md text-muted hover:text-white transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                My Account
-              </Link>
+              <>
+                {isAdmin && (
+                  <Link
+                    href="/dashboard"
+                    className="text-body-md text-muted hover:text-white transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                )}
+                <Link
+                  href="/account"
+                  className="text-body-md text-muted hover:text-white transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  My Account
+                </Link>
+              </>
             ) : (
               <>
                 <Link
