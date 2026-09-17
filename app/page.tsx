@@ -31,7 +31,7 @@ function fmtDur(mins: number) {
 // ── Nav ──────────────────────────────────────────────────────────────────────
 function Nav({ isMobile }: { isMobile: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const isAdmin = !!user && isAdminEmail(user.email)
 
   return (
@@ -69,11 +69,11 @@ function Nav({ isMobile }: { isMobile: boolean }) {
       {/* Desktop CTAs */}
       {!isMobile && (
         <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
-          {isAdmin ? (
+          {!isLoading && (isAdmin ? (
             <Link href="/dashboard" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Dashboard</Link>
           ) : (
             <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Sign in</Link>
-          )}
+          ))}
           <a href="#book" style={{ background: '#E8630A', color: '#1C1008', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(232,99,10,0.4)' }}>Book Now</a>
         </div>
       )}
@@ -122,13 +122,13 @@ function Nav({ isMobile }: { isMobile: boolean }) {
             </a>
           ))}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
-            {isAdmin ? (
+            {!isLoading && (isAdmin ? (
               <Link href="/dashboard" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>Dashboard</Link>
             ) : (
               <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
                 Sign in
               </Link>
-            )}
+            ))}
             <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#E8630A', color: '#1C1008', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
               Book Now
             </a>
