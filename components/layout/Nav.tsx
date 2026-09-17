@@ -13,7 +13,7 @@ const NAV_LINKS = [
 
 export default function Nav() {
   const [isOpen, setIsOpen] = useState(false)
-  const { user } = useAuth()
+  const { user, isLoading } = useAuth()
   const authed = !!user
   const isAdmin = !!user && isAdminEmail(user.email)
 
@@ -47,7 +47,7 @@ export default function Nav() {
 
         {/* Desktop auth */}
         <div className="hidden md:flex items-center gap-4">
-          {authed ? (
+          {!isLoading && (authed ? (
             <>
               {isAdmin && (
                 <Link
@@ -76,7 +76,7 @@ export default function Nav() {
                 Book Now
               </Link>
             </>
-          )}
+          ))}
         </div>
 
         {/* Mobile hamburger */}
@@ -113,7 +113,7 @@ export default function Nav() {
               </Link>
             ))}
             <div className="section-divider" />
-            {authed ? (
+            {!isLoading && (authed ? (
               <>
                 {isAdmin && (
                   <Link
@@ -149,7 +149,7 @@ export default function Nav() {
                   Book Now
                 </Link>
               </>
-            )}
+            ))}
           </div>
         </div>
       )}
