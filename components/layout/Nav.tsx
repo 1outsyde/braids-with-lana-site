@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect } from "react"
-import { VENDOR_CONFIG } from "@/lib/config"
 import { isAuthenticated } from "@/lib/auth"
 
 const NAV_LINKS = [
@@ -22,11 +22,15 @@ export default function Nav() {
     <nav className="sticky top-0 z-50 bg-teal-dark border-b border-[var(--color-border)] backdrop-blur-sm">
       <div className="section-container flex items-center justify-between h-16">
         {/* Logo */}
-        <Link
-          href="/"
-          className="font-display text-display-sm text-white tracking-tight hover:text-teal transition-colors"
-        >
-          {VENDOR_CONFIG.vendorName}
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/braids-by-lana-logo.png"
+            alt="Braids by Lana"
+            width={120}
+            height={44}
+            style={{ objectFit: 'contain' }}
+            priority
+          />
         </Link>
 
         {/* Desktop navigation */}
