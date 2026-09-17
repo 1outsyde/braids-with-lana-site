@@ -3,10 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { VENDOR_CONFIG } from '@/lib/config'
 import { consumerLocationLabel, formatLocationLine, normalizeServiceLocationType } from '@/lib/serviceLocation'
-
-// ─── Vendor config ───────────────────────────────────────────────────────────
-const VENDOR_CONFIG = { hasBookings: true, hasProducts: true } as const
 
 // ─── Design tokens ───────────────────────────────────────────────────────────
 const TEAL_DARK   = '#1C1008'

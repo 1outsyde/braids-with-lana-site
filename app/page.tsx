@@ -71,10 +71,14 @@ function Nav({ isMobile }: { isMobile: boolean }) {
         <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
           {!isLoading && (isAdmin ? (
             <Link href="/dashboard" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Dashboard</Link>
+          ) : user ? (
+            <Link href="/account" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>My Account</Link>
           ) : (
-            <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Sign in</Link>
+            <>
+              <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Sign in</Link>
+              <a href="#book" style={{ background: '#E8630A', color: '#1C1008', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(232,99,10,0.4)' }}>Book Now</a>
+            </>
           ))}
-          <a href="#book" style={{ background: '#E8630A', color: '#1C1008', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(232,99,10,0.4)' }}>Book Now</a>
         </div>
       )}
 
@@ -124,14 +128,20 @@ function Nav({ isMobile }: { isMobile: boolean }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
             {!isLoading && (isAdmin ? (
               <Link href="/dashboard" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>Dashboard</Link>
-            ) : (
-              <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
-                Sign in
+            ) : user ? (
+              <Link href="/account" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
+                My Account
               </Link>
+            ) : (
+              <>
+                <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
+                  Sign in
+                </Link>
+                <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#E8630A', color: '#1C1008', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
+                  Book Now
+                </a>
+              </>
             ))}
-            <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#E8630A', color: '#1C1008', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
-              Book Now
-            </a>
           </div>
         </div>
       )}

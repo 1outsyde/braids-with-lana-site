@@ -33,7 +33,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    if (isLoading === false && user === null) {
+    if (isLoading) return
+    if (!user || !isAdminEmail(user.email)) {
       router.replace('/login')
     }
   }, [user, isLoading, router])
