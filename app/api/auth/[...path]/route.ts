@@ -28,11 +28,14 @@ export async function GET(
 ) {
   const { path } = await params
   const pathStr = path.join('/')
+  const token = req.cookies.get('outsyde_access_token')?.value ?? ''
+  const cookieHeader = req.headers.get('cookie') ?? ''
   const res = await fetch(`${BACKEND}/api/auth/${pathStr}`, {
     headers: {
-      Authorization: req.headers.get('authorization') ?? '',
-      Cookie: req.headers.get('cookie') ?? '',
+      Authorization: req.headers.get('authorization') || (token ? `Bearer ${token}` : ''),
+      Cookie: cookieHeader,
     },
+    cache: 'no-store',
   })
   return NextResponse.json(await res.json(), { status: res.status })
 }
