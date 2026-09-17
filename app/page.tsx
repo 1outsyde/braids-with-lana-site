@@ -3,8 +3,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useWindowWidth } from '@/lib/useWindowWidth'
 import { consumerLocationLabel } from '@/lib/serviceLocation'
-import Nav from "@/components/layout/Nav"
-
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Service {
   id: string
@@ -28,6 +26,106 @@ function fmtDur(mins: number) {
   return m ? `${h}h ${m}m` : `${h}h`
 }
 
+// ── Nav ──────────────────────────────────────────────────────────────────────
+function Nav({ isMobile }: { isMobile: boolean }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  return (
+    <nav style={{
+      position: 'absolute',
+      top: 0, left: 0, right: 0,
+      padding: isMobile ? '16px 20px' : '24px 64px',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      zIndex: 3,
+      // Subtle top fade to help nav items read on any photo
+      background: 'linear-gradient(to bottom, rgba(28,16,8,0.5) 0%, transparent 100%)',
+    }}>
+      {/* Logo */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <img
+          src="/braids-by-lana-logo.png"
+          alt="Braids by Lana"
+          style={{ height: 44, width: 'auto', display: 'block', mixBlendMode: 'multiply', objectFit: 'contain' }}
+        />
+        <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 600 }}>Saint Albans, Queens, NY</div>
+      </div>
+
+      {/* Desktop links */}
+      {!isMobile && (
+        <div style={{ display: 'flex', gap: 36, alignItems: 'center' }}>
+          {['Services', 'Gallery', 'About', 'Contact'].map(l => (
+            <a key={l} href={`#${l.toLowerCase()}`}
+              style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', letterSpacing: '0.03em', fontWeight: 400 }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#E8630A')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.85)')}>{l}</a>
+          ))}
+        </div>
+      )}
+
+      {/* Desktop CTAs */}
+      {!isMobile && (
+        <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+          <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Sign in</Link>
+          <a href="#book" style={{ background: '#E8630A', color: '#1C1008', fontSize: 13, fontWeight: 600, padding: '9px 22px', borderRadius: 3, textDecoration: 'none', letterSpacing: '0.04em', boxShadow: '0 2px 12px rgba(232,99,10,0.4)' }}>Book Now</a>
+        </div>
+      )}
+
+      {/* Mobile hamburger */}
+      {isMobile && (
+        <button
+          onClick={() => setMenuOpen(o => !o)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', display: 'flex', flexDirection: 'column', gap: 5, minHeight: 44, justifyContent: 'center' }}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+        >
+          <span style={{ display: 'block', width: 22, height: 2, background: '#ffffff', transition: 'all 0.2s', transform: menuOpen ? 'translateY(7px) rotate(45deg)' : undefined }} />
+          <span style={{ display: 'block', width: 22, height: 2, background: '#ffffff', transition: 'all 0.2s', opacity: menuOpen ? 0 : 1 }} />
+          <span style={{ display: 'block', width: 22, height: 2, background: '#ffffff', transition: 'all 0.2s', transform: menuOpen ? 'translateY(-7px) rotate(-45deg)' : undefined }} />
+        </button>
+      )}
+
+      {/* Mobile drawer — fixed so it overlays everything */}
+      {isMobile && menuOpen && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0,
+          background: '#1C1008',
+          zIndex: 1000,
+          padding: '20px 20px 32px',
+        }}>
+          {/* Close row */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <img
+                src="/braids-by-lana-logo.png"
+                alt="Braids by Lana"
+                style={{ height: 36, width: 'auto', display: 'block', mixBlendMode: 'multiply', objectFit: 'contain' }}
+              />
+            </div>
+            <button onClick={() => setMenuOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.5)', fontSize: 24, lineHeight: 1, padding: '4px', minHeight: 44 }} aria-label="Close menu">×</button>
+          </div>
+          {['Services', 'Gallery', 'About', 'Contact'].map(l => (
+            <a
+              key={l}
+              href={`#${l.toLowerCase()}`}
+              onClick={() => setMenuOpen(false)}
+              style={{ display: 'block', padding: '14px 0', fontSize: 15, color: 'rgba(255,255,255,0.85)', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.08)', fontWeight: 500 }}
+            >
+              {l}
+            </a>
+          ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 24 }}>
+            <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
+              Sign in
+            </Link>
+            <a href="#book" onClick={() => setMenuOpen(false)} style={{ display: 'block', textAlign: 'center', background: '#E8630A', color: '#1C1008', fontSize: 14, fontWeight: 600, padding: '12px', borderRadius: 4, textDecoration: 'none', letterSpacing: '0.04em' }}>
+              Book Now
+            </a>
+          </div>
+        </div>
+      )}
+    </nav>
+  )
+}
 
 function HeroPhoto({
   heroImage,
@@ -100,7 +198,7 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
         zIndex: 2,
       }} />
 
-      <Nav />
+      <Nav isMobile={isMobile} />
 
       <div style={{
         display: 'flex',
