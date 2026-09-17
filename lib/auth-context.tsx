@@ -25,6 +25,23 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
+async function fetchWithRetry(url: string, options: RequestInit, retries = 3, delay = 3000): Promise<Response | null> {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const res = await fetch(url, options)
+      if (res.ok) return res
+      if (res.status === 401 && i < retries - 1) {
+        await new Promise(r => setTimeout(r, delay))
+        continue
+      }
+      return res
+    } catch {
+      if (i < retries - 1) await new Promise(r => setTimeout(r, delay))
+    }
+  }
+  return null
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -38,9 +55,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (mounted) setUser(null)
           return
         }
-        const { data } = await outsydeClient.get<{ user?: User } & Partial<User>>('/auth/me', {
+        const res = await fetchWithRetry('/api/auth/me', {
           headers: { Authorization: `Bearer ${token}` },
         })
+        if (!res || !res.ok) {
+          if (mounted) setUser(null)
+          return
+        }
+        const data: { user?: User } & Partial<User> = await res.json()
         if (mounted) setUser(data.user ?? (data.id ? (data as User) : null))
       } catch {
         if (mounted) setUser(null)
@@ -56,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data } = await outsydeClient.post<{ user: User; accessToken?: string }>('/auth/mobile/login', { email, password })
     if (data.accessToken && typeof window !== 'undefined') {
       localStorage.setItem('outsyde_access_token', data.accessToken)
-      document.cookie = `outsyde_access_token=${data.accessToken}; path=/; SameSite=Lax`
+      document.cookie = `outsyde_access_token=${data.accessToken}; path=/; SameSite=Lax; max-age=604800; Secure`
     }
     setUser(data.user)
     return data.user
