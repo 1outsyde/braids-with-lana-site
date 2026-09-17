@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useWindowWidth } from '@/lib/useWindowWidth'
 import { consumerLocationLabel } from '@/lib/serviceLocation'
 import { useAuth } from "@/lib/auth-context"
@@ -31,7 +32,8 @@ function fmtDur(mins: number) {
 // ── Nav ──────────────────────────────────────────────────────────────────────
 function Nav({ isMobile }: { isMobile: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { user, isLoading } = useAuth()
+  const { user, logout, isLoading } = useAuth()
+  const router = useRouter()
   const isAdmin = !!user && isAdminEmail(user.email)
 
   return (
@@ -72,7 +74,11 @@ function Nav({ isMobile }: { isMobile: boolean }) {
           {!isLoading && (isAdmin ? (
             <Link href="/dashboard" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Dashboard</Link>
           ) : user ? (
-            <Link href="/account" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>My Account</Link>
+            <>
+              <Link href="/account" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>My Account</Link>
+              <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.25)', userSelect: 'none' }}>·</span>
+              <button onClick={() => { logout(); router.push('/') }} style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>Sign out</button>
+            </>
           ) : (
             <>
               <Link href="/login" style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', textDecoration: 'none' }}>Sign in</Link>
@@ -129,9 +135,11 @@ function Nav({ isMobile }: { isMobile: boolean }) {
             {!isLoading && (isAdmin ? (
               <Link href="/dashboard" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>Dashboard</Link>
             ) : user ? (
-              <Link href="/account" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
-                My Account
-              </Link>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+                <Link href="/account" onClick={() => setMenuOpen(false)} style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none' }}>My Account</Link>
+                <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.25)', userSelect: 'none' }}>·</span>
+                <button onClick={() => { logout(); router.push('/') }} style={{ fontSize: 14, color: 'rgba(255,255,255,0.4)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, fontFamily: 'inherit' }}>Sign out</button>
+              </div>
             ) : (
               <>
                 <Link href="/login" style={{ display: 'block', textAlign: 'center', padding: '12px', fontSize: 14, color: 'rgba(255,255,255,0.7)', textDecoration: 'none', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 4 }}>
