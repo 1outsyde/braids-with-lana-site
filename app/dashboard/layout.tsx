@@ -105,18 +105,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           })}
         </nav>
 
-        {/* Sidebar footer */}
+        {/* Sidebar footer — email only */}
         <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ fontSize: 11, color: 'rgba(245,245,245,0.35)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ fontSize: 11, color: 'rgba(245,245,245,0.35)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {user.email}
           </div>
-          <button
-            onClick={() => { logout(); router.push('/') }}
-            style={{ fontSize: 12, color: 'rgba(245,245,245,0.4)', background: 'transparent', border: 'none', cursor: 'pointer', padding: 0, letterSpacing: '0.04em' }}
-          >
-            Sign out
-          </button>
         </div>
+
+        {/* Sign out — pinned to sidebar bottom */}
+        <button
+          onClick={() => { logout(); router.push('/') }}
+          style={{
+            display: 'block',
+            width: '100%',
+            padding: '14px 20px',
+            textAlign: 'left',
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'rgba(245,245,245,0.28)',
+            background: 'transparent',
+            border: 'none',
+            borderTop: '1px solid rgba(255,255,255,0.06)',
+            cursor: 'pointer',
+            fontFamily: 'inherit',
+          }}
+        >
+          Sign Out
+        </button>
       </aside>
 
       {/* Content */}
