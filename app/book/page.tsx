@@ -510,6 +510,8 @@ function PaymentStep({
     depositAmountCents: number | null
     servicePriceCents: number
     chargeAmountCents: number
+    grossChargeAmountCents: number
+    depositNonRefundable: boolean
   } | null>(null)
 
   const [line1, setLine1] = useState('')
@@ -613,6 +615,8 @@ function PaymentStep({
         depositAmountCents: piData.depositAmountCents ?? null,
         servicePriceCents: piData.servicePriceCents ?? service.price,
         chargeAmountCents: piData.chargeAmountCents ?? service.price,
+        grossChargeAmountCents: piData.feeBreakdown?.grossChargeAmount ?? piData.chargeAmountCents ?? service.price,
+        depositNonRefundable: piData.depositAmountCents != null,
       })
       setPhase('ready')
     } catch (err) {
@@ -641,7 +645,7 @@ function PaymentStep({
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
           <span style={{ fontWeight: 600, color: T.navy, fontSize: 15 }}>{service.name}</span>
           {depositInfo ? (
-            <span style={{ fontWeight: 700, color: T.gold, fontSize: 15 }}>${(depositInfo.chargeAmountCents / 100).toFixed(2)} due now</span>
+            <span style={{ fontWeight: 700, color: T.gold, fontSize: 15 }}>${(depositInfo.grossChargeAmountCents / 100).toFixed(2)} due now</span>
           ) : (
             <span style={{ fontWeight: 700, color: T.gold, fontSize: 15 }}>${(service.price / 100).toFixed(2)}</span>
           )}
@@ -658,12 +662,17 @@ function PaymentStep({
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Deposit due now</span>
-              <span style={{ color: T.navy, fontWeight: 600 }}>${(depositInfo.depositAmountCents / 100).toFixed(2)}</span>
+              <span style={{ color: T.navy, fontWeight: 600 }}>${(depositInfo.grossChargeAmountCents / 100).toFixed(2)}</span>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Remainder due at appointment</span>
               <span>${((depositInfo.servicePriceCents - depositInfo.depositAmountCents) / 100).toFixed(2)}</span>
             </div>
+          </div>
+        )}
+        {depositInfo?.depositNonRefundable && (
+          <div style={{ marginTop: 8, fontSize: 12, color: T.error }}>
+            Deposit is non-refundable once your booking is confirmed.
           </div>
         )}
       </div>
