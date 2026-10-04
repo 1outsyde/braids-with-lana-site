@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return
         }
         const data: { user?: User } & Partial<User> = await res.json()
-        if (mounted) setUser(data.user ?? (data.id ? (data as User) : null))
+        if (mounted) setUser(data.user ?? null)
       } catch {
         if (mounted) setUser(null)
       } finally {
@@ -96,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
     if (data.accessToken && typeof window !== 'undefined') {
       localStorage.setItem('outsyde_access_token', data.accessToken)
-      document.cookie = `outsyde_access_token=${data.accessToken}; path=/; SameSite=Lax`
+      document.cookie = `outsyde_access_token=${data.accessToken}; path=/; SameSite=Lax; max-age=604800; Secure`
     }
     setUser(data.user)
   }
