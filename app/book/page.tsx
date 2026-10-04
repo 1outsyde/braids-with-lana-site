@@ -18,6 +18,7 @@ import {
   normalizeServiceLocationType,
   type ServiceLocationType,
 } from '@/lib/serviceLocation'
+import { formatDuration } from '@/lib/outsyde'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -204,7 +205,7 @@ function ServiceStep({ onSelect }: { onSelect: (s: Service) => void }) {
                   <div style={{ fontSize: 13, color: T.muted, lineHeight: 1.5 }}>{service.description}</div>
                 )}
                 <div style={{ fontSize: 12, color: T.muted, marginTop: 6 }}>
-                  {service.durationMinutes} min · {consumerLocationLabel(service.serviceLocationType)}
+                  {formatDuration(service.durationMinutes) ? `${formatDuration(service.durationMinutes)} · ` : ''}{consumerLocationLabel(service.serviceLocationType)}
                 </div>
               </div>
               <div style={{ fontWeight: 700, fontSize: 16, color: T.gold, marginLeft: 16, flexShrink: 0 }}>
@@ -267,7 +268,7 @@ function DateTimeStep({
       <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 600, color: T.navy, marginBottom: 4, marginTop: 0 }}>
         Pick a Date & Time
       </h2>
-      <p style={{ color: T.muted, fontSize: 13, marginBottom: 20 }}>{service.name} · {service.durationMinutes} min</p>
+      <p style={{ color: T.muted, fontSize: 13, marginBottom: 20 }}>{service.name}{formatDuration(service.durationMinutes) ? ` · ${formatDuration(service.durationMinutes)}` : ''}</p>
 
       <div style={{ marginBottom: 20 }}>
         <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: T.navy, marginBottom: 6 }}>Date</label>
@@ -652,7 +653,9 @@ function PaymentStep({
         </div>
         <div style={{ fontSize: 13, color: T.muted }}>{formatDate(date)}</div>
         <div style={{ fontSize: 13, color: T.muted }}>{formatTime(slot.startTime)} – {formatTime(slot.endTime)}</div>
-        <div style={{ fontSize: 13, color: T.muted }}>{service.durationMinutes} min</div>
+        {formatDuration(service.durationMinutes) && (
+          <div style={{ fontSize: 13, color: T.muted }}>{formatDuration(service.durationMinutes)}</div>
+        )}
         <div style={{ fontSize: 13, color: T.muted, marginTop: 6 }}>{consumerLocationLabel(locType)}</div>
         {depositInfo && typeof depositInfo.depositAmountCents === 'number' && (
           <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #c8e8ea', fontSize: 12, color: T.muted, display: 'flex', flexDirection: 'column', gap: 3 }}>
