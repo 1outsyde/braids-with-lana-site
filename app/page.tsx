@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useWindowWidth } from '@/lib/useWindowWidth'
 import { consumerLocationLabel } from '@/lib/serviceLocation'
+import { formatDuration } from '@/lib/outsyde'
 import { useAuth } from "@/lib/auth-context"
 import { isAdminEmail } from "@/lib/config"
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -21,12 +22,6 @@ interface Service {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function fmtPrice(cents: number) {
   return `$${(cents / 100).toFixed(0)}`
-}
-
-function fmtDur(mins: number) {
-  const h = Math.floor(mins / 60)
-  const m = mins % 60
-  return m ? `${h}h ${m}m` : `${h}h`
 }
 
 // ── Nav ──────────────────────────────────────────────────────────────────────
@@ -429,7 +424,7 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
                       →
                     </Link>
                   </div>
-                  <p style={{ fontSize: 11, color: '#B5977A', marginTop: 10 }}>⏱ {fmtDur(s.durationMinutes)} · {consumerLocationLabel(s.serviceLocationType)}</p>
+                  <p style={{ fontSize: 11, color: '#B5977A', marginTop: 10 }}>{formatDuration(s.durationMinutes) ? `⏱ ${formatDuration(s.durationMinutes)} · ` : ''}{consumerLocationLabel(s.serviceLocationType)}</p>
                 </div>
               </div>
             ))}

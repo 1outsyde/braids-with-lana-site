@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { formatDuration, joinMinutes, splitMinutes } from '@/lib/outsyde'
 import {
   SERVICE_LOCATION_TYPES,
   normalizeServiceLocationType,
@@ -56,19 +57,6 @@ const EMPTY_FORM: FormData = {
   virtualLink: '',
 }
 
-const DURATION_OPTIONS = [
-  { value: '30', label: '30 min' },
-  { value: '45', label: '45 min' },
-  { value: '60', label: '1 hr' },
-  { value: '90', label: '1.5 hrs' },
-  { value: '120', label: '2 hrs' },
-  { value: '150', label: '2.5 hrs' },
-  { value: '180', label: '3 hrs' },
-  { value: '240', label: '4 hrs' },
-  { value: '300', label: '5 hrs' },
-  { value: '360', label: '6 hrs' },
-]
-
 const STATUS_BADGE: Record<string, { bg: string; color: string; label: string }> = {
   live:     { bg: '#E8630A', color: '#fff', label: 'LIVE'     },
   paused:   { bg: '#F5C518', color: '#fff', label: 'PAUSED'   },
@@ -85,13 +73,6 @@ function getDisplayStatus(s: VendorService) {
 
 function fmtPrice(cents: number) {
   return `$${(cents / 100).toFixed(2)}`
-}
-
-function fmtDuration(minutes: number) {
-  if (minutes < 60) return `${minutes} min`
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  return m ? `${h} hr ${m} min` : `${h} hr${h > 1 ? 's' : ''}`
 }
 
 function authHeaders(token: string | null): Record<string, string> {
@@ -113,6 +94,21 @@ export default function ServicesPage() {
   const [formImageUrl, setFormImageUrl] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [applyingDeposit, setApplyingDeposit] = useState(false)
+  // form.durationMinutes holds the total minutes; these hold what was typed in the two boxes.
+  const [durationHours, setDurationHours] = useState('1')
+  const [durationMins, setDurationMins] = useState('0')
+
+  function loadDuration(totalMinutes: string) {
+    const split = splitMinutes(parseInt(totalMinutes, 10))
+    setDurationHours(String(split.hours))
+    setDurationMins(String(split.minutes))
+  }
+
+  function changeDuration(hours: string, minutes: string) {
+    setDurationHours(hours)
+    setDurationMins(minutes)
+    setForm(f => ({ ...f, durationMinutes: String(joinMinutes(hours, minutes)) }))
+  }
 
   async function loadServices() {
     setLoading(true)
@@ -137,6 +133,7 @@ export default function ServicesPage() {
   function openAdd() {
     setEditing(null)
     setForm(EMPTY_FORM)
+    loadDuration(EMPTY_FORM.durationMinutes)
     setFormError(null)
     setFormImageUrl(null)
     setShowForm(true)
@@ -162,6 +159,7 @@ export default function ServicesPage() {
       alternateZipCode: service.alternateZipCode ?? '',
       virtualLink: service.virtualLink ?? '',
     })
+    loadDuration(String(service.durationMinutes))
     setFormError(null)
     setFormImageUrl(service.imageUrl ?? null)
     setShowForm(true)
@@ -202,6 +200,7 @@ export default function ServicesPage() {
     if (!form.name.trim()) { setFormError('Service name is required.'); return }
     const price = parseFloat(form.price)
     if (isNaN(price) || price < 0) { setFormError('Enter a valid price.'); return }
+    if (parseInt(durationMins || '0', 10) > 59) { setFormError('Minutes must be between 0 and 59.'); return }
     const duration = parseInt(form.durationMinutes)
     if (!duration || duration < 15) { setFormError('Duration must be at least 15 minutes.'); return }
 
@@ -450,28 +449,34 @@ export default function ServicesPage() {
                   </Field>
 
                   <Field label="Duration *">
-                    <div style={{ position: 'relative' }}>
-                      <select
-                        value={form.durationMinutes}
-                        onChange={e => setForm(f => ({ ...f, durationMinutes: e.target.value }))}
-                        style={{
-                          ...inputStyle,
-                          WebkitAppearance: 'none',
-                          MozAppearance: 'none',
-                          appearance: 'none',
-                          paddingRight: 36,
-                          cursor: 'pointer',
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%234a6872' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`,
-                          backgroundRepeat: 'no-repeat',
-                          backgroundPosition: 'right 12px center',
-                        }}
-                        onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
-                        onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
-                      >
-                        {DURATION_OPTIONS.map(o => (
-                          <option key={o.value} value={o.value}>{o.label}</option>
-                        ))}
-                      </select>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      {([
+                        ['Hours', durationHours, 'hours'],
+                        ['Minutes', durationMins, 'minutes'],
+                      ] as const).map(([caption, value, which]) => (
+                        <div key={which} style={{ flex: 1 }}>
+                          <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.45)', marginBottom: 4 }}>{caption}</div>
+                          <input
+                            type="number"
+                            inputMode="numeric"
+                            min="0"
+                            max={which === 'minutes' ? '59' : undefined}
+                            step="1"
+                            value={value}
+                            onChange={e => {
+                              const digits = e.target.value.replace(/\D/g, '')
+                              changeDuration(
+                                which === 'hours' ? digits : durationHours,
+                                which === 'minutes' ? digits : durationMins,
+                              )
+                            }}
+                            aria-label={`Duration ${which}`}
+                            style={inputStyle}
+                            onFocus={e => { e.currentTarget.style.borderColor = '#E8630A'; e.currentTarget.style.background = '#fff' }}
+                            onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0'; e.currentTarget.style.background = '#fafafa' }}
+                          />
+                        </div>
+                      ))}
                     </div>
                   </Field>
                 </div>
@@ -874,7 +879,7 @@ export default function ServicesPage() {
                 {/* Price + duration */}
                 <div className="text-right flex-shrink-0 hidden sm:block">
                   <div style={{ fontSize: 15, fontWeight: 600, color: '#F5C518' }}>{fmtPrice(service.price)}</div>
-                  <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>{fmtDuration(service.durationMinutes)}</div>
+                  <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>{formatDuration(service.durationMinutes)}</div>
                 </div>
 
                 {/* Actions */}

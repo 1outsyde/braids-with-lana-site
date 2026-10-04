@@ -25,7 +25,9 @@ export default function ServiceCard({ service }: ServiceCardProps) {
 
       <div className="flex items-center gap-4 mt-auto">
         <span className="price">{formatPrice(service.price)}</span>
-        <span className="duration-tag">{formatDuration(duration)}</span>
+        {formatDuration(duration) && (
+          <span className="duration-tag">{formatDuration(duration)}</span>
+        )}
       </div>
       <span className="text-body-sm text-muted">
         {consumerLocationLabel(service.serviceLocationType)}
