@@ -31,7 +31,7 @@ const dmMono = DM_Mono({
 
 // ─── Metadata ─────────────────────────────────────────────────────
 export const metadata: Metadata = {
-  metadataBase: new URL("https://braidsbyLana.com"),
+  metadataBase: new URL("https://braidsbylana.com"),
   title: {
     default: "Braids by Lana | Professional Hair Braiding — Saint Albans, Queens, NY",
     template: "%s | Braids by Lana",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://braidsbyLana.com",
+    url: "https://braidsbylana.com",
     siteName: "Braids by Lana",
     title: "Braids by Lana | Professional Hair Braiding",
     description:
