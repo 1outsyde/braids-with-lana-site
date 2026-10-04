@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { VENDOR_CONFIG } from '@/lib/config'
+import { formatDuration } from '@/lib/outsyde'
 import { consumerLocationLabel, formatLocationLine, normalizeServiceLocationType } from '@/lib/serviceLocation'
 
 // ─── Design tokens ───────────────────────────────────────────────────────────
@@ -294,8 +295,8 @@ function BookingCard({ appt }: { appt: Appointment }) {
       )}
       {(appt.durationMinutes != null || appt.serviceDurationMinutes != null || appt.price != null || appt.totalPrice != null) && (
         <p style={{ fontFamily: FONT_BODY, fontSize: '0.85rem', color: MUTED }}>
-          {(appt.durationMinutes ?? appt.serviceDurationMinutes) != null && `${appt.durationMinutes ?? appt.serviceDurationMinutes} min`}
-          {(appt.durationMinutes ?? appt.serviceDurationMinutes) != null && (appt.price != null || appt.totalPrice != null) && ' · '}
+          {(appt.durationMinutes ?? appt.serviceDurationMinutes) != null && formatDuration(appt.durationMinutes ?? appt.serviceDurationMinutes)}
+          {formatDuration(appt.durationMinutes ?? appt.serviceDurationMinutes) !== '' && (appt.price != null || appt.totalPrice != null) && ' · '}
           {(appt.price != null || appt.totalPrice != null) && formatCents(appt.price ?? appt.totalPrice ?? 0)}
         </p>
       )}

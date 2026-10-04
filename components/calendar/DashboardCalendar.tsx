@@ -13,6 +13,7 @@ import {
   to12h,
   formatTimeRange,
 } from '@/lib/calendar'
+import { formatDuration } from '@/lib/outsyde'
 
 const DAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
 const MONTHS = [
@@ -84,7 +85,7 @@ function EntryRow({ entry, compact = false }: { entry: DayEntry; compact?: boole
           {booking.clientName}
           {compact
             ? ` · ${formatTimeRange(booking.startTime, booking.durationMinutes)}`
-            : ` · ${booking.durationMinutes} min`}
+            : formatDuration(booking.durationMinutes) ? ` · ${formatDuration(booking.durationMinutes)}` : ''}
         </div>
       </div>
       <span style={{
