@@ -211,13 +211,41 @@ export function formatPrice(cents: number): string {
 }
 
 /**
- * Format duration in human-readable form.
+ * Format a duration in minutes: "45 minutes", "1 hour", "6 hours 40 minutes".
+ * Returns "" for anything that is not a positive number of minutes.
  */
-export function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes}min`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m > 0 ? `${h}h ${m}min` : `${h}hr`;
+const wholeMinutes = (value: unknown): number => {
+  const m = Math.round(Number(value));
+  return Number.isFinite(m) && m > 0 ? m : 0;
+};
+
+export function formatDuration(minutes: number | null | undefined): string {
+  const m = wholeMinutes(minutes);
+  if (m === 0) return "";
+  const hours = Math.floor(m / 60);
+  const rest = m % 60;
+  const parts: string[] = [];
+  if (hours > 0) parts.push(`${hours} hour${hours === 1 ? "" : "s"}`);
+  if (rest > 0) parts.push(`${rest} minute${rest === 1 ? "" : "s"}`);
+  return parts.join(" ");
+}
+
+/** Total minutes -> hours and minutes (minutes 0-59). Invalid input is 0 and 0. */
+export function splitMinutes(minutes: number | null | undefined): { hours: number; minutes: number } {
+  const m = wholeMinutes(minutes);
+  return { hours: Math.floor(m / 60), minutes: m % 60 };
+}
+
+/** Hours and minutes boxes -> total minutes. An empty or invalid box counts as 0. */
+export function joinMinutes(
+  hours: number | string | null | undefined,
+  minutes: number | string | null | undefined,
+): number {
+  const whole = (v: number | string | null | undefined): number => {
+    const n = typeof v === "string" ? parseInt(v, 10) : Math.trunc(Number(v));
+    return Number.isFinite(n) && n > 0 ? n : 0;
+  };
+  return whole(hours) * 60 + whole(minutes);
 }
 
 // ─── Booking ──────────────────────────────────────────────────────
