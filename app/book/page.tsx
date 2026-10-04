@@ -510,8 +510,7 @@ function PaymentStep({
   const [depositInfo, setDepositInfo] = useState<{
     depositAmountCents: number | null
     servicePriceCents: number
-    chargeAmountCents: number
-    grossChargeAmountCents: number
+    grossChargeAmountCents: number | null
     depositNonRefundable: boolean
   } | null>(null)
 
@@ -615,8 +614,7 @@ function PaymentStep({
       setDepositInfo({
         depositAmountCents: piData.depositAmountCents ?? null,
         servicePriceCents: piData.servicePriceCents ?? service.price,
-        chargeAmountCents: piData.chargeAmountCents ?? service.price,
-        grossChargeAmountCents: piData.feeBreakdown?.grossChargeAmount ?? piData.chargeAmountCents ?? service.price,
+        grossChargeAmountCents: piData.feeBreakdown?.grossChargeAmount ?? null,
         depositNonRefundable: piData.depositAmountCents != null,
       })
       setPhase('ready')
@@ -645,7 +643,7 @@ function PaymentStep({
       <div style={{ background: '#FFF8F2', border: `1px solid #c8e8ea`, borderRadius: 8, padding: '16px 20px', marginBottom: 24 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
           <span style={{ fontWeight: 600, color: T.navy, fontSize: 15 }}>{service.name}</span>
-          {depositInfo ? (
+          {depositInfo?.grossChargeAmountCents != null ? (
             <span style={{ fontWeight: 700, color: T.gold, fontSize: 15 }}>${(depositInfo.grossChargeAmountCents / 100).toFixed(2)} due now</span>
           ) : (
             <span style={{ fontWeight: 700, color: T.gold, fontSize: 15 }}>${(service.price / 100).toFixed(2)}</span>
@@ -657,7 +655,7 @@ function PaymentStep({
           <div style={{ fontSize: 13, color: T.muted }}>{formatDuration(service.durationMinutes)}</div>
         )}
         <div style={{ fontSize: 13, color: T.muted, marginTop: 6 }}>{consumerLocationLabel(locType)}</div>
-        {depositInfo && typeof depositInfo.depositAmountCents === 'number' && (
+        {depositInfo && typeof depositInfo.depositAmountCents === 'number' && depositInfo.grossChargeAmountCents != null && (
           <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #c8e8ea', fontSize: 12, color: T.muted, display: 'flex', flexDirection: 'column', gap: 3 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Service total</span>
