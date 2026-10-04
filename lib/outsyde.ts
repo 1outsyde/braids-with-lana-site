@@ -7,7 +7,11 @@
  */
 
 const API_URL = process.env.NEXT_PUBLIC_OUTSYDE_API_URL;
-const BUSINESS_ID = process.env.NEXT_PUBLIC_BUSINESS_ID;
+// Accept either name; NEXT_PUBLIC_OUTSYDE_BUSINESS_ID (used by lib/config.ts) takes
+// precedence so a single Vercel variable covers both files.
+const BUSINESS_ID =
+  process.env.NEXT_PUBLIC_OUTSYDE_BUSINESS_ID ??
+  process.env.NEXT_PUBLIC_BUSINESS_ID;
 
 if (!API_URL && typeof window === "undefined") {
   console.warn("[outsyde] NEXT_PUBLIC_OUTSYDE_API_URL is not set.");
