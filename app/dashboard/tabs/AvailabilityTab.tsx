@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import HoursEditor from '@/components/availability/HoursEditor'
 import BlocksPanel from '@/components/availability/BlocksPanel'
+import PastClosingToggle from '@/components/availability/PastClosingToggle'
 import { DayHours, BlockRow, fillWeekFromRows, getDefaultHours } from '@/lib/availability'
 import { to24h, to12h } from '@/lib/timeUtils'
 
@@ -173,6 +174,8 @@ export default function AvailabilityTab() {
                   {saveState === 'saving' ? 'Saving…' : saveState === 'saved' ? 'Saved ✓' : 'Save hours'}
                 </button>
               </div>
+
+              <PastClosingToggle theme={{ text: '#1C1008', muted: 'rgba(0,0,0,0.5)', accent: '#F5C518', track: 'rgba(0,0,0,0.15)', border: '#e8f0f1', error: '#c0392b' }} />
             </>
           )}
         </div>
