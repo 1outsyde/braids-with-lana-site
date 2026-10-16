@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import ServiceAddonLibraryTools from '@/components/addons/ServiceAddonLibraryTools'
 import { formatDuration, joinMinutes, splitMinutes } from '@/lib/outsyde'
 import {
   SERVICE_LOCATION_TYPES,
@@ -16,6 +17,10 @@ interface Addon {
   priceCents: number
   durationMinutes: number | null
   isActive: boolean
+  // Add-on library (backend migration 046)
+  businessAddonId?: string | null
+  libraryPriceCents?: number | null
+  needsPriceReview?: boolean
 }
 
 interface DraftAddon {
@@ -1167,6 +1172,14 @@ export default function ServicesPage() {
                                         Remove
                                       </button>
                                     </div>
+                                  )}
+                                  {editingAddonId !== addon.id && editing && (
+                                    <ServiceAddonLibraryTools
+                                      serviceId={editing.id}
+                                      addon={addon}
+                                      allServices={services}
+                                      onChanged={() => loadAddons(editing.id)}
+                                    />
                                   )}
                                 </div>
                               ))}

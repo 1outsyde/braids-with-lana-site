@@ -19,6 +19,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: '/dashboard/calendar', label: 'CALENDAR', show: VENDOR_CONFIG.hasBookings },
   { href: '/dashboard/orders', label: 'ORDERS', show: VENDOR_CONFIG.hasProducts },
   { href: '/dashboard/services', label: 'SERVICES', show: VENDOR_CONFIG.hasServices },
+  { href: '/dashboard/addons', label: 'ADD-ONS', show: VENDOR_CONFIG.hasServices },
   { href: '/dashboard/products', label: 'PRODUCTS', show: VENDOR_CONFIG.hasProducts },
   { href: '/dashboard/availability', label: 'AVAILABILITY', show: VENDOR_CONFIG.hasBookings },
   { href: '/dashboard/analytics', label: 'ANALYTICS', show: VENDOR_CONFIG.hasAnalytics },

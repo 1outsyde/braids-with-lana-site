@@ -148,6 +148,17 @@ const STEPS: Step[] = ['service', 'datetime', 'auth', 'addons', 'payment', 'conf
 const STEP_LABELS = ['Service', 'Date & Time', 'Account', 'Add-ons', 'Review & Pay', 'Confirmed']
 const STEP_LABELS_MOBILE = ['Svc', 'Date', 'Acct', 'Add-ons', 'Pay', 'Done']
 
+
+// The backend refuses a hold when a picked add-on was removed or switched off by
+// the business after the customer chose it. Say that plainly instead of the raw error.
+function holdErrorMessage(body: { message?: string; error?: string }, fallback: string): string {
+  const raw = body.message ?? body.error ?? ''
+  if (/add-on IDs are invalid|do not belong to this service/i.test(raw)) {
+    return 'An add-on you picked is no longer offered. Please go back to the add-ons step and choose again.'
+  }
+  return raw || fallback
+}
+
 function ProgressBar({ step }: { step: Step }) {
   const isMobile = useWindowWidth() < 480
   const labels = isMobile ? STEP_LABELS_MOBILE : STEP_LABELS
@@ -829,7 +840,7 @@ function PaymentStep({
       .then(async res => {
         if (!res.ok) {
           const errBody = await res.json().catch(() => ({}))
-          throw new Error(errBody.message ?? errBody.error ?? 'Could not reserve time slot.')
+          throw new Error(holdErrorMessage(errBody, 'Could not reserve time slot.'))
         }
         return res.json()
       })
@@ -948,7 +959,7 @@ function PaymentStep({
           })
           if (!newHoldRes.ok) {
             const newErr = await newHoldRes.json().catch(() => ({}))
-            throw new Error(newErr.message ?? piResult.body.message ?? 'Unable to initialize payment. Please try again.')
+            throw new Error(holdErrorMessage(newErr, piResult.body.message ?? 'Unable to initialize payment. Please try again.'))
           }
           const newHoldRaw = await newHoldRes.json()
           const newHoldId: string = newHoldRaw.id ?? newHoldRaw.holdId ?? newHoldRaw.hold_id
