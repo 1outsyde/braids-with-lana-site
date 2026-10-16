@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
   const date = searchParams.get('date')
   const serviceDurationMinutes = searchParams.get('serviceDurationMinutes')
   const staffMemberId = searchParams.get('staffMemberId')
+  const serviceId = searchParams.get('serviceId')
+  const addonIds = searchParams.get('addonIds')
 
   if (!date || !serviceDurationMinutes) {
     return NextResponse.json({ error: 'date and serviceDurationMinutes are required' }, { status: 400 })
@@ -20,6 +22,8 @@ export async function GET(req: NextRequest) {
   params.set('date', date)
   params.set('serviceDurationMinutes', serviceDurationMinutes)
   if (staffMemberId) params.set('staffMemberId', staffMemberId)
+  if (serviceId) params.set('serviceId', serviceId)
+  if (addonIds) params.set('addonIds', addonIds)
 
   const res = await fetch(`${API_URL}/api/availability/slots?${params.toString()}`, {
     headers: { 'Content-Type': 'application/json' },
