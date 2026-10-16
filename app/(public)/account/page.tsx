@@ -40,6 +40,12 @@ interface Order {
   items?: { name: string; variantLabel?: string; quantity: number; price?: number }[]
 }
 
+interface ApptAddon {
+  id: string
+  name: string
+  priceCents: number
+}
+
 interface Appointment {
   id: string
   bookingNumber?: string
@@ -66,6 +72,9 @@ interface Appointment {
   customerServiceCity?: string | null
   customerServiceState?: string | null
   customerServiceZipCode?: string | null
+  addons?: ApptAddon[]
+  customerDetails?: string | null
+  inPersonDueCents?: number | null
 }
 
 interface PointTransaction {
@@ -298,6 +307,21 @@ function BookingCard({ appt }: { appt: Appointment }) {
           {(appt.durationMinutes ?? appt.serviceDurationMinutes) != null && formatDuration(appt.durationMinutes ?? appt.serviceDurationMinutes)}
           {formatDuration(appt.durationMinutes ?? appt.serviceDurationMinutes) !== '' && (appt.price != null || appt.totalPrice != null) && ' · '}
           {(appt.price != null || appt.totalPrice != null) && formatCents(appt.price ?? appt.totalPrice ?? 0)}
+        </p>
+      )}
+      {appt.addons && appt.addons.length > 0 && (
+        <p style={{ fontFamily: FONT_BODY, fontSize: '0.82rem', color: MUTED, marginTop: 4 }}>
+          Add-ons: {appt.addons.map(a => a.name).join(', ')}
+        </p>
+      )}
+      {appt.inPersonDueCents != null && appt.inPersonDueCents > 0 && (
+        <p style={{ fontFamily: FONT_BODY, fontSize: '0.82rem', color: MUTED, marginTop: 4 }}>
+          {formatCents(appt.inPersonDueCents)} remaining due at appointment
+        </p>
+      )}
+      {appt.customerDetails && (
+        <p style={{ fontFamily: FONT_BODY, fontSize: '0.82rem', color: MUTED, marginTop: 4, fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>
+          &ldquo;{appt.customerDetails}&rdquo;
         </p>
       )}
       <p style={{ fontFamily: FONT_BODY, fontSize: '0.85rem', color: MUTED, marginTop: 6 }}>

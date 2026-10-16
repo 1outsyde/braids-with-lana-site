@@ -9,6 +9,12 @@ import { formatLocationLine } from '@/lib/serviceLocation'
 
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'declined'
 
+interface BookingAddon {
+  id: string
+  name: string
+  priceCents: number
+}
+
 interface Booking {
   id: string
   bookingNumber: number
@@ -31,6 +37,10 @@ interface Booking {
   customerServiceState?: string | null
   customerServiceZipCode?: string | null
   serviceLocationType?: string | null
+  addons?: BookingAddon[]
+  addonsTotalCents?: number | null
+  customerDetails?: string | null
+  inPersonDueCents?: number | null
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -183,6 +193,21 @@ export default function BookingsPage() {
                 {upNext.customer_name}
               </div>
               <div style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', marginTop: 3 }}>{upNext.serviceName ?? upNext.service_name}</div>
+              {upNext.addons && upNext.addons.length > 0 && (
+                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 4 }}>
+                  Add-ons: {upNext.addons.map(a => a.name).join(', ')}
+                </div>
+              )}
+              {upNext.inPersonDueCents != null && upNext.inPersonDueCents > 0 && (
+                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 3 }}>
+                  Collect in person: {fmtMoney(upNext.inPersonDueCents)}
+                </div>
+              )}
+              {upNext.customerDetails && (
+                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 4, fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>
+                  &ldquo;{upNext.customerDetails}&rdquo;
+                </div>
+              )}
               <div style={{ fontSize: 13, color: '#1C1008', marginTop: 6, fontWeight: 500 }}>
                 {fmtDate(upNext.appointment_date ?? upNext.appointmentDate)}{fmtTime(upNext) ? ` · ${fmtTime(upNext)}` : ''}
               </div>
@@ -274,6 +299,17 @@ export default function BookingsPage() {
                         ])}
                       </div>
                     )}
+                    {b.addons && b.addons.length > 0 && (
+                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 4 }}>
+                        Add-ons: {b.addons.map(a => a.name).join(', ')}
+                        {b.addonsTotalCents != null && ` · ${fmtMoney(b.addonsTotalCents)}`}
+                      </div>
+                    )}
+                    {b.customerDetails && (
+                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 4, fontStyle: 'italic' }}>
+                        &ldquo;{b.customerDetails}&rdquo;
+                      </div>
+                    )}
                     <div className="flex items-center gap-3 mt-3 flex-wrap">
                       <span style={{ fontSize: 13, color: 'rgba(0,0,0,0.6)' }}>
                         {fmtDate(b.appointment_date ?? b.appointmentDate)}{time ? ` · ${time}` : ''}
@@ -281,6 +317,11 @@ export default function BookingsPage() {
                       {b.total_amount != null && (
                         <span style={{ fontSize: 14, fontWeight: 600, color: '#F5C518' }}>
                           {fmtMoney(b.total_amount)}
+                        </span>
+                      )}
+                      {b.inPersonDueCents != null && b.inPersonDueCents > 0 && (
+                        <span style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)' }}>
+                          {fmtMoney(b.inPersonDueCents)} due at appt
                         </span>
                       )}
                     </div>

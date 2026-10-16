@@ -12,6 +12,12 @@ interface Stats {
   monthlyRevenueCents: number
 }
 
+interface AppointmentAddon {
+  id: string
+  name: string
+  priceCents: number
+}
+
 interface Appointment {
   id: string
   appointmentDate: string
@@ -20,6 +26,9 @@ interface Appointment {
   serviceName?: string
   clientName?: string
   totalPrice?: number
+  addons?: AppointmentAddon[]
+  customerDetails?: string | null
+  inPersonDueCents?: number | null
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -217,6 +226,21 @@ export default function DashboardOverviewPage() {
                   <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {appt.serviceName ?? 'Service'}{appt.appointmentTime ? ` · ${appt.appointmentTime}` : ''}
                   </div>
+                  {appt.addons && appt.addons.length > 0 && (
+                    <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      Add-ons: {appt.addons.map(a => a.name).join(', ')}
+                    </div>
+                  )}
+                  {appt.inPersonDueCents != null && appt.inPersonDueCents > 0 && (
+                    <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>
+                      Collect in person: {formatCents(appt.inPersonDueCents)}
+                    </div>
+                  )}
+                  {appt.customerDetails && (
+                    <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', marginTop: 2, fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>
+                      &ldquo;{appt.customerDetails}&rdquo;
+                    </div>
+                  )}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 8 }}>
                   {appt.totalPrice != null && (

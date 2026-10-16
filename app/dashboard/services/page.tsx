@@ -9,6 +9,26 @@ import {
   type ServiceLocationType,
 } from '@/lib/serviceLocation'
 
+interface Addon {
+  id: string
+  name: string
+  description?: string | null
+  priceCents: number
+  durationMinutes: number | null
+  isActive: boolean
+}
+
+interface DraftAddon {
+  localId: string
+  name: string
+  description: string | null
+  priceCents: number
+  durationMinutes: number
+}
+
+type AddonFormState = { name: string; description: string; price: string; addsTime: boolean; durationMinutes: string }
+const EMPTY_ADDON_FORM: AddonFormState = { name: '', description: '', price: '', addsTime: false, durationMinutes: '' }
+
 interface VendorService {
   id: string
   name: string
@@ -94,6 +114,20 @@ export default function ServicesPage() {
   const [formImageUrl, setFormImageUrl] = useState<string | null>(null)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [applyingDeposit, setApplyingDeposit] = useState(false)
+  const [addons, setAddons] = useState<Addon[]>([])
+  const [addonsLoading, setAddonsLoading] = useState(false)
+  const [addonsLoadError, setAddonsLoadError] = useState<string | null>(null)
+  const [showAddonForm, setShowAddonForm] = useState(false)
+  const [addonForm, setAddonForm] = useState<AddonFormState>(EMPTY_ADDON_FORM)
+  const [savingAddon, setSavingAddon] = useState(false)
+  const [addonError, setAddonError] = useState<string | null>(null)
+  const [editingAddonId, setEditingAddonId] = useState<string | null>(null)
+  const [editAddonForm, setEditAddonForm] = useState<AddonFormState>(EMPTY_ADDON_FORM)
+  const [savingEditAddon, setSavingEditAddon] = useState(false)
+  const [draftAddons, setDraftAddons] = useState<DraftAddon[]>([])
+  const [showDraftAddonForm, setShowDraftAddonForm] = useState(false)
+  const [editingDraftLocalId, setEditingDraftLocalId] = useState<string | null>(null)
+  const [draftForm, setDraftForm] = useState<AddonFormState>(EMPTY_ADDON_FORM)
   // form.durationMinutes holds the total minutes; these hold what was typed in the two boxes.
   const [durationHours, setDurationHours] = useState('1')
   const [durationMins, setDurationMins] = useState('0')
@@ -136,6 +170,11 @@ export default function ServicesPage() {
     loadDuration(EMPTY_FORM.durationMinutes)
     setFormError(null)
     setFormImageUrl(null)
+    setDraftAddons([])
+    setShowDraftAddonForm(false)
+    setEditingDraftLocalId(null)
+    setDraftForm(EMPTY_ADDON_FORM)
+    setAddonError(null)
     setShowForm(true)
   }
 
@@ -162,6 +201,10 @@ export default function ServicesPage() {
     loadDuration(String(service.durationMinutes))
     setFormError(null)
     setFormImageUrl(service.imageUrl ?? null)
+    setAddons([])
+    setShowAddonForm(false)
+    setAddonError(null)
+    loadAddons(service.id)
     setShowForm(true)
   }
 
@@ -172,6 +215,222 @@ export default function ServicesPage() {
     setFormError(null)
     setFormImageUrl(null)
     setApplyingDeposit(false)
+    setAddons([])
+    setAddonsLoadError(null)
+    setShowAddonForm(false)
+    setAddonForm(EMPTY_ADDON_FORM)
+    setAddonError(null)
+    setEditingAddonId(null)
+    setEditAddonForm(EMPTY_ADDON_FORM)
+    setDraftAddons([])
+    setShowDraftAddonForm(false)
+    setEditingDraftLocalId(null)
+    setDraftForm(EMPTY_ADDON_FORM)
+  }
+
+  async function loadAddons(serviceId: string) {
+    setAddonsLoading(true)
+    setAddonsLoadError(null)
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch(`/api/admin/services/${serviceId}/addons`, {
+        headers: authHeaders(token),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      setAddons(Array.isArray(data) ? data : (data.addons ?? []))
+    } catch {
+      setAddonsLoadError('Could not load add-ons.')
+    } finally {
+      setAddonsLoading(false)
+    }
+  }
+
+  async function handleAddAddon() {
+    if (!editing) return
+    setAddonError(null)
+    const name = addonForm.name.trim()
+    if (!name) { setAddonError('Add-on name is required.'); return }
+    if (name.length > 80) { setAddonError('Name must be 80 characters or fewer.'); return }
+    const price = parseFloat(addonForm.price)
+    if (isNaN(price) || price < 0 || price > 1000) { setAddonError('Enter a price between $0 and $1,000.'); return }
+    let dur = 0
+    if (addonForm.addsTime) {
+      const durRaw = addonForm.durationMinutes.trim()
+      dur = durRaw ? parseInt(durRaw, 10) : 0
+      if (!durRaw || isNaN(dur) || dur < 5 || dur > 480) { setAddonError('Extra minutes must be between 5 and 480.'); return }
+    }
+    const description = addonForm.description.trim() || null
+    if (description && description.length > 300) { setAddonError('Description must be 300 characters or fewer.'); return }
+    setSavingAddon(true)
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch(`/api/admin/services/${editing.id}/addons`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+        body: JSON.stringify({ name, description, priceCents: Math.round(price * 100), durationMinutes: dur }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        setAddonError((err as { message?: string; error?: string }).message ?? (err as { error?: string }).error ?? 'Could not save add-on.')
+        return
+      }
+      setAddonForm(EMPTY_ADDON_FORM)
+      setShowAddonForm(false)
+      await loadAddons(editing.id)
+    } catch {
+      setAddonError('Could not save add-on.')
+    } finally {
+      setSavingAddon(false)
+    }
+  }
+
+  async function handleDeleteAddon(addonId: string) {
+    if (!editing) return
+    setAddonError(null)
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch(`/api/admin/services/${editing.id}/addons/${addonId}`, {
+        method: 'DELETE',
+        headers: authHeaders(token),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        setAddonError((err as { message?: string; error?: string }).message ?? (err as { error?: string }).error ?? 'Could not delete add-on.')
+        return
+      }
+      await loadAddons(editing.id)
+    } catch {
+      setAddonError('Could not delete add-on.')
+    }
+  }
+
+  async function handleToggleAddon(addon: Addon) {
+    if (!editing) return
+    setAddonError(null)
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch(`/api/admin/services/${editing.id}/addons/${addon.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+        body: JSON.stringify({ isActive: !addon.isActive }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        setAddonError((err as { message?: string; error?: string }).message ?? (err as { error?: string }).error ?? 'Could not update add-on.')
+        return
+      }
+      await loadAddons(editing.id)
+    } catch {
+      setAddonError('Could not update add-on.')
+    }
+  }
+
+  async function handleSaveEditAddon() {
+    if (!editing || !editingAddonId) return
+    setAddonError(null)
+    const name = editAddonForm.name.trim()
+    if (!name) { setAddonError('Add-on name is required.'); return }
+    if (name.length > 80) { setAddonError('Name must be 80 characters or fewer.'); return }
+    const price = parseFloat(editAddonForm.price)
+    if (isNaN(price) || price < 0 || price > 1000) { setAddonError('Enter a price between $0 and $1,000.'); return }
+    let dur = 0
+    if (editAddonForm.addsTime) {
+      const durRaw = editAddonForm.durationMinutes.trim()
+      dur = durRaw ? parseInt(durRaw, 10) : 0
+      if (!durRaw || isNaN(dur) || dur < 5 || dur > 480) { setAddonError('Extra minutes must be between 5 and 480.'); return }
+    }
+    const description = editAddonForm.description.trim() || null
+    if (description && description.length > 300) { setAddonError('Description must be 300 characters or fewer.'); return }
+    setSavingEditAddon(true)
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const res = await fetch(`/api/admin/services/${editing.id}/addons/${editingAddonId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+        body: JSON.stringify({ name, description, priceCents: Math.round(price * 100), durationMinutes: dur }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        setAddonError((err as { message?: string; error?: string }).message ?? (err as { error?: string }).error ?? 'Could not update add-on.')
+        return
+      }
+      setEditingAddonId(null)
+      await loadAddons(editing.id)
+    } catch {
+      setAddonError('Could not update add-on.')
+    } finally {
+      setSavingEditAddon(false)
+    }
+  }
+
+  function validateAddonForm(f: AddonFormState): string | null {
+    const name = f.name.trim()
+    if (!name) return 'Add-on name is required.'
+    if (name.length > 80) return 'Name must be 80 characters or fewer.'
+    const price = parseFloat(f.price)
+    if (isNaN(price) || price < 0 || price > 1000) return 'Enter a price between $0 and $1,000.'
+    if (f.addsTime) {
+      const dur = parseInt(f.durationMinutes, 10)
+      if (!f.durationMinutes.trim() || isNaN(dur) || dur < 5 || dur > 480) return 'Extra minutes must be between 5 and 480.'
+    }
+    const desc = f.description.trim()
+    if (desc && desc.length > 300) return 'Description must be 300 characters or fewer.'
+    return null
+  }
+
+  function addonFormToDraft(f: AddonFormState, localId?: string): DraftAddon {
+    return {
+      localId: localId ?? crypto.randomUUID(),
+      name: f.name.trim(),
+      description: f.description.trim() || null,
+      priceCents: Math.round(parseFloat(f.price) * 100),
+      durationMinutes: f.addsTime ? parseInt(f.durationMinutes, 10) : 0,
+    }
+  }
+
+  function handleAddDraftAddon() {
+    setAddonError(null)
+    const err = validateAddonForm(draftForm)
+    if (err) { setAddonError(err); return }
+    if (draftAddons.length >= 20) { setAddonError('Maximum 20 add-ons per service.'); return }
+    setDraftAddons(prev => [...prev, addonFormToDraft(draftForm)])
+    setDraftForm(EMPTY_ADDON_FORM)
+    setShowDraftAddonForm(false)
+  }
+
+  function handleSaveDraftEdit() {
+    if (!editingDraftLocalId) return
+    setAddonError(null)
+    const err = validateAddonForm(draftForm)
+    if (err) { setAddonError(err); return }
+    setDraftAddons(prev => prev.map(d =>
+      d.localId === editingDraftLocalId ? addonFormToDraft(draftForm, editingDraftLocalId) : d
+    ))
+    setEditingDraftLocalId(null)
+    setDraftForm(EMPTY_ADDON_FORM)
+  }
+
+  async function handleSaveSingleDraft(draft: DraftAddon) {
+    if (!editing) return
+    setAddonError(null)
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const r = await fetch(`/api/admin/services/${editing.id}/addons`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
+        body: JSON.stringify({ name: draft.name, description: draft.description, priceCents: draft.priceCents, durationMinutes: draft.durationMinutes }),
+      })
+      if (!r.ok) {
+        const err = await r.json().catch(() => ({}))
+        setAddonError(`"${draft.name}": ${(err as { message?: string; error?: string }).message ?? (err as { error?: string }).error ?? 'Could not save.'}`)
+        return
+      }
+      setDraftAddons(prev => prev.filter(d => d.localId !== draft.localId))
+      await loadAddons(editing.id)
+    } catch {
+      setAddonError(`Could not save "${draft.name}".`)
+    }
   }
 
   async function handleImageUpload(file: File) {
@@ -257,6 +516,56 @@ export default function ServicesPage() {
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error((err as { message?: string }).message ?? 'Save failed')
+      }
+
+      const responseData = await res.json().catch(() => ({})) as { id?: string; service?: { id?: string }; status?: VendorService['status'] }
+
+      if (!editing && draftAddons.length > 0) {
+        const newId = responseData.id ?? responseData.service?.id
+        if (newId) {
+          const tok = localStorage.getItem('outsyde_access_token')
+          const failed: DraftAddon[] = []
+          let firstErr: string | null = null
+          for (const draft of draftAddons) {
+            const r = await fetch(`/api/admin/services/${newId}/addons`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', ...authHeaders(tok) },
+              body: JSON.stringify({ name: draft.name, description: draft.description, priceCents: draft.priceCents, durationMinutes: draft.durationMinutes }),
+            })
+            if (!r.ok) {
+              const e = await r.json().catch(() => ({}))
+              if (!firstErr) firstErr = `"${draft.name}": ${(e as { message?: string; error?: string }).message ?? (e as { error?: string }).error ?? 'Could not save.'}`
+              failed.push(draft)
+            }
+          }
+          if (failed.length > 0) {
+            const newSvc: VendorService = {
+              id: newId, name: form.name.trim(),
+              description: form.description.trim() || null,
+              price: Math.round(parseFloat(form.price) * 100),
+              durationMinutes: parseInt(form.durationMinutes),
+              category: form.category.trim() || null,
+              isActive: form.isActive, isFeatured: false,
+              status: responseData.status ?? 'draft',
+              imageUrl: formImageUrl, stripeProductId: null, stripePriceId: null,
+              depositAmountCents: form.depositEnabled ? Math.round(parseFloat(form.depositAmount) * 100) : null,
+              serviceLocationType: form.serviceLocationType,
+              alternateAddress: form.serviceLocationType === 'alternate' ? form.alternateAddress.trim() : null,
+              alternateCity: form.serviceLocationType === 'alternate' ? form.alternateCity.trim() : null,
+              alternateState: form.serviceLocationType === 'alternate' ? form.alternateState.trim() : null,
+              alternateZipCode: form.serviceLocationType === 'alternate' ? (form.alternateZipCode.trim() || null) : null,
+              virtualLink: form.serviceLocationType === 'virtual' ? form.virtualLink.trim() : null,
+              createdAt: new Date().toISOString(),
+            }
+            setEditing(newSvc)
+            setDraftAddons(failed)
+            setAddonError(firstErr ? `Add-on failed — ${firstErr}. Retry below.` : 'Some add-ons could not be saved.')
+            await loadAddons(newId)
+            await loadServices()
+            setSaving(false)
+            return
+          }
+        }
       }
 
       closeForm()
@@ -728,6 +1037,164 @@ export default function ServicesPage() {
                   )}
                 </div>
 
+                {/* Add-ons section */}
+                <div style={{ borderTop: '1px solid #eef1f2', paddingTop: 16 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: '#1C1008', marginBottom: 4 }}>
+                    Add-ons <span style={{ fontWeight: 400, color: '#5C3D2E' }}>(optional)</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: '#5C3D2E', marginBottom: 14, lineHeight: 1.5 }}>
+                    Extras clients can choose when booking, e.g. rhinestones or custom letters. Each can add to the price and, if you choose, the appointment time.
+                  </div>
+
+                  {addonError && <p style={{ fontSize: 12, color: '#991B1B', marginBottom: 8 }}>{addonError}</p>}
+
+                  {/* Draft add-ons — shown for NEW services, and as a retry list on partial failure */}
+                  {(!editing || draftAddons.length > 0) && (
+                    <div style={{ marginBottom: editing && draftAddons.length > 0 ? 12 : 0 }}>
+                      {editing && draftAddons.length > 0 && (
+                        <div style={{ fontSize: 11, fontWeight: 600, color: '#F5C518', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                          Unsaved — retry each one:
+                        </div>
+                      )}
+                      {draftAddons.length > 0 && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
+                          {draftAddons.map(draft => (
+                            <div key={draft.localId}>
+                              {editingDraftLocalId === draft.localId ? (
+                                <AddonInlineForm
+                                  form={draftForm} setForm={setDraftForm}
+                                  onSave={handleSaveDraftEdit}
+                                  onCancel={() => { setEditingDraftLocalId(null); setDraftForm(EMPTY_ADDON_FORM) }}
+                                  saving={false}
+                                />
+                              ) : (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fafafa', borderRadius: 8, padding: '8px 12px', border: editing ? '1px solid rgba(201,168,76,0.3)' : '1px solid #e0e0e0' }}>
+                                  <div style={{ flex: 1, minWidth: 0 }}>
+                                    <span style={{ fontSize: 13, fontWeight: 500, color: '#1C1008' }}>{draft.name}</span>
+                                    <span style={{ fontSize: 12, color: '#E8630A', marginLeft: 8 }}>+${(draft.priceCents / 100).toFixed(2)}</span>
+                                    <span style={{ fontSize: 11, color: '#5C3D2E', marginLeft: 6 }}>
+                                      {draft.durationMinutes > 0 ? `+${draft.durationMinutes} min` : 'No extra time'}
+                                    </span>
+                                  </div>
+                                  {editing ? (
+                                    <button type="button" onClick={() => handleSaveSingleDraft(draft)}
+                                      style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, border: 'none', background: '#E8630A', color: '#fff', fontWeight: 600, cursor: 'pointer', flexShrink: 0 }}>
+                                      Retry
+                                    </button>
+                                  ) : (
+                                    <>
+                                      <button type="button"
+                                        onClick={() => { setEditingDraftLocalId(draft.localId); setDraftForm({ name: draft.name, description: draft.description ?? '', price: (draft.priceCents / 100).toFixed(2), addsTime: draft.durationMinutes > 0, durationMinutes: draft.durationMinutes > 0 ? String(draft.durationMinutes) : '' }) }}
+                                        style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, border: '1px solid #e0e0e0', background: 'transparent', color: '#5C3D2E', cursor: 'pointer', flexShrink: 0 }}>
+                                        Edit
+                                      </button>
+                                      <button type="button"
+                                        onClick={() => setDraftAddons(prev => prev.filter(d => d.localId !== draft.localId))}
+                                        style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.25)', background: 'transparent', color: '#991B1B', cursor: 'pointer', flexShrink: 0 }}>
+                                        Remove
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {!editing && draftAddons.length < 20 && !showDraftAddonForm && !editingDraftLocalId && (
+                        <button type="button" onClick={() => setShowDraftAddonForm(true)}
+                          style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#E8630A', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
+                          + Add an add-on
+                        </button>
+                      )}
+                      {!editing && draftAddons.length >= 20 && (
+                        <p style={{ fontSize: 12, color: '#5C3D2E' }}>Maximum 20 add-ons reached.</p>
+                      )}
+                      {!editing && showDraftAddonForm && (
+                        <AddonInlineForm
+                          form={draftForm} setForm={setDraftForm}
+                          onSave={handleAddDraftAddon}
+                          onCancel={() => { setShowDraftAddonForm(false); setDraftForm(EMPTY_ADDON_FORM); setAddonError(null) }}
+                          saving={false}
+                        />
+                      )}
+                    </div>
+                  )}
+
+                  {/* Saved add-ons — existing services only */}
+                  {editing && (
+                    <>
+                      {addonsLoading ? (
+                        <p style={{ fontSize: 12, color: '#5C3D2E' }}>Loading…</p>
+                      ) : addonsLoadError ? (
+                        <p style={{ fontSize: 12, color: '#991B1B' }}>{addonsLoadError}</p>
+                      ) : (
+                        <>
+                          {addons.length > 0 && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: 10 }}>
+                              {addons.map(addon => (
+                                <div key={addon.id}>
+                                  {editingAddonId === addon.id ? (
+                                    <AddonInlineForm
+                                      form={editAddonForm} setForm={setEditAddonForm}
+                                      onSave={handleSaveEditAddon}
+                                      onCancel={() => { setEditingAddonId(null); setAddonError(null) }}
+                                      saving={savingEditAddon}
+                                    />
+                                  ) : (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#fafafa', borderRadius: 8, padding: '8px 12px' }}>
+                                      <div
+                                        onClick={() => handleToggleAddon(addon)}
+                                        title={addon.isActive ? 'Active — click to disable' : 'Disabled — click to enable'}
+                                        style={{ width: 32, height: 18, borderRadius: 9, position: 'relative', cursor: 'pointer', flexShrink: 0, background: addon.isActive ? '#E8630A' : '#e0e0e0', transition: 'background 0.2s' }}
+                                      >
+                                        <div style={{ position: 'absolute', top: 1, left: addon.isActive ? 15 : 1, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
+                                      </div>
+                                      <div style={{ flex: 1, minWidth: 0 }}>
+                                        <span style={{ fontSize: 13, fontWeight: 500, color: addon.isActive ? '#1C1008' : '#5C3D2E' }}>{addon.name}</span>
+                                        <span style={{ fontSize: 12, color: '#E8630A', marginLeft: 8 }}>+${(addon.priceCents / 100).toFixed(2)}</span>
+                                        <span style={{ fontSize: 11, color: '#5C3D2E', marginLeft: 6 }}>
+                                          {(addon.durationMinutes ?? 0) > 0 ? `+${addon.durationMinutes} min` : 'No extra time'}
+                                        </span>
+                                      </div>
+                                      <button type="button"
+                                        onClick={() => { setEditingAddonId(addon.id); setShowAddonForm(false); setAddonError(null); setEditAddonForm({ name: addon.name, description: addon.description ?? '', price: (addon.priceCents / 100).toFixed(2), addsTime: (addon.durationMinutes ?? 0) > 0, durationMinutes: (addon.durationMinutes ?? 0) > 0 ? String(addon.durationMinutes) : '' }) }}
+                                        style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, border: '1px solid #e0e0e0', background: 'transparent', color: '#5C3D2E', cursor: 'pointer', flexShrink: 0 }}>
+                                        Edit
+                                      </button>
+                                      <button type="button" onClick={() => handleDeleteAddon(addon.id)}
+                                        style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, border: '1px solid rgba(239,68,68,0.25)', background: 'transparent', color: '#991B1B', cursor: 'pointer', flexShrink: 0 }}>
+                                        Remove
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          {(addons.length + draftAddons.length) < 20 && !showAddonForm && !editingAddonId && (
+                            <button type="button" onClick={() => setShowAddonForm(true)}
+                              style={{ fontSize: 13, padding: '8px 18px', borderRadius: 8, border: 'none', background: '#E8630A', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>
+                              + Add an add-on
+                            </button>
+                          )}
+                          {(addons.length + draftAddons.length) >= 20 && (
+                            <p style={{ fontSize: 12, color: '#5C3D2E' }}>Maximum 20 add-ons reached.</p>
+                          )}
+                          {showAddonForm && (
+                            <AddonInlineForm
+                              form={addonForm} setForm={setAddonForm}
+                              onSave={handleAddAddon}
+                              onCancel={() => { setShowAddonForm(false); setAddonForm(EMPTY_ADDON_FORM); setAddonError(null) }}
+                              saving={savingAddon}
+                            />
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+
                 {formError && (
                   <p style={{ fontSize: 13, color: '#991B1B', margin: 0 }}>{formError}</p>
                 )}
@@ -946,6 +1413,90 @@ const inputStyle: React.CSSProperties = {
   fontFamily: "'DM Sans', sans-serif",
   outline: 'none',
   boxSizing: 'border-box',
+}
+
+function AddonInlineForm({
+  form, setForm, onSave, onCancel, saving,
+}: {
+  form: AddonFormState
+  setForm: React.Dispatch<React.SetStateAction<AddonFormState>>
+  onSave: () => void
+  onCancel: () => void
+  saving: boolean
+}) {
+  return (
+    <div style={{ background: '#fafafa', borderRadius: 10, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 10 }}>
+        <div>
+          <div style={{ fontSize: 11, color: '#5C3D2E', marginBottom: 4 }}>Name * (1–80)</div>
+          <input
+            value={form.name} maxLength={80}
+            onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+            placeholder="e.g. Rhinestones"
+            style={{ ...inputStyle, height: 36, fontSize: 13 }}
+            onFocus={e => { e.currentTarget.style.borderColor = '#E8630A' }}
+            onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0' }}
+          />
+        </div>
+        <div>
+          <div style={{ fontSize: 11, color: '#5C3D2E', marginBottom: 4 }}>Price ($0–$1,000) *</div>
+          <input
+            type="number" min="0" max="1000" step="0.01"
+            value={form.price}
+            onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
+            placeholder="0.00"
+            style={{ ...inputStyle, height: 36, fontSize: 13 }}
+            onFocus={e => { e.currentTarget.style.borderColor = '#E8630A' }}
+            onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0' }}
+          />
+        </div>
+      </div>
+      <div>
+        <div style={{ fontSize: 11, color: '#5C3D2E', marginBottom: 4 }}>Description (≤300)</div>
+        <input
+          value={form.description} maxLength={300}
+          onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+          placeholder="Brief description…"
+          style={{ ...inputStyle, height: 36, fontSize: 13 }}
+          onFocus={e => { e.currentTarget.style.borderColor = '#E8630A' }}
+          onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0' }}
+        />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ fontSize: 12, color: '#1C1008' }}>Adds time to the appointment</div>
+        <div
+          onClick={() => setForm(f => ({ ...f, addsTime: !f.addsTime, durationMinutes: '' }))}
+          style={{ width: 36, height: 20, borderRadius: 10, position: 'relative', cursor: 'pointer', flexShrink: 0, background: form.addsTime ? '#E8630A' : '#e0e0e0', transition: 'background 0.2s' }}
+        >
+          <div style={{ position: 'absolute', top: 2, left: form.addsTime ? 18 : 2, width: 16, height: 16, borderRadius: '50%', background: '#fff', transition: 'left 0.2s' }} />
+        </div>
+      </div>
+      {form.addsTime && (
+        <div>
+          <div style={{ fontSize: 11, color: '#5C3D2E', marginBottom: 4 }}>Extra minutes * (5–480)</div>
+          <input
+            type="number" min="5" max="480" step="5"
+            value={form.durationMinutes}
+            onChange={e => setForm(f => ({ ...f, durationMinutes: e.target.value }))}
+            placeholder="30"
+            style={{ ...inputStyle, height: 36, fontSize: 13, width: 120 }}
+            onFocus={e => { e.currentTarget.style.borderColor = '#E8630A' }}
+            onBlur={e => { e.currentTarget.style.borderColor = '#e0e0e0' }}
+          />
+        </div>
+      )}
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button type="button" onClick={onSave} disabled={saving}
+          style={{ fontSize: 12, padding: '6px 16px', borderRadius: 7, border: 'none', background: '#E8630A', color: '#fff', fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+        <button type="button" onClick={onCancel}
+          style={{ fontSize: 12, padding: '6px 14px', borderRadius: 7, border: '1px solid #e0e0e0', background: 'transparent', color: '#5C3D2E', cursor: 'pointer' }}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
 }
 
 function Field({ label, children, style }: { label: string; children: React.ReactNode; style?: React.CSSProperties }) {
