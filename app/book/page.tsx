@@ -1078,9 +1078,15 @@ function PaymentStep({
       const piResult = await tryPI(holdId)
 
       if (!piResult.ok) {
+        // The backend answers an expired or missing hold with 400
+        // { errorCode: 'HOLD_EXPIRED' | 'HOLD_NOT_FOUND', error: '...' }.
+        const holdErrText = [piResult.body.message, piResult.body.error]
+          .filter((v: unknown) => typeof v === 'string').join(' ')
         const isHoldGone = piResult.status === 404 ||
-          /hold.*(expired|not found|missing|invalid)/i.test(piResult.body.message ?? '') ||
-          /expired|missing|invalid.*hold/i.test(piResult.body.message ?? '')
+          piResult.body.errorCode === 'HOLD_EXPIRED' ||
+          piResult.body.errorCode === 'HOLD_NOT_FOUND' ||
+          /hold.*(expired|not found|missing|invalid)/i.test(holdErrText) ||
+          /expired|missing|invalid.*hold/i.test(holdErrText)
 
         if (isHoldGone) {
           // The hold lapsed. Tell the customer instead of quietly making a new one.
