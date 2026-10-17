@@ -22,6 +22,9 @@ export async function PATCH(req: NextRequest) {
     const incoming = await req.json()
     if ('heroImageUrl' in incoming) {
       upstream = JSON.stringify({ coverImage: incoming.heroImageUrl, coverMediaType: 'image' })
+    } else if ('heroVideoUploadId' in incoming) {
+      // Video cover: Mux upload id; the backend swaps in the stream URL when ready.
+      upstream = JSON.stringify({ coverImage: incoming.heroVideoUploadId, coverMediaType: 'video' })
     } else {
       upstream = JSON.stringify(incoming)
     }
