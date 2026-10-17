@@ -7,6 +7,7 @@ import { consumerLocationLabel } from '@/lib/serviceLocation'
 import { formatDuration } from '@/lib/outsyde'
 import { useAuth } from "@/lib/auth-context"
 import { isAdminEmail } from "@/lib/config"
+import CoverVideo from '@/components/ui/CoverVideo'
 // ── Types ────────────────────────────────────────────────────────────────────
 interface Service {
   id: string
@@ -163,11 +164,15 @@ function HeroPhoto({
   heroImageFailed,
   setHeroImageFailed,
   rounded,
+  mediaType = 'image',
+  poster = null,
 }: {
   heroImage: string | null
   heroImageFailed: boolean
   setHeroImageFailed?: (v: boolean) => void
   rounded?: number | string
+  mediaType?: 'image' | 'video'
+  poster?: string | null
 }) {
   return (
     <div style={{
@@ -178,7 +183,14 @@ function HeroPhoto({
       borderRadius: rounded ?? 24,
       background: 'linear-gradient(145deg, #E8630A 0%, #F5C518 42%, #1C1008 100%)',
     }}>
-      {heroImage && !heroImageFailed ? (
+      {heroImage && mediaType === 'video' ? (
+        // Video cover (muted loop). Still processing on Mux → the wrapper gradient shows.
+        <CoverVideo
+          src={heroImage}
+          poster={poster}
+          style={{ width: '100%', height: '100%', objectPosition: 'center center', display: 'block' }}
+        />
+      ) : heroImage && !heroImageFailed ? (
         <img
           src={heroImage}
           alt="Braids by Lana"
@@ -206,10 +218,12 @@ function HeroPhoto({
 }
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
-function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
+function Hero({ heroImage, heroImageFailed, setHeroImageFailed, heroMediaType = 'image', heroPoster = null }: {
   heroImage: string | null
   heroImageFailed: boolean
   setHeroImageFailed: (v: boolean) => void
+  heroMediaType?: 'image' | 'video'
+  heroPoster?: string | null
 }) {
   const isMobile = useWindowWidth() < 768
 
@@ -245,6 +259,8 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
               heroImage={heroImage}
               heroImageFailed={heroImageFailed}
               setHeroImageFailed={setHeroImageFailed}
+              mediaType={heroMediaType}
+              poster={heroPoster}
               rounded={20}
             />
           </div>
@@ -344,6 +360,8 @@ function Hero({ heroImage, heroImageFailed, setHeroImageFailed }: {
               heroImage={heroImage}
               heroImageFailed={heroImageFailed}
               setHeroImageFailed={setHeroImageFailed}
+              mediaType={heroMediaType}
+              poster={heroPoster}
               rounded={28}
             />
           </div>
@@ -735,6 +753,8 @@ export default function HomePage() {
   const [servicesLoading, setServicesLoading] = useState(true)
   const [heroImage, setHeroImage] = useState<string | null>(null)
   const [heroImageFailed, setHeroImageFailed] = useState(false)
+  const [heroMediaType, setHeroMediaType] = useState<'image' | 'video'>('image')
+  const [heroPoster, setHeroPoster] = useState<string | null>(null)
   const [stylistPhoto, setStylistPhoto] = useState<string | null>(null)
   const [galleryPhotos, setGalleryPhotos] = useState<(string | null)[]>([null, null, null, null])
 
@@ -753,6 +773,8 @@ export default function HomePage() {
       .then(data => {
         const biz = data.business ?? data
         setHeroImage(biz.coverImage ?? biz.cover_image ?? null)
+        setHeroMediaType((biz.coverMediaType ?? biz.cover_media_type) === 'video' ? 'video' : 'image')
+        setHeroPoster(biz.coverPosterUrl ?? null)
         setHeroImageFailed(false)
         setStylistPhoto(biz.siteConfig?.stylistPhoto ?? null)
         setGalleryPhotos(biz.siteConfig?.galleryPhotos ?? [null, null, null, null])
@@ -773,9 +795,12 @@ export default function HomePage() {
         heroImage={heroImage}
         heroImageFailed={heroImageFailed}
         setHeroImageFailed={setHeroImageFailed}
+        heroMediaType={heroMediaType}
+        heroPoster={heroPoster}
       />
       <Services services={services} loading={servicesLoading} />
-      <MeetStylist photo={stylistPhoto} fallback={heroImage} />
+      {/* Image-only spot: a video cover falls back to its still picture */}
+      <MeetStylist photo={stylistPhoto} fallback={heroMediaType === 'video' ? heroPoster : heroImage} />
       <RecentWorkGallery photos={galleryPhotos} fallback={null} />
       <BookCTA />
       <Contact />

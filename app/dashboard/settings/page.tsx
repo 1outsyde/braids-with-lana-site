@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import { useWindowWidth } from '@/lib/useWindowWidth'
+import CoverVideo from '@/components/ui/CoverVideo'
+import { COVER_VIDEO_MAX_SECONDS, uploadCoverVideo } from '@/lib/coverMedia'
 
 export default function SettingsPage() {
   const isMobile = useWindowWidth() < 768
 
   // ── Cover image ──────────────────────────────────────────────────────────────
   const [heroImageUrl, setHeroImageUrl] = useState<string | null>(null)
+  const [heroMediaType, setHeroMediaType] = useState<'image' | 'video'>('image')
+  const [heroPosterUrl, setHeroPosterUrl] = useState<string | null>(null)
   const [heroUploading, setHeroUploading] = useState(false)
   const [heroError, setHeroError] = useState<string | null>(null)
   const [heroSuccess, setHeroSuccess] = useState(false)
@@ -30,6 +34,8 @@ export default function SettingsPage() {
       .then(data => {
         const biz = data.business ?? data
         setHeroImageUrl(biz.coverImage ?? biz.cover_image ?? null)
+        setHeroMediaType((biz.coverMediaType ?? biz.cover_media_type) === 'video' ? 'video' : 'image')
+        setHeroPosterUrl(biz.coverPosterUrl ?? null)
         if (biz.siteConfig) {
           setStylistPhotoUrl(biz.siteConfig.stylistPhoto ?? null)
           setGalleryPhotos(biz.siteConfig.galleryPhotos ?? [null, null, null, null])
@@ -95,6 +101,8 @@ export default function SettingsPage() {
       if (!patchRes.ok) throw new Error(`Profile update failed: ${patchRes.status}`)
 
       setHeroImageUrl(url)
+      setHeroMediaType('image')
+      setHeroPosterUrl(null)
       setHeroSuccess(true)
       setTimeout(() => setHeroSuccess(false), 4000)
     } catch (err) {
@@ -228,6 +236,44 @@ export default function SettingsPage() {
     transition: 'background 0.2s',
   })
 
+  async function handleHeroVideoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setHeroError(null)
+    setHeroSuccess(false)
+    setHeroUploading(true)
+
+    try {
+      const token = localStorage.getItem('outsyde_access_token')
+      const uploadId = await uploadCoverVideo(file, token)
+
+      const patchRes = await fetch('/api/admin/profile', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ heroVideoUploadId: uploadId }),
+      })
+      if (!patchRes.ok) throw new Error(`Profile update failed: ${patchRes.status}`)
+
+      // The backend returns the stream URL straight away if Mux has already finished.
+      const saved = await patchRes.json().catch(() => ({}))
+      const savedCover = saved?.business?.coverImage
+      setHeroImageUrl(typeof savedCover === 'string' && savedCover ? savedCover : uploadId)
+      setHeroMediaType('video')
+      setHeroPosterUrl(null)
+      setHeroSuccess(true)
+      setTimeout(() => setHeroSuccess(false), 4000)
+    } catch (err) {
+      setHeroError(err instanceof Error ? err.message : 'Upload failed. Try again.')
+    } finally {
+      setHeroUploading(false)
+      e.target.value = ''
+    }
+  }
+
   return (
     <div style={{ maxWidth: 680 }}>
       <h1 style={{
@@ -246,14 +292,34 @@ export default function SettingsPage() {
       {/* ── Card 1: Cover Image ────────────────────────────────────────────── */}
       <div style={cardStyle}>
         <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 24, fontWeight: 600, color: '#1C1008', marginBottom: 6 }}>
-          Cover Image
+          Cover Photo or Video
         </h2>
         <p style={{ fontSize: 13, color: '#7A5C4A', marginBottom: 20, lineHeight: 1.6 }}>
-          Your business cover photo — appears on your homepage and across the Outsyde platform.
-          Upload a high-quality braiding photo, at least 1200px wide.
+          Your business cover appears on your homepage and across the Outsyde platform.
+          Upload a high quality braiding photo (at least 1200px wide) or a short video (up to {COVER_VIDEO_MAX_SECONDS} seconds, plays muted on a loop).
         </p>
 
-        {heroImageUrl && (
+        {heroImageUrl && heroMediaType === 'video' && (
+          <div style={{ marginBottom: 24 }}>
+            <CoverVideo
+              src={heroImageUrl}
+              poster={heroPosterUrl}
+              style={{ width: '100%', maxWidth: 480, height: 220, borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block', background: '#1C1008' }}
+              processing={
+                <div style={{
+                  width: '100%', maxWidth: 480, height: 220, borderRadius: 8, border: '1.5px solid #F0D9C8',
+                  background: '#1C1008', color: '#F0D9C8', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', fontSize: 13, textAlign: 'center', padding: '0 24px',
+                }}>
+                  Video uploaded. It is processing and will show on your site in a minute or two.
+                </div>
+              }
+            />
+            <p style={{ fontSize: 11, color: '#B5977A', marginTop: 6 }}>Current cover video</p>
+          </div>
+        )}
+
+        {heroImageUrl && heroMediaType !== 'video' && (
           <div style={{ marginBottom: 24 }}>
             <img
               src={heroImageUrl}
@@ -264,6 +330,7 @@ export default function SettingsPage() {
           </div>
         )}
 
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
         <label style={uploadBtnStyle(heroUploading)}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
@@ -273,9 +340,18 @@ export default function SettingsPage() {
           {heroUploading ? 'Uploading…' : 'Upload cover photo'}
           <input type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} disabled={heroUploading} onChange={handleHeroUpload} />
         </label>
+        <label style={uploadBtnStyle(heroUploading)}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <polygon points="23 7 16 12 23 17 23 7" />
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+          </svg>
+          {heroUploading ? 'Uploading…' : 'Upload cover video'}
+          <input type="file" accept="video/mp4,video/quicktime,video/webm" style={{ display: 'none' }} disabled={heroUploading} onChange={handleHeroVideoUpload} />
+        </label>
+        </div>
 
         {heroError && <p style={{ fontSize: 12, color: '#e05252', marginTop: 12 }}>{heroError}</p>}
-        {heroSuccess && <p style={{ fontSize: 12, color: '#E8630A', marginTop: 12 }}>✓ Cover image updated</p>}
+        {heroSuccess && <p style={{ fontSize: 12, color: '#E8630A', marginTop: 12 }}>✓ Cover updated</p>}
       </div>
 
       {/* ── Card 2: Stylist Photo ──────────────────────────────────────────── */}
