@@ -145,7 +145,7 @@ export default function DashboardOverviewPage() {
         <StatCard
           label="Revenue This Month"
           value={loading ? '—' : formatCents(stats?.monthlyRevenueCents ?? 0)}
-          sub="orders + bookings"
+          sub="paid through Outsyde"
         />
         <StatCard
           label="Services Listed"

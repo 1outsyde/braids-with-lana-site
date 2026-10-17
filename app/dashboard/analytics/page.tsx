@@ -2,29 +2,17 @@
 
 import { useEffect, useState } from 'react'
 
-interface Stats {
-  totalRevenue?: number
-  totalOrders?: number
-  totalBookings?: number
-  avgOrderValue?: number
-  totalCustomers?: number
-  // Backend may use different field names
-  total_revenue?: number
-  total_orders?: number
-  total_bookings?: number
-  avg_order_value?: number
-  total_customers?: number
-}
-
+// GET /api/business/stats returns { stats: { monthlyRevenueCents, bookingCount, orderCount,
+// inPersonDueCents, inPersonCollectedCents, ... } }. Revenue counts only money captured through Outsyde.
 function resolveStats(raw: Record<string, unknown>): {
-  revenue: number; orders: number; bookings: number; avgOrder: number; customers: number
+  revenue: number; orders: number; bookings: number; inPersonDue: number
 } {
+  const s = ((raw && typeof raw.stats === 'object' && raw.stats) || raw || {}) as Record<string, unknown>
   return {
-    revenue: Number(raw.totalRevenue ?? raw.total_revenue ?? 0),
-    orders: Number(raw.totalOrders ?? raw.total_orders ?? 0),
-    bookings: Number(raw.totalBookings ?? raw.total_bookings ?? 0),
-    avgOrder: Number(raw.avgOrderValue ?? raw.avg_order_value ?? 0),
-    customers: Number(raw.totalCustomers ?? raw.total_customers ?? 0),
+    revenue: Number(s.monthlyRevenueCents ?? 0),
+    orders: Number(s.orderCount ?? 0),
+    bookings: Number(s.bookingCount ?? 0),
+    inPersonDue: Number(s.inPersonDueCents ?? 0),
   }
 }
 
@@ -113,10 +101,10 @@ export default function AnalyticsPage() {
         </div>
       ) : stats ? (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <StatCard label="Total Revenue" value={fmtMoney(stats.revenue)} />
-          <StatCard label="Bookings" value={String(stats.bookings)} sub="all time" />
-          <StatCard label="Orders" value={String(stats.orders)} sub="all time" />
-          <StatCard label="Avg Order" value={stats.avgOrder ? fmtMoney(stats.avgOrder) : '—'} />
+          <StatCard label="Revenue This Month" value={fmtMoney(stats.revenue)} sub="paid through Outsyde" />
+          <StatCard label="Due at Appointment" value={fmtMoney(stats.inPersonDue)} sub="paid in person, not through Outsyde" />
+          <StatCard label="Bookings" value={String(stats.bookings)} sub="confirmed and completed" />
+          <StatCard label="Orders" value={String(stats.orders)} sub="paid, all time" />
         </div>
       ) : null}
 
