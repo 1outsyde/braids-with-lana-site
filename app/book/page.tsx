@@ -525,7 +525,9 @@ function PaymentForm({
       setPaying(false)
       // A PaymentIntent cancelled by the backend (hold expired) shows the
       // expired pop-up; ordinary declines keep the inline error.
-      if (error.code === 'payment_intent_unexpected_state' || isHoldExpired()) {
+      const piCanceled = error.code === 'payment_intent_unexpected_state' &&
+        error.payment_intent?.status !== 'succeeded'
+      if (piCanceled || isHoldExpired()) {
         onHoldExpired()
         return
       }
