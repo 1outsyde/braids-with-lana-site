@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback, type ReactNode } from 'react'
+import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { useWindowWidth } from '@/lib/useWindowWidth'
 import { loadStripe } from '@stripe/stripe-js'
 import {
@@ -9,6 +9,7 @@ import {
   useElements,
 } from '@stripe/react-stripe-js'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
 import {
   consumerLocationLabel,
@@ -423,14 +424,89 @@ function AuthStep({ onDone, onBack }: { onDone: () => void; onBack: () => void }
 
 // ─── Step 4: Payment ──────────────────────────────────────────────────────────
 
+// The backend holds the slot for 10 minutes. Used only when neither the
+// payment-intent response (holdExpiresAt) nor the hold response (expiresAt)
+// gives us the real expiry.
+const HOLD_FALLBACK_MS = 10 * 60 * 1000
+
+function parseTime(value: unknown): number | null {
+  if (typeof value !== 'string') return null
+  const t = Date.parse(value)
+  return Number.isNaN(t) ? null : t
+}
+
+function formatCountdown(ms: number): string {
+  const total = Math.max(0, Math.ceil(ms / 1000))
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
+}
+
+function HoldExpiredDialog({ businessName }: { businessName: string }) {
+  const router = useRouter()
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const goHome = useCallback(() => { router.push('/') }, [router])
+
+  useEffect(() => {
+    buttonRef.current?.focus()
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') goHome()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [goHome])
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 1000, background: 'rgba(28,16,8,0.55)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16,
+    }}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="hold-expired-title"
+        aria-describedby="hold-expired-body"
+        style={{
+          position: 'relative', width: '100%', maxWidth: 400, background: T.card, borderRadius: 10,
+          padding: '32px 28px 24px', boxShadow: '0 8px 40px rgba(28,16,8,0.25)', textAlign: 'center',
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={goHome}
+          style={{
+            position: 'absolute', top: 10, right: 12, background: 'none', border: 'none',
+            fontSize: 22, lineHeight: 1, color: T.muted, cursor: 'pointer', padding: 4,
+          }}
+        >
+          ×
+        </button>
+        <h2 id="hold-expired-title" style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 600, color: T.navy, margin: '0 0 10px' }}>
+          Your booking hold expired
+        </h2>
+        <p id="hold-expired-body" style={{ fontSize: 14, color: T.muted, lineHeight: 1.5, margin: '0 0 22px' }}>
+          We held this time for 10 minutes, so it has been released. Please book again.
+        </p>
+        <button ref={buttonRef} type="button" onClick={goHome} style={btnPrimary()}>
+          Back to {businessName}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function PaymentForm({
   clientSecret,
   bookingInfo,
   onSuccess,
+  isHoldExpired,
+  onHoldExpired,
 }: {
   clientSecret: string
   bookingInfo: BookingConfirmation
   onSuccess: () => void
+  isHoldExpired: () => boolean
+  onHoldExpired: () => void
 }) {
   const stripe = useStripe()
   const elements = useElements()
@@ -446,8 +522,14 @@ function PaymentForm({
     if (!card) { setPaying(false); return }
     const { error } = await stripe.confirmCardPayment(clientSecret, { payment_method: { card } })
     if (error) {
-      setPayError(error.message ?? 'Payment failed. Please try again.')
       setPaying(false)
+      // A PaymentIntent cancelled by the backend (hold expired) shows the
+      // expired pop-up; ordinary declines keep the inline error.
+      if (error.code === 'payment_intent_unexpected_state' || isHoldExpired()) {
+        onHoldExpired()
+        return
+      }
+      setPayError(error.message ?? 'Payment failed. Please try again.')
     } else {
       onSuccess()
     }
@@ -520,6 +602,17 @@ function PaymentStep({
   const [alternateAck, setAlternateAck] = useState(false)
   const [virtualAck, setVirtualAck] = useState(false)
   const [customerReady, setCustomerReady] = useState(false)
+  const [holdExpiresAt, setHoldExpiresAt] = useState<number | null>(null)
+  const [holdExpiredFlag, setHoldExpiredFlag] = useState(false)
+  const [now, setNow] = useState(0)
+
+  const holdExpired = holdExpiredFlag || (phase === 'ready' && holdExpiresAt !== null && now >= holdExpiresAt)
+
+  useEffect(() => {
+    if (phase !== 'ready' || holdExpiresAt === null || holdExpired) return
+    const id = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [phase, holdExpiresAt, holdExpired])
 
   useEffect(() => {
     fetch('/api/bookings/business')
@@ -571,6 +664,7 @@ function PaymentStep({
     }
     setPhaseError(null)
     setPhase('holding')
+    const holdStartedAt = Date.now()
     try {
       const holdRes = await fetch('/api/bookings/hold', {
         method: 'POST',
@@ -590,6 +684,7 @@ function PaymentStep({
         console.error('[book] hold response missing id field:', holdData)
         throw new Error('Unable to reserve your time slot. Please try again.')
       }
+      const holdExpiry = parseTime(holdData.expiresAt) ?? holdStartedAt + HOLD_FALLBACK_MS
 
       const customerAddress = locType === 'customer'
         ? customerAddressPayload({ line1, city, state, zipCode })
@@ -603,9 +698,22 @@ function PaymentStep({
       if (!piRes.ok) {
         const errData = await piRes.json().catch(() => ({}))
         console.error('[book] payment-intent error:', piRes.status, errData)
+        const errText = [errData.error, errData.message].filter(v => typeof v === 'string').join(' ')
+        if (
+          errData.errorCode === 'HOLD_EXPIRED' ||
+          errData.code === 'HOLD_EXPIRED' ||
+          (piRes.status === 400 && /expired/i.test(errText))
+        ) {
+          setHoldExpiredFlag(true)
+          setPhase('error')
+          return
+        }
         throw new Error(errData.message ?? 'Unable to initialize payment. Please try again.')
       }
       const piData = await piRes.json()
+
+      setHoldExpiresAt(parseTime(piData.holdExpiresAt) ?? holdExpiry)
+      setNow(Date.now())
 
       setClientSecret(piData.clientSecret)
       setConfirmation({ bookingNumber: piData.bookingNumber, appointmentId: piData.appointmentId })
@@ -778,7 +886,7 @@ function PaymentStep({
         </div>
       )}
 
-      {phase === 'error' && (
+      {phase === 'error' && !holdExpired && (
         <>
           <div style={{ background: T.errorBg, border: `1px solid ${T.errorBorder}`, borderRadius: 6, padding: '12px 16px', marginBottom: 20, color: T.error, fontSize: 13 }}>
             {phaseError}
@@ -787,19 +895,38 @@ function PaymentStep({
         </>
       )}
 
-      {phase === 'ready' && clientSecret && confirmation && (
-        <Elements stripe={stripePromise} options={{ clientSecret }}>
-          <PaymentForm
-            clientSecret={clientSecret}
-            bookingInfo={confirmation}
-            onSuccess={() => onSuccess(confirmation, locationSummary())}
-          />
-        </Elements>
+      {phase === 'ready' && !holdExpired && holdExpiresAt !== null && (
+        <div
+          role="timer"
+          aria-live="off"
+          style={{ display: 'flex', flexWrap: 'wrap', gap: 6, justifyContent: 'space-between', alignItems: 'center', background: '#FFF8F2', border: `1px solid ${T.teal}`, borderRadius: 6, padding: '10px 14px', marginBottom: 16, fontSize: 13, color: T.navy }}
+        >
+          <span>Time held: <strong style={{ color: T.teal, fontVariantNumeric: 'tabular-nums' }}>{formatCountdown(holdExpiresAt - now)}</strong></span>
+          <span style={{ fontSize: 12, color: T.muted }}>Complete payment to secure your time.</span>
+        </div>
       )}
 
-      {phase === 'ready' && (
+      {/* Hidden rather than unmounted when the hold expires, so a confirm
+          already in flight can still finish and reach the confirmation step. */}
+      {phase === 'ready' && clientSecret && confirmation && (
+        <div style={{ display: holdExpired ? 'none' : 'block' }}>
+          <Elements stripe={stripePromise} options={{ clientSecret }}>
+            <PaymentForm
+              clientSecret={clientSecret}
+              bookingInfo={confirmation}
+              onSuccess={() => onSuccess(confirmation, locationSummary())}
+              isHoldExpired={() => holdExpiresAt !== null && Date.now() >= holdExpiresAt}
+              onHoldExpired={() => setHoldExpiredFlag(true)}
+            />
+          </Elements>
+        </div>
+      )}
+
+      {phase === 'ready' && !holdExpired && (
         <button onClick={onBack} style={{ ...btnSecondary, width: '100%', marginTop: 12 }}>Back</button>
       )}
+
+      {holdExpired && <HoldExpiredDialog businessName={business?.name || 'Braids With Lana'} />}
     </div>
   )
 }
