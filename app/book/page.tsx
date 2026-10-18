@@ -1143,9 +1143,6 @@ function PaymentStep({
           console.error('[book] PI/hold amount mismatch — PI grossChargeAmount:', piData.feeBreakdown.grossChargeAmount, 'hold dueNowCents:', holdDisplay.dueNowCents)
           setPiDueNowCents(piData.feeBreakdown.grossChargeAmount)
         }
-        if (amountChargedNow != null && amountChargedNow !== (piData.feeBreakdown?.grossChargeAmount ?? holdDisplay?.dueNowCents)) {
-          setPiDueNowCents(amountChargedNow)
-        }
       }
 
       setClientSecret(piData.clientSecret)
