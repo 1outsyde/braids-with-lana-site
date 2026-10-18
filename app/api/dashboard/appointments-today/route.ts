@@ -14,6 +14,11 @@ function proxyHeaders(req: NextRequest): Record<string, string> {
   }
 }
 
+// Today's Schedule counts only real appointments: requests waiting on the
+// business plus confirmed, completed and no show. Unpaid checkouts (draft,
+// pending_payment) and expired, canceled or declined bookings are left out.
+const TODAY_STATUSES = new Set(['pending_provider', 'confirmed', 'completed', 'no_show'])
+
 export async function GET(req: NextRequest) {
   // Backend doesn't filter by date — fetch a broad page and filter here
   const res = await fetch(`${API}/api/business/appointments?limit=100`, {
@@ -25,7 +30,8 @@ export async function GET(req: NextRequest) {
 
   const today = new Date().toISOString().slice(0, 10) // YYYY-MM-DD
   const todayAppts = (data.appointments ?? [])
-    .filter((a: { appointmentDate?: string }) => a.appointmentDate === today)
+    .filter((a: { appointmentDate?: string; status?: string }) =>
+      a.appointmentDate === today && TODAY_STATUSES.has(String(a.status ?? '')))
     .slice(0, 10)
 
   return NextResponse.json({ appointments: todayAppts })
