@@ -20,6 +20,7 @@ import {
   type ServiceLocationType,
 } from '@/lib/serviceLocation'
 import { formatDuration } from '@/lib/outsyde'
+import UseMyPoints, { PROMO_ERROR_CODES, promoInUseIds, type RewardCode } from '@/components/checkout/UseMyPoints'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
@@ -69,6 +70,12 @@ interface Slot {
 interface BookingConfirmation {
   bookingNumber: string
   appointmentId: string
+}
+
+// Set only when the customer used Outsyde rewards on this booking.
+interface RewardsPaid {
+  discountCents: number
+  chargedNowCents: number
 }
 
 interface HoldData {
@@ -758,6 +765,7 @@ function PaymentForm({
   holdExpiresAtMs,
   onHoldExpired,
   onPayingChange,
+  payAmountCents,
 }: {
   clientSecret: string
   bookingInfo: BookingConfirmation
@@ -765,6 +773,8 @@ function PaymentForm({
   holdExpiresAtMs: number | null
   onHoldExpired: () => void
   onPayingChange: (paying: boolean) => void
+  // Only set when Outsyde rewards are applied: the amount the card is charged now.
+  payAmountCents?: number | null
 }) {
   const stripe = useStripe()
   const elements = useElements()
@@ -812,7 +822,7 @@ function PaymentForm({
         <CardElement options={{ style: { base: { fontSize: '14px', color: T.navy, fontFamily: "'DM Sans', sans-serif" } } }} />
       </div>
       <button type="submit" disabled={paying || !stripe} style={btnPrimary(paying || !stripe)}>
-        {paying ? 'Processing…' : 'Pay & Confirm Booking'}
+        {paying ? 'Processing…' : payAmountCents != null ? `Pay $${(payAmountCents / 100).toFixed(2)} & Confirm Booking` : 'Pay & Confirm Booking'}
       </button>
     </form>
   )
@@ -858,7 +868,7 @@ function PaymentStep({
   existingHoldId: string | null
   existingHoldKey: string | null
   existingHoldData: HoldData | null
-  onSuccess: (conf: BookingConfirmation, locationSummary: string) => void
+  onSuccess: (conf: BookingConfirmation, locationSummary: string, rewards: RewardsPaid | null) => void
   onBack: () => void
   onHoldReady: (holdId: string, holdKey: string, holdData: HoldData) => void
   onClearHold: () => void
@@ -884,6 +894,11 @@ function PaymentStep({
   const [holdExpired, setHoldExpired] = useState(false)
   // While Stripe is confirming, let the payment result decide (success wins).
   const payingRef = useRef(false)
+  // Outsyde rewards. promoCodeId is sent on every payment-intent call (null means no code).
+  const [promoCodeId, setPromoCodeId] = useState<string | null>(null)
+  const [promoDiscountCents, setPromoDiscountCents] = useState(0)
+  const [chargedNowCents, setChargedNowCents] = useState<number | null>(null)
+  const [pointsReloadKey, setPointsReloadKey] = useState(0)
 
   useEffect(() => {
     if (holdExpiresAtMs == null || holdExpired) return
@@ -902,6 +917,8 @@ function PaymentStep({
   const holdSecondsLeft = holdExpiresAtMs != null && nowMs != null
     ? Math.max(0, Math.ceil((holdExpiresAtMs - nowMs) / 1000))
     : null
+  // What the customer pays now before any Outsyde rewards.
+  const dueBeforeRewards = piDueNowCents ?? holdDisplay?.dueNowCents ?? null
 
   async function releaseHold(holdId: string): Promise<void> {
     try {
@@ -1065,7 +1082,7 @@ function PaymentStep({
       const res = await fetch('/api/bookings/payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ holdId: hId, ...customerAddress }),
+        body: JSON.stringify({ holdId: hId, ...customerAddress, promoCodeId }),
       })
       const body = await res.json().catch(() => ({}))
       return { ok: res.ok, status: res.status, body }
@@ -1076,6 +1093,16 @@ function PaymentStep({
       if (!holdId) throw new Error('No time slot reserved. Please go back and try again.')
 
       const piResult = await tryPI(holdId)
+
+      if (!piResult.ok && typeof piResult.body.code === 'string' && PROMO_ERROR_CODES.includes(piResult.body.code)) {
+        // The backend refused the reward. Clear the pick, reload the list, and let the customer choose again.
+        if (piResult.body.code === 'PROMO_IN_USE' && promoCodeId) promoInUseIds.add(promoCodeId)
+        clearRewards()
+        setPointsReloadKey(k => k + 1)
+        setPhaseError(typeof piResult.body.error === 'string' ? piResult.body.error : 'That reward could not be applied. Please choose again.')
+        setPhase('review')
+        return
+      }
 
       if (!piResult.ok) {
         const isHoldGone = piResult.status === 404 ||
@@ -1100,13 +1127,25 @@ function PaymentStep({
       const piHoldExp = typeof piData.holdExpiresAt === 'string' ? Date.parse(piData.holdExpiresAt) : NaN
       if (Number.isFinite(piHoldExp)) setHoldExpiresAtMs(piHoldExp)
 
-      if (
-        piData.feeBreakdown?.grossChargeAmount != null &&
-        holdDisplay?.dueNowCents != null &&
-        piData.feeBreakdown.grossChargeAmount !== holdDisplay.dueNowCents
-      ) {
-        console.error('[book] PI/hold amount mismatch — PI grossChargeAmount:', piData.feeBreakdown.grossChargeAmount, 'hold dueNowCents:', holdDisplay.dueNowCents)
-        setPiDueNowCents(piData.feeBreakdown.grossChargeAmount)
+      const amountChargedNow = typeof piData.amountChargedNowCents === 'number' ? piData.amountChargedNowCents : null
+      if (promoCodeId) {
+        // With a reward the backend's numbers are the truth for what is charged now.
+        const discount = typeof piData.discountCents === 'number' ? piData.discountCents : promoDiscountCents
+        setPromoDiscountCents(discount)
+        setChargedNowCents(amountChargedNow ?? (dueBeforeRewards != null ? dueBeforeRewards - discount : null))
+      } else {
+        setChargedNowCents(null)
+        if (
+          piData.feeBreakdown?.grossChargeAmount != null &&
+          holdDisplay?.dueNowCents != null &&
+          piData.feeBreakdown.grossChargeAmount !== holdDisplay.dueNowCents
+        ) {
+          console.error('[book] PI/hold amount mismatch — PI grossChargeAmount:', piData.feeBreakdown.grossChargeAmount, 'hold dueNowCents:', holdDisplay.dueNowCents)
+          setPiDueNowCents(piData.feeBreakdown.grossChargeAmount)
+        }
+        if (amountChargedNow != null && amountChargedNow !== (piData.feeBreakdown?.grossChargeAmount ?? holdDisplay?.dueNowCents)) {
+          setPiDueNowCents(amountChargedNow)
+        }
       }
 
       setClientSecret(piData.clientSecret)
@@ -1121,6 +1160,47 @@ function PaymentStep({
   function formatDate(d: string) {
     return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   }
+
+  function clearRewards() {
+    setPromoCodeId(null)
+    setPromoDiscountCents(0)
+    setChargedNowCents(null)
+  }
+
+  function selectReward(code: RewardCode | null) {
+    setPhaseError(null)
+    if (!code) { clearRewards(); return }
+    setPromoCodeId(code.id)
+    setPromoDiscountCents(code.discountCents)
+    setChargedNowCents(null)
+  }
+
+  // Go back to the review so the customer can pick a different reward. The next
+  // payment-intent call updates the same payment with the new amount.
+  function changeRewards() {
+    if (payingRef.current) return
+    setClientSecret('')
+    setPhase('review')
+  }
+
+  const rewardsApplied = promoCodeId != null && promoDiscountCents > 0
+  const payNowCents = rewardsApplied
+    ? (chargedNowCents ?? (dueBeforeRewards != null ? Math.max(0, dueBeforeRewards - promoDiscountCents) : null))
+    : null
+  const rewardsRows = rewardsApplied && (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span>Outsyde rewards</span>
+        <span>${(promoDiscountCents / 100).toFixed(2)} off</span>
+      </div>
+      {payNowCents != null && (
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <span>Pay now</span>
+          <span style={{ fontWeight: 700, color: T.teal }}>${(payNowCents / 100).toFixed(2)}</span>
+        </div>
+      )}
+    </>
+  )
 
   function formatTime(t: string) {
     const [h, m] = t.split(':').map(Number)
@@ -1197,6 +1277,7 @@ function PaymentStep({
                       <span style={{ fontWeight: 700, color: T.teal }}>${((piDueNowCents ?? holdDisplay.dueNowCents ?? 0) / 100).toFixed(2)}</span>
                     </div>
                   )}
+                  {rewardsRows}
                   {holdDisplay.inPersonDueCents != null && holdDisplay.inPersonDueCents > 0 && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span>Paid at appointment</span>
@@ -1221,12 +1302,29 @@ function PaymentStep({
                       <span style={{ fontWeight: 700, color: T.teal }}>${((piDueNowCents ?? holdDisplay.dueNowCents ?? 0) / 100).toFixed(2)}</span>
                     </div>
                   )}
+                  {rewardsRows}
                 </>
               )}
             </div>
           </div>
         )}
       </div>
+
+      {holdDisplay && !holdExpired && (phase === 'review' || phase === 'pi_loading' || phase === 'ready') && (
+        <UseMyPoints
+          dueNowCents={dueBeforeRewards}
+          selectedCodeId={promoCodeId}
+          onSelect={selectReward}
+          locked={phase !== 'review'}
+          onChange={phase === 'ready' ? changeRewards : undefined}
+          reloadKey={pointsReloadKey}
+          theme={{
+            accent: T.teal, accentLight: T.tealLight, text: T.navy, muted: T.muted, border: T.border,
+            card: T.card, selectedBg: '#FFF8F2', error: T.error, errorBg: T.errorBg, errorBorder: T.errorBorder,
+            font: "'DM Sans', sans-serif",
+          }}
+        />
+      )}
 
       <div style={{ background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, padding: '16px 20px', marginBottom: 20 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: T.muted, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Location</div>
@@ -1377,10 +1475,15 @@ function PaymentStep({
           <PaymentForm
             clientSecret={clientSecret}
             bookingInfo={confirmation}
-            onSuccess={() => onSuccess(confirmation, locationSummary())}
+            onSuccess={() => onSuccess(
+              confirmation,
+              locationSummary(),
+              rewardsApplied && payNowCents != null ? { discountCents: promoDiscountCents, chargedNowCents: payNowCents } : null,
+            )}
             holdExpiresAtMs={holdExpiresAtMs}
             onHoldExpired={() => setHoldExpired(true)}
             onPayingChange={p => { payingRef.current = p }}
+            payAmountCents={rewardsApplied ? payNowCents : null}
           />
         </Elements>
       )}
@@ -1395,7 +1498,7 @@ function PaymentStep({
 
 // ─── Step 6: Confirmation ─────────────────────────────────────────────────────
 
-function ConfirmStep({ service, date, slot, confirmation, locationSummary, customerDetails, holdData }: {
+function ConfirmStep({ service, date, slot, confirmation, locationSummary, customerDetails, holdData, rewards }: {
   service: Service
   date: string
   slot: Slot
@@ -1403,7 +1506,20 @@ function ConfirmStep({ service, date, slot, confirmation, locationSummary, custo
   locationSummary: string
   customerDetails: string
   holdData: HoldData | null
+  rewards: RewardsPaid | null
 }) {
+  const rewardsRows = rewards && (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 13, color: T.muted }}>Outsyde rewards</span>
+        <span style={{ fontSize: 13, color: T.muted }}>${(rewards.discountCents / 100).toFixed(2)} off</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 13, color: T.muted }}>Paid now</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>${(rewards.chargedNowCents / 100).toFixed(2)}</span>
+      </div>
+    </>
+  )
   function formatDate(d: string) {
     return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
   }
@@ -1475,6 +1591,7 @@ function ConfirmStep({ service, date, slot, confirmation, locationSummary, custo
                       <span style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>${(holdData.dueNowCents / 100).toFixed(2)}</span>
                     </div>
                   )}
+                  {rewardsRows}
                   {holdData.inPersonDueCents != null && holdData.inPersonDueCents > 0 && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <span style={{ fontSize: 13, color: T.muted }}>Paid at appointment</span>
@@ -1496,6 +1613,7 @@ function ConfirmStep({ service, date, slot, confirmation, locationSummary, custo
                       <span style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>${(holdData.dueNowCents / 100).toFixed(2)}</span>
                     </div>
                   )}
+                  {rewardsRows}
                 </>
               )}
             </>
@@ -1529,6 +1647,7 @@ export default function BookPage() {
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null)
   const [locationSummary, setLocationSummary] = useState('')
+  const [rewardsPaid, setRewardsPaid] = useState<RewardsPaid | null>(null)
   const [selectedAddonIds, setSelectedAddonIds] = useState<string[]>([])
   const [customerDetails, setCustomerDetails] = useState('')
   const [skipAuth, setSkipAuth] = useState(false)
@@ -1625,9 +1744,10 @@ export default function BookPage() {
                 setSavedHoldKey(null)
                 setSavedHoldData(null)
               }}
-              onSuccess={(conf, summary) => {
+              onSuccess={(conf, summary, rewards) => {
                 setConfirmation(conf)
                 setLocationSummary(summary)
+                setRewardsPaid(rewards)
                 setStep('confirm')
               }}
               onBack={() => setStep('addons')}
@@ -1644,6 +1764,7 @@ export default function BookPage() {
               locationSummary={locationSummary}
               customerDetails={customerDetails}
               holdData={savedHoldData}
+              rewards={rewardsPaid}
             />
           )}
         </div>

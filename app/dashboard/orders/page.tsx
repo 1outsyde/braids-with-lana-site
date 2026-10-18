@@ -17,6 +17,8 @@ interface Order {
   customer_email: string
   items: OrderItem[]
   total_amount: number
+  discountAmountCents?: number | null
+  discount_amount_cents?: number | null
   tracking_number?: string
   carrier?: string
   created_at: string
@@ -225,6 +227,14 @@ export default function OrdersPage() {
                 {isOpen && (
                   <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', padding: '16px 20px', background: '#FAFAFA' }}>
                     <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginBottom: 12 }}>{order.customer_email}</div>
+                    {(() => {
+                      const discount = order.discountAmountCents ?? order.discount_amount_cents ?? 0
+                      return discount > 0 ? (
+                        <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginBottom: 12 }}>
+                          Customer used {fmtMoney(discount)} Outsyde rewards, paid by Outsyde. Your payout is unchanged.
+                        </div>
+                      ) : null
+                    })()}
                     <div className="flex flex-col gap-2 mb-4">
                       {(order.items ?? []).map((item, i) => (
                         <div key={i} className="flex justify-between" style={{ fontSize: 13 }}>
