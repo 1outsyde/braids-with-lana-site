@@ -566,7 +566,7 @@ function ProfileSection() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [displayName, setDisplayName]       = useState(user?.firstName ?? '')
+  const [displayName, setDisplayName]       = useState(user?.displayName ?? user?.name ?? user?.firstName ?? '')
   const [username, setUsername]             = useState(user?.username ?? '')
   const [identitySaving, setIdentitySaving] = useState(false)
   const [identityMsg, setIdentityMsg]       = useState<string | null>(null)
@@ -617,13 +617,13 @@ function ProfileSection() {
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({ displayName, username }),
+        body: JSON.stringify({ displayName, ...(username.trim() ? { username: username.trim() } : {}) }),
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
         throw new Error((err as { message?: string }).message ?? 'Save failed')
       }
-      updateUser({ firstName: displayName, username })
+      updateUser({ displayName, name: displayName, ...(username.trim() ? { username: username.trim() } : {}) })
       setIdentityMsg('Changes saved.')
     } catch (err: unknown) {
       setIdentityMsg(err instanceof Error ? err.message : 'Failed to save. Please try again.')

@@ -14,7 +14,7 @@ export default function Footer() {
               {VENDOR_CONFIG.vendorName}
             </p>
             <p className="text-body-sm text-muted leading-relaxed">
-              Professional hair braiding by {VENDOR_CONFIG.ownerName}. Serving
+              Professional hair braiding by {VENDOR_CONFIG.vendorName}. Serving
               Saint Albans, Queens, NY.
             </p>
             <Link href="/book" className="btn btn-primary self-start">

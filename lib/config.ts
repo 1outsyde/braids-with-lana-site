@@ -7,7 +7,6 @@ export const VENDOR_CONFIG = {
   businessName: "Braids With Lana",
   businessSlug: "braids-with-lana",
   location: "Saint Albans, Queens, NY",
-  ownerName: "Dede L Dounou",
   hasBookings: true,
   hasServices: true,
   hasProducts: false,
