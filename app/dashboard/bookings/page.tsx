@@ -1,13 +1,25 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { buildDateMap, DateMap } from '@/lib/calendar'
+import { buildDateMap, DateMap, HIDDEN_BOOKING_STATUSES } from '@/lib/calendar'
 import DashboardCalendar from '@/components/calendar/DashboardCalendar'
 import { formatLocationLine } from '@/lib/serviceLocation'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
-type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'declined'
+type BookingStatus =
+  | 'pending_provider'
+  | 'confirmed'
+  | 'completed'
+  | 'canceled'
+  | 'declined'
+  | 'expired'
+  | 'no_show'
+  | 'draft'
+  | 'pending_payment'
+  // Legacy values the backend no longer sends, kept so old rows still render.
+  | 'pending'
+  | 'cancelled'
 
 interface BookingAddon {
   id: string
@@ -48,19 +60,44 @@ interface Booking {
 
 const STATUS_FILTERS: { label: string; value: string }[] = [
   { label: 'All', value: '' },
-  { label: 'Pending', value: 'pending' },
+  { label: 'Pending', value: 'pending_provider' },
   { label: 'Confirmed', value: 'confirmed' },
   { label: 'Completed', value: 'completed' },
   { label: 'Declined', value: 'declined' },
-  { label: 'Cancelled', value: 'cancelled' },
+  { label: 'Cancelled', value: 'canceled' },
+  { label: 'Expired', value: 'expired' },
 ]
 
-const STATUS_STYLE: Record<BookingStatus, { bg: string; color: string; label: string }> = {
-  pending:   { bg: '#FEF3C7', color: '#92400E', label: 'Pending'   },
-  confirmed: { bg: '#DBEAFE', color: '#1E40AF', label: 'Confirmed' },
-  completed: { bg: '#D1FAE5', color: '#065F46', label: 'Completed' },
-  cancelled: { bg: '#FEE2E2', color: '#991B1B', label: 'Cancelled' },
-  declined:  { bg: '#F3F4F6', color: '#6B7280', label: 'Declined'  },
+type StatusStyle = { bg: string; color: string; label: string }
+
+const STATUS_STYLE: Partial<Record<BookingStatus, StatusStyle>> = {
+  pending_provider: { bg: '#FEF3C7', color: '#92400E', label: 'Awaiting approval' },
+  pending:          { bg: '#FEF3C7', color: '#92400E', label: 'Awaiting approval' },
+  confirmed:        { bg: '#DBEAFE', color: '#1E40AF', label: 'Confirmed' },
+  completed:        { bg: '#D1FAE5', color: '#065F46', label: 'Completed' },
+  canceled:         { bg: '#FEE2E2', color: '#991B1B', label: 'Cancelled' },
+  cancelled:        { bg: '#FEE2E2', color: '#991B1B', label: 'Cancelled' },
+  declined:         { bg: '#F3F4F6', color: '#6B7280', label: 'Declined' },
+  expired:          { bg: '#F3F4F6', color: '#6B7280', label: 'Expired' },
+  no_show:          { bg: '#FEE2E2', color: '#991B1B', label: 'No show' },
+}
+
+// Unknown statuses get a neutral grey badge, never the Pending style.
+function statusStyle(status: string): StatusStyle {
+  return STATUS_STYLE[status as BookingStatus] ?? {
+    bg: '#F3F4F6',
+    color: '#6B7280',
+    label: status ? status.replace(/_/g, ' ') : 'Unknown',
+  }
+}
+
+// Real requests waiting on the business (card on hold). 'pending' is legacy.
+function isAwaiting(status: string): boolean {
+  return status === 'pending_provider' || status === 'pending'
+}
+
+function filterLabel(value: string): string {
+  return (STATUS_FILTERS.find(f => f.value === value)?.label ?? value).toLowerCase()
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -116,9 +153,11 @@ export default function BookingsPage() {
         bookingsRes.json(),
         blocksRes.json().catch(() => ({})),
       ])
-      const loaded = Array.isArray(bookingsData)
+      const raw: Booking[] = Array.isArray(bookingsData)
         ? bookingsData
         : (bookingsData.appointments ?? bookingsData.bookings ?? [])
+      // Unpaid checkouts are not bookings; hide them even if the API sends them.
+      const loaded = raw.filter(b => !HIDDEN_BOOKING_STATUSES.has(b.status))
       setBookings(loaded)
       setDateMap(buildDateMap(loaded, blocksData.blocks ?? blocksData.data ?? []))
     } catch {
@@ -149,7 +188,7 @@ export default function BookingsPage() {
 
   const today = new Date().toDateString()
   const upcoming = bookings.filter(b =>
-    (b.status === 'pending' || b.status === 'confirmed') &&
+    (isAwaiting(b.status) || b.status === 'confirmed') &&
     new Date((b.appointmentDate ?? b.appointment_date) + 'T00:00:00') >= new Date(today + 'T00:00:00')
   )
   const upNext = upcoming.sort((a, b) =>
@@ -219,7 +258,7 @@ export default function BookingsPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              {upNext.status === 'pending' && (
+              {isAwaiting(upNext.status) && (
                 <>
                   <ActionButton label="Accept" loading={actionLoading === upNext.id + 'confirmed'} onClick={() => updateStatus(upNext.id, 'confirmed')} primary />
                   <ActionButton label="Decline" loading={actionLoading === upNext.id + 'declined'} onClick={() => updateStatus(upNext.id, 'declined')} />
@@ -272,7 +311,7 @@ export default function BookingsPage() {
       ) : (
         <div className="flex flex-col gap-3">
           {bookings.map(b => {
-            const st = STATUS_STYLE[b.status] ?? STATUS_STYLE.pending
+            const st = statusStyle(b.status)
             const time = fmtTime(b)
             return (
               <div
@@ -338,7 +377,7 @@ export default function BookingsPage() {
                     )}
                   </div>
                   <div className="flex gap-2 items-center flex-shrink-0 mt-1">
-                    {b.status === 'pending' && (
+                    {isAwaiting(b.status) && (
                       <>
                         <ActionButton label="Accept" loading={actionLoading === b.id + 'confirmed'} onClick={() => updateStatus(b.id, 'confirmed')} primary small />
                         <ActionButton label="Decline" loading={actionLoading === b.id + 'declined'} onClick={() => updateStatus(b.id, 'declined')} small />
@@ -424,7 +463,7 @@ function EmptyState({ filter }: { filter: string }) {
         ✂
       </div>
       <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 22, fontWeight: 600, color: '#1C1008', marginBottom: 8 }}>
-        {filter ? `No ${filter} bookings` : 'No bookings yet'}
+        {filter ? `No ${filterLabel(filter)} bookings` : 'No bookings yet'}
       </div>
       <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.4)', margin: 0 }}>
         New appointments will appear here

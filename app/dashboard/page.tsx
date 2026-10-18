@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { buildDateMap, DateMap } from '@/lib/calendar'
+import { buildDateMap, DateMap, BOOKING_STATUS_LABEL } from '@/lib/calendar'
 import DashboardCalendar from '@/components/calendar/DashboardCalendar'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -45,7 +45,10 @@ function greeting() {
   return 'Good evening'
 }
 
+// The pending color is only for real requests (pending_provider, legacy 'pending').
+// Anything else not listed gets the neutral style below.
 const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
+  pending_provider: { bg: 'rgba(245,197,24,0.15)',  color: '#F5C518' },
   pending:   { bg: 'rgba(245,197,24,0.15)',  color: '#F5C518' },
   confirmed: { bg: 'rgba(232,99,10,0.15)',  color: '#E8630A' },
   completed: { bg: 'rgba(28,16,8,0.12)',    color: '#1C1008' },
@@ -58,7 +61,7 @@ function StatusBadge({ status }: { status: string }) {
       fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 10,
       background: s.bg, color: s.color, textTransform: 'capitalize', letterSpacing: '0.02em',
     }}>
-      {status.replace(/_/g, ' ')}
+      {BOOKING_STATUS_LABEL[status] ?? status.replace(/_/g, ' ')}
     </span>
   )
 }

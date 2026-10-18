@@ -40,6 +40,27 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
   }, [user, isLoading, router])
 
+  // Once per browser session, send the admin's time zone so the business gets
+  // one if it has none yet. Fire and forget: never blocks or breaks rendering.
+  const isAdmin = !isLoading && !!user && isAdminEmail(user.email)
+  useEffect(() => {
+    if (!isAdmin) return
+    try {
+      const flag = 'outsyde_tz_synced'
+      if (sessionStorage.getItem(flag)) return
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      if (!timeZone) return
+      sessionStorage.setItem(flag, '1')
+      fetch('/api/admin/time-zone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ timeZone }),
+      }).catch(() => {})
+    } catch {
+      // sessionStorage or Intl unavailable; skip silently
+    }
+  }, [isAdmin])
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#1C1008' }}>
