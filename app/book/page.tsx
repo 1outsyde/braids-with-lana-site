@@ -605,6 +605,7 @@ function PaymentStep({
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null)
   const [phaseError, setPhaseError] = useState<string | null>(null)
   const [business, setBusiness] = useState<PublicBusiness | null>(null)
+  const [dueNowBaseCents, setDueNowBaseCents] = useState<number | null>(null)
   const [depositInfo, setDepositInfo] = useState<{
     depositAmountCents: number | null
     servicePriceCents: number
@@ -743,6 +744,13 @@ function PaymentStep({
       setNow(Date.now())
 
       setHoldId(holdId)
+      setDueNowBaseCents(
+        typeof piData.amountChargedNowCents === 'number' && !(piData.discountCents > 0)
+          ? piData.amountChargedNowCents
+          : typeof piData.feeBreakdown?.grossChargeAmount === 'number'
+            ? piData.feeBreakdown.grossChargeAmount
+            : null
+      )
       setClientSecret(piData.clientSecret)
       setConfirmation({ bookingNumber: piData.bookingNumber, appointmentId: piData.appointmentId })
       setDepositInfo({
@@ -761,8 +769,9 @@ function PaymentStep({
     return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   }
 
-  // What the customer pays now before any Outsyde rewards (from the first payment-intent call).
-  const dueBeforeRewards = depositInfo ? depositInfo.chargeAmountCents : null
+  // What the customer pays now before any Outsyde rewards, service fee included: the first
+  // payment-intent call is made with no code, so its charged-now amount is exactly that.
+  const dueBeforeRewards = dueNowBaseCents ?? (depositInfo ? depositInfo.chargeAmountCents : null)
 
   function clearRewards() {
     setPromoCodeId(null)
@@ -801,6 +810,15 @@ function PaymentStep({
       if (!result.ok) {
         if (isHoldExpiredResponse(result.status, body)) {
           setHoldExpiredFlag(true)
+          return
+        }
+        // Removing the reward failed: the payment still has it, so keep showing it.
+        if (!code) {
+          setRewardsError(
+            typeof body.error === 'string'
+              ? `${body.error} Your reward is still applied.`
+              : 'Your reward could not be removed. It is still applied. Please try again.'
+          )
           return
         }
         const promoRefusal = typeof body.code === 'string' && PROMO_ERROR_CODES.includes(body.code)
