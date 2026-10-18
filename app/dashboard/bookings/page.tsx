@@ -41,6 +41,7 @@ interface Booking {
   addonsTotalCents?: number | null
   customerDetails?: string | null
   inPersonDueCents?: number | null
+  discountAmountCents?: number | null
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -203,6 +204,11 @@ export default function BookingsPage() {
                   Collect in person: {fmtMoney(upNext.inPersonDueCents)}
                 </div>
               )}
+              {upNext.discountAmountCents != null && upNext.discountAmountCents > 0 && (
+                <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 3 }}>
+                  Customer used {fmtMoney(upNext.discountAmountCents)} Outsyde rewards, paid by Outsyde. Your payout is unchanged.
+                </div>
+              )}
               {upNext.customerDetails && (
                 <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 4, fontStyle: 'italic', whiteSpace: 'pre-wrap' }}>
                   &ldquo;{upNext.customerDetails}&rdquo;
@@ -325,6 +331,11 @@ export default function BookingsPage() {
                         </span>
                       )}
                     </div>
+                    {b.discountAmountCents != null && b.discountAmountCents > 0 && (
+                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 4 }}>
+                        Customer used {fmtMoney(b.discountAmountCents)} Outsyde rewards, paid by Outsyde. Your payout is unchanged.
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2 items-center flex-shrink-0 mt-1">
                     {b.status === 'pending' && (

@@ -29,6 +29,7 @@ interface Appointment {
   addons?: AppointmentAddon[]
   customerDetails?: string | null
   inPersonDueCents?: number | null
+  discountAmountCents?: number | null
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -234,6 +235,11 @@ export default function DashboardOverviewPage() {
                   {appt.inPersonDueCents != null && appt.inPersonDueCents > 0 && (
                     <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>
                       Collect in person: {formatCents(appt.inPersonDueCents)}
+                    </div>
+                  )}
+                  {appt.discountAmountCents != null && appt.discountAmountCents > 0 && (
+                    <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>
+                      Customer used {formatCents(appt.discountAmountCents)} Outsyde rewards, paid by Outsyde. Your payout is unchanged.
                     </div>
                   )}
                   {appt.customerDetails && (
