@@ -46,10 +46,18 @@ export function formatTimeRange(startTime: string, durationMinutes: number): str
   return `${to12h(startTime)} – ${to12h(computeEndTime(startTime, durationMinutes))}`
 }
 
+// Statuses that are not real bookings (unpaid checkouts). They never appear
+// on the dashboard calendar.
+export const HIDDEN_BOOKING_STATUSES = new Set(['draft', 'pending_payment'])
+
+// Amber is reserved for real requests waiting on the business
+// (pending_provider, plus legacy 'pending').
 export const BOOKING_STATUS_COLOR: Record<string, string> = {
   confirmed:        '#2D7A47',
   completed:        '#2D7A47',
-  pending_payment:  '#D4890A',
+  pending_payment:  '#9CA3AF',
+  draft:            '#9CA3AF',
+  expired:          '#9CA3AF',
   pending_provider: '#D4890A',
   pending:          '#D4890A',
   canceled:         '#C0392B',
@@ -62,6 +70,8 @@ export const BOOKING_STATUS_LABEL: Record<string, string> = {
   confirmed:        'Confirmed',
   completed:        'Completed',
   pending_payment:  'Pending payment',
+  draft:            'Draft',
+  expired:          'Expired',
   pending_provider: 'Awaiting approval',
   pending:          'Pending',
   canceled:         'Canceled',
@@ -73,7 +83,9 @@ export const BOOKING_STATUS_LABEL: Record<string, string> = {
 export const BOOKING_STATUS_BADGE_BG: Record<string, string> = {
   confirmed:        'rgba(45,122,71,0.12)',
   completed:        'rgba(45,122,71,0.12)',
-  pending_payment:  'rgba(212,137,10,0.12)',
+  pending_payment:  'rgba(156,163,175,0.15)',
+  draft:            'rgba(156,163,175,0.15)',
+  expired:          'rgba(156,163,175,0.15)',
   pending_provider: 'rgba(212,137,10,0.12)',
   pending:          'rgba(212,137,10,0.12)',
   canceled:         'rgba(192,57,43,0.10)',
@@ -105,6 +117,8 @@ export function buildDateMap(
   const map: DateMap = {}
 
   for (const appt of appointments) {
+    const status = String(appt.status ?? '')
+    if (HIDDEN_BOOKING_STATUSES.has(status)) continue
     const key = appt.appointment_date ?? appt.appointmentDate
     if (!key) continue
     if (!map[key]) map[key] = []
@@ -115,7 +129,7 @@ export function buildDateMap(
       type: 'booking',
       id: appt.id,
       bookingNumber: appt.booking_number ?? appt.bookingNumber ?? 0,
-      status: appt.status ?? 'pending',
+      status,
       serviceName: appt.service_name ?? appt.serviceName ?? 'Appointment',
       clientName: appt.client_name ?? appt.clientName ?? appt.customer_name ?? appt.customerName ?? 'Client',
       startTime,
