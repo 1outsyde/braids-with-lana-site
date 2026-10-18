@@ -405,7 +405,7 @@ export default function DashboardCalendar({ dateMap, mode }: DashboardCalendarPr
           }}>
             {[
               { color: '#2D7A47', label: 'Confirmed' },
-              { color: '#D4890A', label: 'Pending' },
+              { color: '#D4890A', label: 'Pending' }, // pending_provider only; unpaid checkouts are hidden
               { color: '#C0392B', label: 'Blocked' },
             ].map(({ color, label }) => (
               <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
