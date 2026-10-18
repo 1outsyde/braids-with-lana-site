@@ -120,10 +120,12 @@ export default function UseMyPoints({
   if (!data) return null
   if (data.activeCodes.length === 0 && data.balance < MIN_TIER_POINTS) return null
 
-  // Booking rule: the customer still pays at least $1.00 now.
+  // Booking rule (backend, 2026-10-18): what is paid online now, before the service fee, must be
+  // at least 10x the code. dueNowCents includes the service fee; this recovers the base exactly.
   function blockReason(discountCents: number): string | null {
     if (dueNowCents == null) return 'Not available for this booking'
-    if (discountCents > dueNowCents - 100) return 'Too large for the amount due today'
+    const minimum = discountCents * 10
+    if (Math.round(dueNowCents / 1.08) < minimum) return `For bookings of $${(minimum / 100).toFixed(2)} or more paid online`
     return null
   }
 
