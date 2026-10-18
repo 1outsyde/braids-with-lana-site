@@ -25,6 +25,7 @@ interface Booking {
   duration_minutes?: number
   notes?: string
   total_amount?: number
+  discountAmountCents?: number | null
   created_at: string
   customerServiceAddress?: string | null
   customerServiceCity?: string | null
@@ -284,6 +285,11 @@ export default function BookingsPage() {
                         </span>
                       )}
                     </div>
+                    {b.discountAmountCents != null && b.discountAmountCents > 0 && (
+                      <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', marginTop: 4 }}>
+                        Customer used {fmtMoney(b.discountAmountCents)} Outsyde rewards, paid by Outsyde. Your payout is unchanged.
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2 items-center flex-shrink-0 mt-1">
                     {b.status === 'pending' && (

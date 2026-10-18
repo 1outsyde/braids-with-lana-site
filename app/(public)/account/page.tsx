@@ -76,6 +76,13 @@ interface PointTransaction {
   points: number
 }
 
+interface ActiveRewardCode {
+  id: string
+  code: string
+  discountCents: number
+  expiresAt?: string | null
+}
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function formatCents(cents: number) {
   return `$${(cents / 100).toFixed(2)}`
@@ -416,6 +423,7 @@ function RewardsSection({ loyaltyPoints }: { loyaltyPoints: number }) {
   const [transactions, setTransactions] = useState<PointTransaction[]>([])
   const [txLoading, setTxLoading]       = useState(true)
   const [txStub, setTxStub]             = useState(false)
+  const [activeCodes, setActiveCodes]   = useState<ActiveRewardCode[]>([])
 
   useEffect(() => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('outsyde_access_token') : null
@@ -426,7 +434,12 @@ function RewardsSection({ loyaltyPoints }: { loyaltyPoints: number }) {
       .then(data => {
         const txs = Array.isArray(data) ? data : (data.transactions ?? [])
         setTransactions(txs)
-        if (txs.length === 0 && data.stub !== false) setTxStub(true)
+        // The live points endpoint sends tiers and activeCodes; only the fallback lacks them.
+        const isLive = !Array.isArray(data) && (Array.isArray(data.tiers) || Array.isArray(data.activeCodes))
+        if (!Array.isArray(data) && Array.isArray(data.activeCodes)) {
+          setActiveCodes(data.activeCodes.filter((c: ActiveRewardCode) => c && typeof c.id === 'string' && typeof c.discountCents === 'number'))
+        }
+        if (txs.length === 0 && data.stub !== false && !isLive) setTxStub(true)
       })
       .catch(() => setTxStub(true))
       .finally(() => setTxLoading(false))
@@ -491,6 +504,29 @@ function RewardsSection({ loyaltyPoints }: { loyaltyPoints: number }) {
           Points are applied at checkout.
         </p>
       </Card>
+
+      {/* Active reward codes */}
+      {activeCodes.length > 0 && (
+        <Card>
+          <SectionTitle>Your Reward Codes</SectionTitle>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {activeCodes.map(code => (
+              <div key={code.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: `1px solid ${BORDER}` }}>
+                <div>
+                  <p style={{ fontFamily: FONT_BODY, fontSize: '0.875rem', color: TEXT, fontWeight: 600 }}>{formatCents(code.discountCents)} off</p>
+                  {code.expiresAt && (
+                    <p style={{ fontFamily: FONT_BODY, fontSize: '0.75rem', color: MUTED }}>Expires {formatDateShort(code.expiresAt)}</p>
+                  )}
+                </div>
+                <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: MUTED }}>{code.code}</span>
+              </div>
+            ))}
+          </div>
+          <p style={{ fontFamily: FONT_BODY, fontSize: '0.78rem', color: MUTED, marginTop: 16, lineHeight: 1.6 }}>
+            Choose a code under Use my points when you book.
+          </p>
+        </Card>
+      )}
 
       {/* Point history */}
       <Card>

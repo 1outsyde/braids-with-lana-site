@@ -11,6 +11,7 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
+import UseMyPoints, { PROMO_ERROR_CODES, promoInUseIds, type RewardCode } from '@/components/checkout/UseMyPoints'
 import {
   consumerLocationLabel,
   customerAddressComplete,
@@ -59,6 +60,12 @@ interface Slot {
 interface BookingConfirmation {
   bookingNumber: string
   appointmentId: string
+}
+
+// Set only when the customer used Outsyde rewards on this booking.
+interface RewardsPaid {
+  discountCents: number
+  chargedNowCents: number
 }
 
 type Step = 'service' | 'datetime' | 'auth' | 'payment' | 'confirm'
@@ -501,12 +508,20 @@ function PaymentForm({
   onSuccess,
   isHoldExpired,
   onHoldExpired,
+  payAmountCents,
+  busy = false,
+  onPayingChange,
 }: {
   clientSecret: string
   bookingInfo: BookingConfirmation
   onSuccess: () => void
   isHoldExpired: () => boolean
   onHoldExpired: () => void
+  // Only set when Outsyde rewards are applied: the amount the card is charged now.
+  payAmountCents?: number | null
+  // True while the payment amount is being updated for a reward change.
+  busy?: boolean
+  onPayingChange?: (paying: boolean) => void
 }) {
   const stripe = useStripe()
   const elements = useElements()
@@ -520,7 +535,9 @@ function PaymentForm({
     setPayError(null)
     const card = elements.getElement(CardElement)
     if (!card) { setPaying(false); return }
+    onPayingChange?.(true)
     const { error } = await stripe.confirmCardPayment(clientSecret, { payment_method: { card } })
+    onPayingChange?.(false)
     if (error) {
       setPaying(false)
       // A PaymentIntent cancelled by the backend (hold expired) shows the
@@ -545,8 +562,8 @@ function PaymentForm({
       <div style={{ border: `1px solid ${T.border}`, borderRadius: 6, padding: '12px 14px', marginBottom: 20, background: '#fff' }}>
         <CardElement options={{ style: { base: { fontSize: '14px', color: T.navy, fontFamily: "'DM Sans', sans-serif" } } }} />
       </div>
-      <button type="submit" disabled={paying || !stripe} style={btnPrimary(paying || !stripe)}>
-        {paying ? 'Processing…' : 'Pay & Confirm Booking'}
+      <button type="submit" disabled={paying || busy || !stripe} style={btnPrimary(paying || busy || !stripe)}>
+        {paying ? 'Processing…' : payAmountCents != null ? `Pay $${(payAmountCents / 100).toFixed(2)} & Confirm Booking` : 'Pay & Confirm Booking'}
       </button>
     </form>
   )
@@ -579,7 +596,7 @@ function PaymentStep({
   service: Service
   date: string
   slot: Slot
-  onSuccess: (conf: BookingConfirmation, locationSummary: string) => void
+  onSuccess: (conf: BookingConfirmation, locationSummary: string, rewards: RewardsPaid | null) => void
   onBack: () => void
 }) {
   const locType = normalizeServiceLocationType(service.serviceLocationType)
@@ -605,6 +622,16 @@ function PaymentStep({
   const [holdExpiresAt, setHoldExpiresAt] = useState<number | null>(null)
   const [holdExpiredFlag, setHoldExpiredFlag] = useState(false)
   const [now, setNow] = useState(0)
+  // Outsyde rewards. promoCodeId is sent on every payment-intent call (null means no code).
+  const [holdId, setHoldId] = useState<string | null>(null)
+  const [promoCodeId, setPromoCodeId] = useState<string | null>(null)
+  const [promoDiscountCents, setPromoDiscountCents] = useState(0)
+  const [chargedNowCents, setChargedNowCents] = useState<number | null>(null)
+  const [pointsReloadKey, setPointsReloadKey] = useState(0)
+  const [applyingReward, setApplyingReward] = useState(false)
+  const [rewardsError, setRewardsError] = useState<string | null>(null)
+  const payingRef = useRef(false)
+  const [paying, setPaying] = useState(false)
 
   const holdExpired = holdExpiredFlag || (phase === 'ready' && holdExpiresAt !== null && now >= holdExpiresAt)
 
@@ -693,7 +720,7 @@ function PaymentStep({
       const piRes = await fetch('/api/bookings/payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ holdId, ...customerAddress }),
+        body: JSON.stringify({ holdId, ...customerAddress, promoCodeId }),
       })
       if (!piRes.ok) {
         const errData = await piRes.json().catch(() => ({}))
@@ -715,6 +742,7 @@ function PaymentStep({
       setHoldExpiresAt(parseTime(piData.holdExpiresAt) ?? holdExpiry)
       setNow(Date.now())
 
+      setHoldId(holdId)
       setClientSecret(piData.clientSecret)
       setConfirmation({ bookingNumber: piData.bookingNumber, appointmentId: piData.appointmentId })
       setDepositInfo({
@@ -732,6 +760,99 @@ function PaymentStep({
   function formatDate(d: string) {
     return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
   }
+
+  // What the customer pays now before any Outsyde rewards (from the first payment-intent call).
+  const dueBeforeRewards = depositInfo ? depositInfo.chargeAmountCents : null
+
+  function clearRewards() {
+    setPromoCodeId(null)
+    setPromoDiscountCents(0)
+    setChargedNowCents(null)
+  }
+
+  // Re-sends create-payment-intent for the same hold with the picked code (or null).
+  // The backend updates the same PaymentIntent to the new amount.
+  async function sendPromo(nextCodeId: string | null) {
+    if (!holdId) return { ok: false, status: 0, body: {} as Record<string, unknown> }
+    const customerAddress = locType === 'customer'
+      ? customerAddressPayload({ line1, city, state, zipCode })
+      : {}
+    const res = await fetch('/api/bookings/payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ holdId, ...customerAddress, promoCodeId: nextCodeId }),
+    })
+    const body = await res.json().catch(() => ({}))
+    return { ok: res.ok, status: res.status, body: body as Record<string, unknown> }
+  }
+
+  function isHoldExpiredResponse(status: number, body: Record<string, unknown>): boolean {
+    const errText = [body.error, body.message].filter(v => typeof v === 'string').join(' ')
+    return body.errorCode === 'HOLD_EXPIRED' || body.code === 'HOLD_EXPIRED' || (status === 400 && /expired/i.test(errText))
+  }
+
+  async function selectReward(code: RewardCode | null) {
+    if (payingRef.current || applyingReward) return
+    setRewardsError(null)
+    setApplyingReward(true)
+    try {
+      const result = await sendPromo(code ? code.id : null)
+      const body = result.body
+      if (!result.ok) {
+        if (isHoldExpiredResponse(result.status, body)) {
+          setHoldExpiredFlag(true)
+          return
+        }
+        const promoRefusal = typeof body.code === 'string' && PROMO_ERROR_CODES.includes(body.code)
+        if (promoRefusal && body.code === 'PROMO_IN_USE' && code) promoInUseIds.add(code.id)
+        setRewardsError(
+          typeof body.error === 'string'
+            ? body.error
+            : 'That reward could not be applied. Please choose again.'
+        )
+        clearRewards()
+        setPointsReloadKey(k => k + 1)
+        // Put the payment back to no code so the amount shown matches what is charged.
+        if (code) {
+          const reset = await sendPromo(null)
+          if (!reset.ok) {
+            if (isHoldExpiredResponse(reset.status, reset.body)) { setHoldExpiredFlag(true); return }
+            setPhaseError('Unable to update your payment. Please go back and try again.')
+            setPhase('error')
+            return
+          }
+          if (typeof reset.body.clientSecret === 'string') setClientSecret(reset.body.clientSecret)
+        }
+        return
+      }
+      const piHoldExp = parseTime(body.holdExpiresAt)
+      if (piHoldExp !== null) setHoldExpiresAt(piHoldExp)
+      if (typeof body.clientSecret === 'string') setClientSecret(body.clientSecret)
+      if (!code) { clearRewards(); return }
+      const discount = typeof body.discountCents === 'number' ? body.discountCents : code.discountCents
+      const charged = typeof body.amountChargedNowCents === 'number' ? body.amountChargedNowCents : null
+      setPromoCodeId(code.id)
+      setPromoDiscountCents(discount)
+      setChargedNowCents(charged ?? (dueBeforeRewards != null ? dueBeforeRewards - discount : null))
+    } catch {
+      setRewardsError('Could not update your payment. Please try again.')
+      // The amount on file is unknown now; go back to no code.
+      clearRewards()
+      setPointsReloadKey(k => k + 1)
+      const reset = await sendPromo(null).catch(() => null)
+      if (!reset || !reset.ok) {
+        setPhaseError('Unable to update your payment. Please go back and try again.')
+        setPhase('error')
+      }
+    } finally {
+      setApplyingReward(false)
+    }
+  }
+
+  const rewardsApplied = promoCodeId != null && promoDiscountCents > 0
+  const payNowCents = rewardsApplied
+    ? (chargedNowCents ?? (dueBeforeRewards != null ? Math.max(0, dueBeforeRewards - promoDiscountCents) : null))
+    : null
 
   function formatTime(t: string) {
     const [h, m] = t.split(':').map(Number)
@@ -772,6 +893,20 @@ function PaymentStep({
               <span>Remainder due at appointment</span>
               <span>${((depositInfo.servicePriceCents - depositInfo.depositAmountCents) / 100).toFixed(2)}</span>
             </div>
+          </div>
+        )}
+        {rewardsApplied && (
+          <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid #c8e8ea', fontSize: 12, color: T.muted, display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Outsyde rewards</span>
+              <span>${(promoDiscountCents / 100).toFixed(2)} off</span>
+            </div>
+            {payNowCents != null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span>Pay now</span>
+                <span style={{ color: T.teal, fontWeight: 700 }}>${(payNowCents / 100).toFixed(2)}</span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -895,6 +1030,28 @@ function PaymentStep({
         </>
       )}
 
+      {phase === 'ready' && !holdExpired && depositInfo && (
+        <>
+          {rewardsError && (
+            <div style={{ background: T.errorBg, border: `1px solid ${T.errorBorder}`, borderRadius: 6, padding: '12px 16px', marginBottom: 16, color: T.error, fontSize: 13 }}>
+              {rewardsError}
+            </div>
+          )}
+          <UseMyPoints
+            dueNowCents={dueBeforeRewards}
+            selectedCodeId={promoCodeId}
+            onSelect={selectReward}
+            locked={applyingReward || paying}
+            reloadKey={pointsReloadKey}
+            theme={{
+              accent: T.teal, accentLight: T.tealLight, text: T.navy, muted: T.muted, border: T.border,
+              card: T.card, selectedBg: '#FFF8F2', error: T.error, errorBg: T.errorBg, errorBorder: T.errorBorder,
+              font: "'DM Sans', sans-serif",
+            }}
+          />
+        </>
+      )}
+
       {phase === 'ready' && !holdExpired && holdExpiresAt !== null && (
         <div
           role="timer"
@@ -910,13 +1067,20 @@ function PaymentStep({
           already in flight can still finish and reach the confirmation step. */}
       {phase === 'ready' && clientSecret && confirmation && (
         <div style={{ display: holdExpired ? 'none' : 'block' }}>
-          <Elements stripe={stripePromise} options={{ clientSecret }}>
+          <Elements key={clientSecret} stripe={stripePromise} options={{ clientSecret }}>
             <PaymentForm
               clientSecret={clientSecret}
               bookingInfo={confirmation}
-              onSuccess={() => onSuccess(confirmation, locationSummary())}
+              onSuccess={() => onSuccess(
+                confirmation,
+                locationSummary(),
+                rewardsApplied && payNowCents != null ? { discountCents: promoDiscountCents, chargedNowCents: payNowCents } : null,
+              )}
               isHoldExpired={() => holdExpiresAt !== null && Date.now() >= holdExpiresAt}
               onHoldExpired={() => setHoldExpiredFlag(true)}
+              payAmountCents={rewardsApplied ? payNowCents : null}
+              busy={applyingReward}
+              onPayingChange={p => { payingRef.current = p; setPaying(p) }}
             />
           </Elements>
         </div>
@@ -933,12 +1097,13 @@ function PaymentStep({
 
 // ─── Step 5: Confirmation ─────────────────────────────────────────────────────
 
-function ConfirmStep({ service, date, slot, confirmation, locationSummary }: {
+function ConfirmStep({ service, date, slot, confirmation, locationSummary, rewards }: {
   service: Service
   date: string
   slot: Slot
   confirmation: BookingConfirmation
   locationSummary: string
+  rewards: RewardsPaid | null
 }) {
   function formatDate(d: string) {
     return new Date(d + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
@@ -987,6 +1152,18 @@ function ConfirmStep({ service, date, slot, confirmation, locationSummary }: {
             <span style={{ fontSize: 13, color: T.muted }}>Total</span>
             <span style={{ fontSize: 13, fontWeight: 700, color: T.gold }}>${(service.price / 100).toFixed(2)}</span>
           </div>
+          {rewards && (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13, color: T.muted }}>Outsyde rewards</span>
+                <span style={{ fontSize: 13, color: T.muted }}>${(rewards.discountCents / 100).toFixed(2)} off</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: 13, color: T.muted }}>Paid now</span>
+                <span style={{ fontSize: 13, fontWeight: 700, color: T.teal }}>${(rewards.chargedNowCents / 100).toFixed(2)}</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -1009,6 +1186,7 @@ export default function BookPage() {
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
   const [confirmation, setConfirmation] = useState<BookingConfirmation | null>(null)
   const [locationSummary, setLocationSummary] = useState('')
+  const [rewardsPaid, setRewardsPaid] = useState<RewardsPaid | null>(null)
 
   return (
     <div style={{ minHeight: '100vh', background: T.bg, padding: '40px 16px', fontFamily: "'DM Sans', sans-serif" }}>
@@ -1055,9 +1233,10 @@ export default function BookPage() {
               service={selectedService}
               date={selectedDate}
               slot={selectedSlot}
-              onSuccess={(conf, summary) => {
+              onSuccess={(conf, summary, rewards) => {
                 setConfirmation(conf)
                 setLocationSummary(summary)
+                setRewardsPaid(rewards)
                 setStep('confirm')
               }}
               onBack={() => setStep('auth')}
@@ -1071,6 +1250,7 @@ export default function BookPage() {
               slot={selectedSlot}
               confirmation={confirmation}
               locationSummary={locationSummary}
+              rewards={rewardsPaid}
             />
           )}
         </div>
