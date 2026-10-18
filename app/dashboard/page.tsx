@@ -20,6 +20,7 @@ interface Appointment {
   serviceName?: string
   clientName?: string
   totalPrice?: number
+  discountAmountCents?: number | null
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -217,6 +218,11 @@ export default function DashboardOverviewPage() {
                   <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {appt.serviceName ?? 'Service'}{appt.appointmentTime ? ` · ${appt.appointmentTime}` : ''}
                   </div>
+                  {appt.discountAmountCents != null && appt.discountAmountCents > 0 && (
+                    <div style={{ fontSize: 11, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>
+                      Customer used {formatCents(appt.discountAmountCents)} Outsyde rewards, paid by Outsyde. Your payout is unchanged.
+                    </div>
+                  )}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0, marginLeft: 8 }}>
                   {appt.totalPrice != null && (
