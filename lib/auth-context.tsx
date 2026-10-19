@@ -12,6 +12,9 @@ export interface User {
   profileImageUrl?: string | null
   businessId?: string | null
   username?: string | null
+  // Display name (users.name). /api/auth/me returns these since backend 2026-10-18.
+  name?: string | null
+  displayName?: string | null
 }
 
 interface AuthContextValue {
@@ -60,7 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (formData: { email: string; password: string; firstName: string; lastName: string }) => {
     const suffix = String(Math.floor(1000 + Math.random() * 9000))
-    const username = `${formData.firstName}${formData.lastName}`.toLowerCase().replace(/\s+/g, '') + suffix
+    // First name only: the last name is never part of anything public (Outsyde display name rule).
+    const username = (formData.firstName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'member') + suffix
     const { data } = await outsydeClient.post<{ user: User; accessToken?: string }>('/auth/register', {
       ...formData,
       name: `${formData.firstName} ${formData.lastName}`,
