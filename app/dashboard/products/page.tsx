@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { refusalMessage } from '@/lib/planState'
 
 interface Product {
   id: string
@@ -25,6 +26,8 @@ const STATUS_BADGE: Record<ProductStatus, { bg: string; color: string; label: st
 }
 
 function getDisplayStatus(p: Product): ProductStatus {
+  // Paused by the backend (plan payment late, or paused from the app): show it as paused, not draft.
+  if (p.status === 'paused') return 'paused'
   if (p.status === 'live' && p.is_active) return 'live'
   if (p.status === 'live' && !p.is_active) return 'paused'
   if (p.status === 'archived') return 'archived'
@@ -124,10 +127,10 @@ export default function ProductsPage() {
           body: JSON.stringify(goingLive ? { status: 'live', isActive: true } : { status: 'draft', isActive: false }),
         })
       }
-      if (!res.ok) throw new Error()
+      if (!res.ok) throw new Error(await refusalMessage(res, 'Could not update product status.'))
       await loadProducts()
-    } catch {
-      alert('Could not update product status.')
+    } catch (err) {
+      alert(err instanceof Error && err.message ? err.message : 'Could not update product status.')
     } finally {
       setPublishLoading(null)
     }
