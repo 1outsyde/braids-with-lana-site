@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { refusalMessage } from '@/lib/planState'
 import {
   SERVICE_LOCATION_TYPES,
   normalizeServiceLocationType,
@@ -17,7 +18,7 @@ interface VendorService {
   category: string | null
   isActive: boolean
   isFeatured: boolean
-  status: 'draft' | 'live' | 'archived'
+  status: 'draft' | 'live' | 'archived' | 'paused'
   imageUrl: string | null
   stripeProductId: string | null
   stripePriceId: string | null
@@ -77,6 +78,8 @@ const STATUS_BADGE: Record<string, { bg: string; color: string; label: string }>
 }
 
 function getDisplayStatus(s: VendorService) {
+  // Paused by the backend (plan payment late, or paused from the app): show it as paused, not draft.
+  if (s.status === 'paused') return 'paused'
   if (s.status === 'archived') return 'archived'
   if (s.status === 'live' && !s.isActive) return 'paused'
   if (s.status === 'live' && s.isActive) return 'live'
@@ -280,19 +283,19 @@ export default function ServicesPage() {
           method: 'POST',
           headers: authHeaders(token),
         })
-        if (!res.ok) throw new Error('Publish failed')
+        if (!res.ok) throw new Error(await refusalMessage(res, 'Could not publish service. Please try again.'))
       } else {
         const res = await fetch(`/api/admin/services/${service.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
           body: JSON.stringify({ status: 'live', isActive: true }),
         })
-        if (!res.ok) throw new Error('Publish failed')
+        if (!res.ok) throw new Error(await refusalMessage(res, 'Could not publish service. Please try again.'))
       }
 
       await loadServices()
-    } catch {
-      alert('Could not publish service. Please try again.')
+    } catch (err) {
+      alert(err instanceof Error && err.message ? err.message : 'Could not publish service. Please try again.')
     } finally {
       setPublishing(null)
     }
