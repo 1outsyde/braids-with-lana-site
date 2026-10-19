@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { describePlan, PLAN_BADGE } from '@/lib/planState'
 
 interface Subscription {
   planName?: string
@@ -26,6 +27,7 @@ function resolveSubscription(raw: Record<string, unknown>) {
     status: String(raw.status ?? 'unknown'),
     priceCents: Number(raw.price ?? raw.price_cents ?? raw.priceInCents ?? 0),
     renewalDate: String(raw.renewalDate ?? raw.renewal_date ?? raw.nextBillingDate ?? raw.next_billing_date ?? raw.currentPeriodEnd ?? ''),
+    plan: describePlan(raw),
   }
 }
 
@@ -52,7 +54,8 @@ export default function SubscriptionPage() {
     load()
   }, [])
 
-  const isActive = sub?.status === 'active'
+  const plan = sub?.plan ?? null
+  const badge = plan ? PLAN_BADGE[plan.kind] : PLAN_BADGE.other
   const renewalDisplay = sub?.renewalDate
     ? new Date(sub.renewalDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
     : null
@@ -79,10 +82,10 @@ export default function SubscriptionPage() {
               </span>
               <span style={{
                 fontSize: 11, padding: '3px 10px', borderRadius: 12, fontWeight: 700,
-                background: isActive ? '#D1FAE5' : '#FEE2E2',
-                color: isActive ? '#065F46' : '#991B1B',
+                background: badge.bg,
+                color: badge.color,
               }}>
-                {sub.status?.toUpperCase()}
+                {plan?.label}
               </span>
             </div>
             {sub.priceCents > 0 && (
@@ -90,7 +93,12 @@ export default function SubscriptionPage() {
                 ${(sub.priceCents / 100).toFixed(2)}/month
               </div>
             )}
-            {renewalDisplay && (
+            {plan?.note && (
+              <p style={{ fontSize: 13, color: plan.kind === 'paused' ? '#991B1B' : '#92400E', marginTop: 8, lineHeight: 1.5 }}>
+                {plan.note}
+              </p>
+            )}
+            {renewalDisplay && plan?.showRenewal && (
               <div style={{ fontSize: 13, color: 'rgba(0,0,0,0.4)', marginTop: 4 }}>
                 Renews {renewalDisplay}
               </div>
