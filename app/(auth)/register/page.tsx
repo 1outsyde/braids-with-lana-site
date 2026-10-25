@@ -1,8 +1,11 @@
 'use client'
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { markReferralApplied, normalizeReferralCode, rememberReferralCode, REFERRAL_COPY } from '@/lib/referral'
+
+const noopSubscribe = () => () => {}
 
 export default function RegisterPage() {
   const { register } = useAuth()
@@ -16,6 +19,14 @@ export default function RegisterPage() {
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+
+  // Invite code from a friend's link (?ref=CODE, Outsyde referral Step 6). Read on the client only; kept for this
+  // visit so a signup inside booking carries it too. Optional and editable; a wrong code never stops the signup.
+  const search = useSyncExternalStore(noopSubscribe, () => window.location.search, () => '')
+  const urlCode = normalizeReferralCode(new URLSearchParams(search).get('ref'))
+  const [typedCode, setTypedCode] = useState<string | null>(null)
+  const referralInput = typedCode ?? urlCode ?? ''
+  useEffect(() => { if (urlCode) rememberReferralCode(urlCode) }, [urlCode])
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -36,7 +47,8 @@ export default function RegisterPage() {
 
     setLoading(true)
     try {
-      await register({ email, password, firstName, lastName })
+      const { referralApplied } = await register({ email, password, firstName, lastName, referralCode: referralInput.trim() || null })
+      if (referralApplied) markReferralApplied()
       router.push('/account')
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed. Please try again.'
@@ -146,6 +158,21 @@ export default function RegisterPage() {
               value={confirm}
               onChange={e => setConfirm(e.target.value)}
               autoComplete="new-password"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="register-invite-code" style={labelStyle}>{REFERRAL_COPY.fieldLabel}</label>
+            <input
+              id="register-invite-code"
+              type="text"
+              value={referralInput}
+              onChange={e => setTypedCode(e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase())}
+              placeholder={REFERRAL_COPY.fieldHint}
+              autoComplete="off"
+              autoCapitalize="characters"
+              maxLength={20}
               style={inputStyle}
             />
           </div>
