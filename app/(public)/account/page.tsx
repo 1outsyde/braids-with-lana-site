@@ -1,8 +1,11 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useSyncExternalStore } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
+import { clearReferralAppliedNote, inviteLinkFor, referralAppliedNote, referralCounts, referralShareMessage, REFERRAL_COPY, type FriendReferralStats } from '@/lib/referral'
+
+const noopSubscribe = () => () => {}
 import { VENDOR_CONFIG } from '@/lib/config'
 import { formatDuration } from '@/lib/outsyde'
 import { consumerLocationLabel, formatLocationLine, normalizeServiceLocationType } from '@/lib/serviceLocation'
@@ -441,6 +444,57 @@ function OrderCard({ order }: { order: Order }) {
   )
 }
 
+// ─── Invite friends (Outsyde referral Step 6) ────────────────────────────────
+// Loads on its own and stays hidden when the code can't load, so the points never wait on it.
+function InviteFriendsCard() {
+  const [info, setInfo] = useState<{ code: string; stats?: FriendReferralStats } | null>(null)
+  const [copied, setCopied] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    const token = typeof window !== 'undefined' ? localStorage.getItem('outsyde_access_token') : null
+    fetch('/api/consumer/referral', { headers: token ? { Authorization: `Bearer ${token}` } : {}, cache: 'no-store' })
+      .then(r => (r.ok ? r.json() : null))
+      .then(d => {
+        if (!cancelled && d && typeof d.referralCode === 'string') setInfo({ code: d.referralCode, stats: d.stats })
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
+  if (!info) return null
+  const link = inviteLinkFor(window.location.origin, info.code)
+  const counts = referralCounts(info.stats)
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 2000) } catch { /* ignore */ }
+  }
+  const share = async () => {
+    if (typeof navigator.share === 'function') {
+      try { await navigator.share({ title: 'Join me on Outsyde', text: referralShareMessage(link) }); return } catch { /* fall back to copy */ }
+    }
+    await copy()
+  }
+  const btn: React.CSSProperties = { fontFamily: FONT_BODY, fontSize: '0.75rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', padding: '12px 16px', borderRadius: 4, cursor: 'pointer', minHeight: 44 }
+  return (
+    <Card>
+      <SectionTitle>{REFERRAL_COPY.cardTitle}</SectionTitle>
+      <p style={{ fontFamily: FONT_BODY, fontSize: '0.875rem', color: MUTED, lineHeight: 1.7, marginBottom: 14 }}>{REFERRAL_COPY.cardBody}</p>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px', border: `1px dashed ${BORDER}`, borderRadius: 4, marginBottom: 12 }}>
+        <span style={{ fontFamily: FONT_BODY, fontSize: '0.7rem', letterSpacing: '.14em', textTransform: 'uppercase', color: MUTED }}>Your code</span>
+        <span style={{ fontFamily: FONT_BODY, fontSize: '1.1rem', fontWeight: 700, letterSpacing: '.12em', color: TEXT }}>{info.code}</span>
+      </div>
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <button type="button" onClick={share} style={{ ...btn, flex: '1 1 140px', background: TEAL, color: TEAL_DARK, border: 'none' }}>Share invite</button>
+        <button type="button" onClick={copy} style={{ ...btn, flex: '1 1 140px', background: 'transparent', color: TEXT, border: `1px solid ${BORDER}` }}>{copied ? REFERRAL_COPY.copied : 'Copy link'}</button>
+      </div>
+      <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', marginTop: 16, fontFamily: FONT_BODY, fontSize: '0.8rem', color: MUTED }}>
+        <span><b style={{ color: TEXT }}>{counts.invited}</b> invited</span>
+        <span><b style={{ color: TEXT }}>{counts.waiting}</b> waiting on a first purchase</span>
+        <span><b style={{ color: TEXT }}>{counts.earned.toLocaleString()}</b> points earned</span>
+      </div>
+      <p style={{ fontFamily: FONT_BODY, fontSize: '0.75rem', color: MUTED, marginTop: 12, lineHeight: 1.6 }}>{REFERRAL_COPY.fineprint}</p>
+    </Card>
+  )
+}
+
 // ─── Rewards section ──────────────────────────────────────────────────────────
 function RewardsSection({ loyaltyPoints }: { loyaltyPoints: number }) {
   const [transactions, setTransactions] = useState<PointTransaction[]>([])
@@ -482,6 +536,8 @@ function RewardsSection({ loyaltyPoints }: { loyaltyPoints: number }) {
           loyalty points
         </p>
       </div>
+
+      <InviteFriendsCard />
 
       {/* How you earn */}
       <Card>
@@ -805,6 +861,9 @@ function ProfileSection() {
 // ─── Root page ────────────────────────────────────────────────────────────────
 export default function AccountPage() {
   const { user, isLoading } = useAuth()
+  // A signup whose invite code applied leaves a one time note (Outsyde referral Step 6); shown once, then cleared.
+  const inviteApplied = useSyncExternalStore(noopSubscribe, () => referralAppliedNote(), () => false)
+  useEffect(() => { if (inviteApplied) clearReferralAppliedNote() }, [inviteApplied])
   const router = useRouter()
 
   const visibleTabs = ALL_TABS.filter(t =>
@@ -899,6 +958,11 @@ export default function AccountPage() {
 
       {/* Content */}
       <div style={{ maxWidth: 720, margin: '0 auto', padding: '32px 24px 64px' }}>
+        {inviteApplied && (
+          <div role="status" style={{ marginBottom: 20, padding: '12px 16px', border: `1px solid ${BORDER}`, borderRadius: 4, fontFamily: FONT_BODY, fontSize: '0.85rem', color: TEXT, lineHeight: 1.5 }}>
+            {REFERRAL_COPY.applied}
+          </div>
+        )}
         {activeTab === 'bookings' && <BookingsSection />}
         {activeTab === 'orders'   && <OrdersSection />}
         {activeTab === 'rewards'  && <RewardsSection loyaltyPoints={user.loyaltyPoints ?? 0} />}
