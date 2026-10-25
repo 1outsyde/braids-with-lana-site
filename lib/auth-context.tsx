@@ -1,6 +1,7 @@
 'use client'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { outsydeClient } from './outsyde'
+import { clearReferralCode, normalizeReferralCode, storedReferralCode } from './referral'
 
 export interface User {
   id: string
@@ -21,7 +22,7 @@ interface AuthContextValue {
   user: User | null
   isLoading: boolean
   login: (email: string, password: string) => Promise<User>
-  register: (data: { email: string; password: string; firstName: string; lastName: string }) => Promise<void>
+  register: (data: { email: string; password: string; firstName: string; lastName: string; referralCode?: string | null }) => Promise<{ referralApplied: boolean }>
   logout: () => Promise<void>
   updateUser: (updates: Partial<User>) => void
 }
@@ -87,22 +88,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return data.user
   }
 
-  const register = async (formData: { email: string; password: string; firstName: string; lastName: string }) => {
+  // referralCode: undefined = use a code kept from an invite link this visit (signup inside booking);
+  // null or '' = the customer cleared the field, send none. Never fails the signup (Outsyde referral Step 6).
+  const register = async (input: { email: string; password: string; firstName: string; lastName: string; referralCode?: string | null }) => {
+    const { referralCode: typedCode, ...formData } = input
+    const referralCode = typedCode === undefined ? storedReferralCode() : normalizeReferralCode(typedCode)
     const suffix = String(Math.floor(1000 + Math.random() * 9000))
     // First name only: the last name is never part of anything public (Outsyde display name rule).
     const username = (formData.firstName.toLowerCase().replace(/[^a-z0-9]/g, '') || 'member') + suffix
-    const { data } = await outsydeClient.post<{ user: User; accessToken?: string }>('/auth/register', {
+    const { data } = await outsydeClient.post<{ user: User; accessToken?: string; referralApplied?: boolean }>('/auth/register', {
       ...formData,
       name: `${formData.firstName} ${formData.lastName}`,
       username,
       role: 'consumer',
       source: 'braids-with-lana',
+      ...(referralCode ? { referralCode } : {}),
     })
     if (data.accessToken && typeof window !== 'undefined') {
       localStorage.setItem('outsyde_access_token', data.accessToken)
       document.cookie = `outsyde_access_token=${data.accessToken}; path=/; SameSite=Lax; max-age=604800; Secure`
     }
+    clearReferralCode()
     setUser(data.user)
+    return { referralApplied: data.referralApplied === true }
   }
 
   const logout = async () => {
