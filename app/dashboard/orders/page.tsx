@@ -1,20 +1,26 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { lineDetail } from '@/lib/manageBusiness'
 
+// GET /api/business/orders?format=snake (the BFF asks for it). A line bought with add-ons has
+// addons_label, and its price already includes them.
 interface OrderItem {
   name: string
-  quantity: number
+  qty?: number
+  quantity?: number
   price: number
   variant_label?: string
+  addons_label?: string | null
 }
+const itemQty = (i: OrderItem) => i.qty ?? i.quantity ?? 1
 
 interface Order {
   id: string
   order_number: number
   status: string
   customer_name: string
-  customer_email: string
+  customer_email?: string
   items: OrderItem[]
   total_amount: number
   discountAmountCents?: number | null
@@ -56,7 +62,9 @@ export default function OrdersPage() {
       const res = await fetch('/api/admin/orders')
       if (!res.ok) throw new Error()
       const data = await res.json()
-      setOrders(Array.isArray(data) ? data : (data.orders ?? []))
+      const list: Order[] = Array.isArray(data) ? data : (data.orders ?? [])
+      // Unpaid checkouts (pending) never charged anyone, so they are left out, like the app.
+      setOrders(list.filter(o => o.status !== 'pending'))
     } catch {
       setError('Could not load orders.')
     } finally {
@@ -68,12 +76,13 @@ export default function OrdersPage() {
 
   async function handleShip(order: Order) {
     if (!shipForm.trackingNumber.trim()) { alert('Tracking number required.'); return }
+    if (!shipForm.carrier.trim()) { alert('Choose the carrier.'); return }
     setActionLoading(order.id + 'ship')
     try {
       const res = await fetch(`/api/admin/orders/${order.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ trackingNumber: shipForm.trackingNumber, carrier: shipForm.carrier }),
+        body: JSON.stringify({ status: 'shipped', trackingNumber: shipForm.trackingNumber.trim(), carrier: shipForm.carrier }),
       })
       if (!res.ok) throw new Error()
       setShipModal(null)
@@ -226,7 +235,7 @@ export default function OrdersPage() {
 
                 {isOpen && (
                   <div style={{ borderTop: '1px solid rgba(0,0,0,0.06)', padding: '16px 20px', background: '#FAFAFA' }}>
-                    <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginBottom: 12 }}>{order.customer_email}</div>
+                    {order.customer_email ? <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginBottom: 12 }}>{order.customer_email}</div> : null}
                     {(() => {
                       const discount = order.discountAmountCents ?? order.discount_amount_cents ?? 0
                       return discount > 0 ? (
@@ -239,9 +248,12 @@ export default function OrdersPage() {
                       {(order.items ?? []).map((item, i) => (
                         <div key={i} className="flex justify-between" style={{ fontSize: 13 }}>
                           <span style={{ color: 'rgba(0,0,0,0.65)' }}>
-                            {item.name}{item.variant_label ? ` — ${item.variant_label}` : ''} × {item.quantity}
+                            {item.name} × {itemQty(item)}
+                            {lineDetail(item.variant_label, item.addons_label) ? (
+                              <span style={{ display: 'block', fontSize: 12, color: 'rgba(0,0,0,0.45)', marginTop: 2 }}>{lineDetail(item.variant_label, item.addons_label)}</span>
+                            ) : null}
                           </span>
-                          <span style={{ color: 'rgba(0,0,0,0.45)' }}>{fmtMoney(item.price * item.quantity)}</span>
+                          <span style={{ color: 'rgba(0,0,0,0.45)' }}>{fmtMoney(item.price * itemQty(item))}</span>
                         </div>
                       ))}
                     </div>
@@ -260,7 +272,7 @@ export default function OrdersPage() {
                           Ship order
                         </button>
                       )}
-                      {(order.status === 'paid' || order.status === 'pending') && (
+                      {order.status === 'paid' && (
                         <button
                           onClick={() => handleCancel(order.id)}
                           disabled={!!actionLoading}

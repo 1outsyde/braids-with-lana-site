@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { buildDateMap, DateMap, BOOKING_STATUS_LABEL } from '@/lib/calendar'
 import DashboardCalendar from '@/components/calendar/DashboardCalendar'
+import { VENDOR_CONFIG } from '@/lib/config'
+import SetupChecklistCard from '@/components/dashboard/SetupChecklistCard'
+import { DASH_THEME } from '@/components/dashboard/theme'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -162,6 +165,9 @@ export default function DashboardOverviewPage() {
           sub="appointments today"
         />
       </div>
+
+      {/* Same setup checklist as the Outsyde app (hidden once everything is done) */}
+      <SetupChecklistCard t={DASH_THEME} pages={{ products: VENDOR_CONFIG.hasProducts, services: VENDOR_CONFIG.hasServices }} />
 
       {/* Quick action: no services yet */}
       {showAddServiceCTA && (
