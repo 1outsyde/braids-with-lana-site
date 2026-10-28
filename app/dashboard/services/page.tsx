@@ -8,6 +8,7 @@ import {
   vendorLocationLabel,
   type ServiceLocationType,
 } from '@/lib/serviceLocation'
+import { newServicePolicy, prefillDeposit, type BusinessPolicyFields } from '@/lib/manageBusiness'
 
 interface VendorService {
   id: string
@@ -137,9 +138,20 @@ export default function ServicesPage() {
 
   useEffect(() => { loadServices() }, [])
 
+  // Booking settings (Settings page): new services start with the default deposit and copy the
+  // business cancellation policy. Never applied to a service that already exists.
+  const [bizDefaults, setBizDefaults] = useState<(BusinessPolicyFields & { cancellationPolicySetAt?: string | null; defaultDepositCents?: number | null }) | null>(null)
+  useEffect(() => {
+    fetch('/api/admin/business', { cache: 'no-store' })
+      .then(r => (r.ok ? r.json() : null))
+      .then((d: { business?: typeof bizDefaults } | null) => setBizDefaults(d?.business ?? null))
+      .catch(() => setBizDefaults(null))
+  }, [])
+
   function openAdd() {
     setEditing(null)
-    setForm(EMPTY_FORM)
+    const dep = prefillDeposit(bizDefaults?.defaultDepositCents, EMPTY_FORM.price)
+    setForm({ ...EMPTY_FORM, depositEnabled: dep.enabled, depositAmount: dep.amount })
     setFormError(null)
     setFormImageUrl(null)
     setShowForm(true)
@@ -255,7 +267,7 @@ export default function ServicesPage() {
         : await fetch('/api/admin/services', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', ...authHeaders(token) },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({ ...newServicePolicy(bizDefaults), ...payload }),
           })
 
       if (!res.ok) {

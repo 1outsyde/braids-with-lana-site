@@ -19,12 +19,17 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-  const body = await req.json()
+  // Only the fields the dashboard changes: mark shipped (with tracking) or cancel.
+  const body = await req.json().catch(() => ({})) as { status?: unknown; trackingNumber?: unknown; carrier?: unknown }
+  const status = body.status === 'shipped' || body.status === 'cancelled' ? body.status : null
+  if (!status) return NextResponse.json({ error: 'Unsupported change.' }, { status: 400 })
+  const trackingNumber = typeof body.trackingNumber === 'string' ? body.trackingNumber.trim().slice(0, 100) : ''
+  const carrier = typeof body.carrier === 'string' ? body.carrier.trim().slice(0, 40) : ''
 
-  const res = await fetch(`${API_URL}/api/business/orders/${id}/fulfill`, {
+  const res = await fetch(`${API_URL}/api/business/orders/${id}`, {
     method: 'PATCH',
     headers: proxyHeaders(req),
-    body: JSON.stringify(body),
+    body: JSON.stringify({ status, ...(status === 'shipped' ? { trackingNumber, carrier } : {}) }),
   })
 
   const data = await res.json().catch(() => ({}))

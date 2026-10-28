@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/auth-context'
 import { consumerLocationLabel, formatLocationLine, normalizeServiceLocationType } from '@/lib/serviceLocation'
+import { lineDetail } from '@/lib/manageBusiness'
 
 // ─── Vendor config ───────────────────────────────────────────────────────────
 const VENDOR_CONFIG = { hasBookings: true, hasProducts: true } as const
@@ -38,7 +39,7 @@ interface Order {
   status: string
   total?: number
   shipment?: { trackingNumber?: string; carrier?: string } | null
-  items?: { name: string; variantLabel?: string; quantity: number; price?: number }[]
+  items?: { name: string; variantLabel?: string; addonsLabel?: string | null; quantity: number; price?: number }[]
 }
 
 interface Appointment {
@@ -393,7 +394,7 @@ function OrderCard({ order }: { order: Order }) {
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontFamily: FONT_BODY }}>
               <span style={{ color: TEXT }}>
                 {item.name}
-                {item.variantLabel && <span style={{ color: MUTED }}> · {item.variantLabel}</span>}
+                {lineDetail(item.variantLabel, item.addonsLabel) && <span style={{ color: MUTED }}> · {lineDetail(item.variantLabel, item.addonsLabel)}</span>}
               </span>
               <span style={{ color: MUTED }}>×{item.quantity}</span>
             </div>

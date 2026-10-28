@@ -2,21 +2,23 @@
 
 import { useEffect, useState } from 'react'
 import { refusalMessage } from '@/lib/planState'
+import { STOCK_CHOICES, productDisplayStatus, stockLabel, stockModeOf, stockPayload, type ProductStatus, type StockMode } from '@/lib/manageBusiness'
 
+// GET /api/vendor/products returns camelCase rows (Drizzle). The snake names are kept as a fallback.
 interface Product {
   id: string
   name: string
   description?: string
   price: number          // cents
   status: 'draft' | 'live' | 'archived' | 'paused'
-  is_active: boolean
-  stripe_product_id?: string
-  image_url?: string
-  inventory?: number
+  isActive?: boolean
+  is_active?: boolean
+  stripeProductId?: string | null
+  stripe_product_id?: string | null
+  inventory?: number | null
+  trackInventory?: boolean | null
   category?: string
 }
-
-type ProductStatus = 'live' | 'paused' | 'draft' | 'archived'
 
 const STATUS_BADGE: Record<ProductStatus, { bg: string; color: string; label: string }> = {
   live:     { bg: '#D1FAE5', color: '#065F46', label: 'LIVE'     },
@@ -25,19 +27,14 @@ const STATUS_BADGE: Record<ProductStatus, { bg: string; color: string; label: st
   archived: { bg: '#FEE2E2', color: '#991B1B', label: 'ARCHIVED' },
 }
 
-function getDisplayStatus(p: Product): ProductStatus {
-  // Paused by the backend (plan payment late, or paused from the app): show it as paused, not draft.
-  if (p.status === 'paused') return 'paused'
-  if (p.status === 'live' && p.is_active) return 'live'
-  if (p.status === 'live' && !p.is_active) return 'paused'
-  if (p.status === 'archived') return 'archived'
-  return 'draft'
-}
+// Paused by the backend (plan payment late, or paused from the app) shows as paused, not draft.
+const getDisplayStatus = (p: Product): ProductStatus => productDisplayStatus(p)
 
 function fmtPrice(cents: number) { return `$${(cents / 100).toFixed(2)}` }
 
-type FormData = { name: string; description: string; price: string; category: string; inventory: string }
-const EMPTY_FORM: FormData = { name: '', description: '', price: '', category: '', inventory: '' }
+// Stock is optional (Legend 2026-10-28): new products start on No limit.
+type FormData = { name: string; description: string; price: string; category: string; stockMode: StockMode; stockCount: string }
+const EMPTY_FORM: FormData = { name: '', description: '', price: '', category: '', stockMode: 'unlimited', stockCount: '' }
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -73,7 +70,8 @@ export default function ProductsPage() {
   }
   function openEdit(p: Product) {
     setEditing(p)
-    setForm({ name: p.name, description: p.description ?? '', price: (p.price / 100).toFixed(2), category: p.category ?? '', inventory: p.inventory != null ? String(p.inventory) : '' })
+    const mode = stockModeOf(p)
+    setForm({ name: p.name, description: p.description ?? '', price: (p.price / 100).toFixed(2), category: p.category ?? '', stockMode: mode, stockCount: mode === 'count' ? String(p.inventory) : '' })
     setFormError(null); setShowForm(true)
   }
   function closeForm() { setShowForm(false); setEditing(null); setForm(EMPTY_FORM); setFormError(null) }
@@ -83,6 +81,8 @@ export default function ProductsPage() {
     if (!form.name.trim()) { setFormError('Product name is required.'); return }
     const price = parseFloat(form.price)
     if (isNaN(price) || price < 0) { setFormError('Enter a valid price.'); return }
+    const stock = stockPayload(form.stockMode, form.stockCount)
+    if ('error' in stock) { setFormError(stock.error); return }
 
     setSaving(true)
     try {
@@ -91,7 +91,8 @@ export default function ProductsPage() {
         description: form.description.trim() || undefined,
         price: Math.round(price * 100),
         category: form.category.trim() || undefined,
-        inventory: form.inventory ? parseInt(form.inventory) : undefined,
+        inventory: stock.inventory,
+        trackInventory: stock.trackInventory,
       }
 
       const res = editing
@@ -111,7 +112,7 @@ export default function ProductsPage() {
   }
 
   async function handlePublish(product: Product) {
-    const isFirstPublish = !product.stripe_product_id
+    const isFirstPublish = !(product.stripeProductId ?? product.stripe_product_id)
     const displayStatus = getDisplayStatus(product)
     const goingLive = displayStatus !== 'live'
 
@@ -179,10 +180,31 @@ export default function ProductsPage() {
                   <label style={labelStyle}>Price ($) *</label>
                   <input type="number" min="0" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="0.00" style={inputStyle} />
                 </div>
-                <div style={{ flex: 1 }}>
-                  <label style={labelStyle}>Inventory (optional)</label>
-                  <input type="number" min="0" value={form.inventory} onChange={e => setForm(f => ({ ...f, inventory: e.target.value }))} placeholder="Unlimited" style={inputStyle} />
+              </div>
+              <div>
+                <label style={labelStyle}>Stock</label>
+                <div role="radiogroup" aria-label="Stock" className="flex gap-2 flex-wrap">
+                  {STOCK_CHOICES.map(c => {
+                    const on = form.stockMode === c.value
+                    return (
+                      <button
+                        key={c.value}
+                        type="button"
+                        role="radio"
+                        aria-checked={on}
+                        onClick={() => setForm(f => ({ ...f, stockMode: c.value }))}
+                        style={{ fontSize: 13, padding: '7px 14px', borderRadius: 8, border: `1px solid ${on ? '#F5C518' : 'rgba(0,0,0,0.12)'}`, background: on ? 'rgba(245,197,24,0.16)' : 'transparent', color: on ? '#1C1008' : 'rgba(0,0,0,0.5)', fontWeight: on ? 600 : 400, cursor: 'pointer' }}
+                      >
+                        {c.label}
+                      </button>
+                    )
+                  })}
                 </div>
+                <p style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', margin: '6px 0 0' }}>{STOCK_CHOICES.find(c => c.value === form.stockMode)?.hint}</p>
+                {form.stockMode === 'count' && (
+                  <input type="number" min="1" step="1" aria-label="How many you have" value={form.stockCount} onChange={e => setForm(f => ({ ...f, stockCount: e.target.value }))} placeholder="How many you have" style={{ ...inputStyle, marginTop: 8 }} />
+                )}
+                <p style={{ fontSize: 12, color: 'rgba(0,0,0,0.5)', margin: '6px 0 0' }}>Customers never see your stock number, only Sold out.</p>
               </div>
               <div>
                 <label style={labelStyle}>Category</label>
@@ -259,7 +281,7 @@ export default function ProductsPage() {
                 </div>
                 <div className="text-right flex-shrink-0 hidden sm:block">
                   <div style={{ fontSize: 15, fontWeight: 600, color: '#F5C518' }}>{fmtPrice(product.price)}</div>
-                  {product.inventory != null && <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>Stock: {product.inventory}</div>}
+                  <div style={{ fontSize: 12, color: 'rgba(0,0,0,0.4)', marginTop: 2 }}>Stock: {stockLabel(product)}</div>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
                   <button
