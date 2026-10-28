@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react'
 import { useWindowWidth } from '@/lib/useWindowWidth'
 import CoverVideo from '@/components/ui/CoverVideo'
 import { COVER_VIDEO_MAX_SECONDS, uploadCoverVideo } from '@/lib/coverMedia'
+import { VENDOR_CONFIG } from '@/lib/config'
+import BookingSettingsCard from '@/components/dashboard/BookingSettingsCard'
+import { DASH_THEME } from '@/components/dashboard/theme'
 
 export default function SettingsPage() {
   const isMobile = useWindowWidth() < 768
@@ -286,7 +289,7 @@ export default function SettingsPage() {
         Site Settings
       </h1>
       <p style={{ fontSize: 13, color: '#7A5C4A', marginBottom: 36, lineHeight: 1.6 }}>
-        Manage how your public-facing site looks to clients.
+        Manage how your site looks to clients, and your booking settings.
       </p>
 
       {/* ── Card 1: Cover Image ────────────────────────────────────────────── */}
@@ -461,6 +464,9 @@ export default function SettingsPage() {
 
         {galleryError && <p style={{ fontSize: 12, color: '#e05252', marginTop: 12 }}>{galleryError}</p>}
       </div>
+
+      {/* Cancellation policy, default deposit and terms (same settings as the Outsyde app) */}
+      {VENDOR_CONFIG.hasServices && <BookingSettingsCard t={DASH_THEME} isMobile={isMobile} />}
     </div>
   )
 }
