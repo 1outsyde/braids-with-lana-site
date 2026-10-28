@@ -15,7 +15,7 @@ function proxyHeaders(req: NextRequest): Record<string, string> {
 }
 
 export async function GET(req: NextRequest) {
-  const res = await fetch(`${API_URL}/api/business/orders?businessId=${BUSINESS_ID}`, {
+  const res = await fetch(`${API_URL}/api/business/orders?businessId=${BUSINESS_ID}&format=snake`, {
     headers: proxyHeaders(req),
     cache: 'no-store',
   })
