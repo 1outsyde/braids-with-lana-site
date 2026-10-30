@@ -5,6 +5,7 @@ import { useWindowWidth } from '@/lib/useWindowWidth'
 import { VENDOR_CONFIG } from '@/lib/config'
 import BookingSettingsCard from '@/components/dashboard/BookingSettingsCard'
 import { DASH_THEME } from '@/components/dashboard/theme'
+import { useCropFile } from '@/components/crop/useCropFile'
 
 export default function SettingsPage() {
   const isMobile = useWindowWidth() < 768
@@ -12,6 +13,7 @@ export default function SettingsPage() {
   const [heroUploading, setHeroUploading] = useState(false)
   const [heroError, setHeroError] = useState<string | null>(null)
   const [heroSuccess, setHeroSuccess] = useState(false)
+  const { crop, cropModal } = useCropFile()
 
   useEffect(() => {
     const bizId = process.env.NEXT_PUBLIC_OUTSYDE_BUSINESS_ID
@@ -27,11 +29,17 @@ export default function SettingsPage() {
   }, [])
 
   async function handleHeroUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const picked = e.target.files?.[0]
+    e.target.value = ''
+    if (!picked) return
 
     setHeroError(null)
     setHeroSuccess(false)
+
+    // 16:9 crop first (photo ratios step 4), same shape as the cover in the app.
+    const cropped = await crop(picked, 'cover')
+    if (!cropped) return
+    const file = cropped.file
 
     if (file.size > 8 * 1024 * 1024) {
       setHeroError('File too large — maximum 8MB.')
@@ -74,12 +82,12 @@ export default function SettingsPage() {
       setHeroError(err instanceof Error ? err.message : 'Upload failed. Try again.')
     } finally {
       setHeroUploading(false)
-      e.target.value = ''
     }
   }
 
   return (
     <div style={{ maxWidth: 680 }}>
+      {cropModal}
       <h1 style={{
         fontFamily: 'Cormorant Garamond, serif',
         fontSize: 32,
@@ -122,7 +130,7 @@ export default function SettingsPage() {
               style={{
                 width: '100%',
                 maxWidth: 480,
-                height: 220,
+                aspectRatio: '16 / 9',
                 objectFit: 'cover',
                 borderRadius: 8,
                 border: '1.5px solid #F0D9C8',
