@@ -7,6 +7,7 @@ import { COVER_VIDEO_MAX_SECONDS, uploadCoverVideo } from '@/lib/coverMedia'
 import { VENDOR_CONFIG } from '@/lib/config'
 import BookingSettingsCard from '@/components/dashboard/BookingSettingsCard'
 import { DASH_THEME } from '@/components/dashboard/theme'
+import { useCropFile } from '@/components/crop/useCropFile'
 
 export default function SettingsPage() {
   const isMobile = useWindowWidth() < 768
@@ -18,6 +19,7 @@ export default function SettingsPage() {
   const [heroUploading, setHeroUploading] = useState(false)
   const [heroError, setHeroError] = useState<string | null>(null)
   const [heroSuccess, setHeroSuccess] = useState(false)
+  const { crop, cropModal } = useCropFile()
 
   // ── Stylist photo ────────────────────────────────────────────────────────────
   const [stylistPhotoUrl, setStylistPhotoUrl] = useState<string | null>(null)
@@ -63,8 +65,13 @@ export default function SettingsPage() {
 
   // ── Cover image upload ───────────────────────────────────────────────────────
   async function handleHeroUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const picked = e.target.files?.[0]
+    e.target.value = ''
+    if (!picked) return
+    // 16:9 crop first (photo ratios step 4), same shape as the cover in the app.
+    const cropped = await crop(picked, 'cover')
+    if (!cropped) return
+    const file = cropped.file
 
     setHeroError(null)
     setHeroSuccess(false)
@@ -112,14 +119,18 @@ export default function SettingsPage() {
       setHeroError(err instanceof Error ? err.message : 'Upload failed. Try again.')
     } finally {
       setHeroUploading(false)
-      e.target.value = ''
     }
   }
 
   // ── Stylist photo upload ─────────────────────────────────────────────────────
   async function handleStylistUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const picked = e.target.files?.[0]
+    e.target.value = ''
+    if (!picked) return
+    // 4:5 portrait crop first (photo ratios step 4).
+    const cropped = await crop(picked, 'stylist')
+    if (!cropped) return
+    const file = cropped.file
 
     setStylistError(null)
     setStylistSuccess(false)
@@ -156,14 +167,18 @@ export default function SettingsPage() {
       setStylistError(err instanceof Error ? err.message : 'Upload failed. Try again.')
     } finally {
       setStylistUploading(false)
-      e.target.value = ''
     }
   }
 
   // ── Gallery slot upload ──────────────────────────────────────────────────────
   async function handleGalleryUpload(slotIndex: number, e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+    const picked = e.target.files?.[0]
+    e.target.value = ''
+    if (!picked) return
+    // Square crop first (photo ratios step 4).
+    const cropped = await crop(picked, 'gallery')
+    if (!cropped) return
+    const file = cropped.file
 
     setGalleryError(null)
 
@@ -197,7 +212,6 @@ export default function SettingsPage() {
       setGalleryError(err instanceof Error ? err.message : 'Upload failed. Try again.')
     } finally {
       setUploadingSlot(null)
-      e.target.value = ''
     }
   }
 
@@ -279,6 +293,7 @@ export default function SettingsPage() {
 
   return (
     <div style={{ maxWidth: 680 }}>
+      {cropModal}
       <h1 style={{
         fontFamily: 'Cormorant Garamond, serif',
         fontSize: 32,
@@ -327,7 +342,7 @@ export default function SettingsPage() {
             <img
               src={heroImageUrl}
               alt="Current hero"
-              style={{ width: '100%', maxWidth: 480, height: 220, objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
+              style={{ width: '100%', maxWidth: 480, aspectRatio: '16 / 9', objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
             />
             <p style={{ fontSize: 11, color: '#B5977A', marginTop: 6 }}>Current cover image</p>
           </div>
@@ -371,7 +386,7 @@ export default function SettingsPage() {
             <img
               src={stylistPhotoUrl}
               alt="Stylist photo"
-              style={{ width: 180, height: 220, objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
+              style={{ width: 180, aspectRatio: '4 / 5', objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
             />
             <p style={{ fontSize: 11, color: '#B5977A', marginTop: 6 }}>Current stylist photo</p>
           </div>
@@ -408,7 +423,7 @@ export default function SettingsPage() {
                   <img
                     src={photo}
                     alt={`Gallery ${i + 1}`}
-                    style={{ width: '100%', height: 150, objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
+                    style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
                   />
                   <button
                     onClick={() => handleGalleryRemove(i)}
@@ -432,7 +447,7 @@ export default function SettingsPage() {
               ) : (
                 <label style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  width: '100%', height: 150, border: '1.5px dashed #F0D9C8', borderRadius: 8,
+                  width: '100%', aspectRatio: '1 / 1', border: '1.5px dashed #F0D9C8', borderRadius: 8,
                   cursor: uploadingSlot !== null ? 'not-allowed' : 'pointer',
                   background: uploadingSlot === i ? 'rgba(232,99,10,0.04)' : '#FFFAF5',
                   transition: 'border-color 0.2s',

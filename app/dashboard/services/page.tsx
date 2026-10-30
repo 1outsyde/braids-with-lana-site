@@ -11,6 +11,7 @@ import {
   type ServiceLocationType,
 } from '@/lib/serviceLocation'
 import { newServicePolicy, prefillDeposit, type BusinessPolicyFields } from '@/lib/manageBusiness'
+import { useCropFile } from '@/components/crop/useCropFile'
 
 interface Addon {
   id: string
@@ -117,6 +118,7 @@ export default function ServicesPage() {
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const { crop, cropModal } = useCropFile()
   const [deleting, setDeleting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const [publishing, setPublishing] = useState<string | null>(null)
@@ -453,11 +455,14 @@ export default function ServicesPage() {
     }
   }
 
-  async function handleImageUpload(file: File) {
+  async function handleImageUpload(picked: File) {
+    // Square crop first (photo ratios step 4); cancelling keeps the current photo.
+    const cropped = await crop(picked, 'service')
+    if (!cropped) return
     setUploadingImage(true)
     try {
       const fd = new FormData()
-      fd.append('file', file)
+      fd.append('file', cropped.file)
       const token = localStorage.getItem('outsyde_access_token')
       const res = await fetch('/api/admin/services/upload-image', {
         method: 'POST',
@@ -699,6 +704,7 @@ export default function ServicesPage() {
 
   return (
     <div>
+      {cropModal}
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -967,7 +973,7 @@ export default function ServicesPage() {
                       <img
                         src={formImageUrl}
                         alt="Service preview"
-                        style={{ width: 120, height: 80, objectFit: 'cover', borderRadius: 6, display: 'block', border: '1px solid rgba(0,0,0,0.1)' }}
+                        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 6, display: 'block', border: '1px solid rgba(0,0,0,0.1)' }}
                       />
                       <button
                         type="button"
