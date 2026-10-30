@@ -391,7 +391,7 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
         {loading && (
           <div style={{ display: 'flex', gap: 20, overflowX: 'auto', paddingBottom: 12, scrollbarWidth: 'none' as const }}>
             {[1, 2, 3].map(i => (
-              <div key={i} style={{ flex: '0 0 268px', height: 340, background: '#FFFAF5', borderRadius: 12, border: '1.5px solid #F0D9C8', flexShrink: 0 }} />
+              <div key={i} style={{ flex: '0 0 268px', height: 428, background: '#FFFAF5', borderRadius: 12, border: '1.5px solid #F0D9C8', flexShrink: 0 }} />
             ))}
           </div>
         )}
@@ -424,7 +424,7 @@ function Services({ services, loading }: { services: Service[]; loading: boolean
                 onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#E8630A'; el.style.transform = 'translateY(-6px)'; el.style.boxShadow = '0 12px 32px rgba(232,99,10,0.15)' }}
                 onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.borderColor = '#F0D9C8'; el.style.transform = 'translateY(0)'; el.style.boxShadow = '0 2px 12px rgba(0,0,0,0.04)' }}>
                 {/* Image area */}
-                <div style={{ height: 180, overflow: 'hidden', position: 'relative' }}>
+                <div style={{ aspectRatio: '1 / 1', overflow: 'hidden', position: 'relative' }}>
                   {s.imageUrl
                     ? <img src={s.imageUrl} alt={s.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <div style={{ width: '100%', height: '100%', background: CARD_COLORS[i % CARD_COLORS.length], display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#E8630A', opacity: 0.5, fontSize: 32 }}>✂</div>
@@ -703,10 +703,10 @@ function MeetStylist({ photo, fallback }: { photo: string | null; fallback: stri
             <img
               src={img}
               alt="Lana, your stylist"
-              style={{ width: '100%', maxWidth: 420, height: isMobile ? 300 : 440, objectFit: 'cover', borderRadius: 12, display: 'block', border: '1.5px solid rgba(232,99,10,0.2)' }}
+              style={{ width: '100%', maxWidth: 420, aspectRatio: '4 / 5', objectFit: 'cover', borderRadius: 12, display: 'block', border: '1.5px solid rgba(232,99,10,0.2)' }}
             />
           ) : (
-            <div style={{ width: '100%', maxWidth: 420, height: isMobile ? 300 : 440, borderRadius: 12, background: 'rgba(232,99,10,0.08)', border: '1.5px dashed rgba(232,99,10,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: '100%', maxWidth: 420, aspectRatio: '4 / 5', borderRadius: 12, background: 'rgba(232,99,10,0.08)', border: '1.5px dashed rgba(232,99,10,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 40, color: 'rgba(232,99,10,0.4)', fontStyle: 'italic' }}>Lana</span>
             </div>
           )}
@@ -737,7 +737,7 @@ function RecentWorkGallery({ photos, fallback }: { photos: (string | null)[]; fa
                 key={i}
                 src={src}
                 alt={`Recent work ${i + 1}`}
-                style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
+                style={{ width: '100%', aspectRatio: '1 / 1', objectFit: 'cover', borderRadius: 8, border: '1.5px solid #F0D9C8', display: 'block' }}
               />
             ) : null
           })}
